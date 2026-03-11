@@ -144,8 +144,10 @@ const ConsignantePainel = () => {
           <span className="text-xs px-2 py-1 rounded-full bg-success/10 text-success font-medium shrink-0">Vigente</span>
         </div>
 
+        {/* Charts */}
+        <ConsignanteCharts />
+
         {/* Products */}
-        <div className="space-y-3">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-semibold text-foreground">Meus Produtos</h3>
             <Button variant="outline" size="sm" className="border-border" onClick={handleExportProducts}>
