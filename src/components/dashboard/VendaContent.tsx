@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
   Search,
@@ -10,10 +10,18 @@ import {
   Trash2,
   ShoppingCart,
   Tag,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const mockProducts = [
   { id: 1, name: "Vestido Floral Vintage", sku: "VFV-001", category: "Roupas", size: "M", condition: "Excelente", price: 89.9, status: "Disponível", image: "👗" },
@@ -34,6 +42,16 @@ const mockPDVSales = [
   { id: 5, time: "09:05", items: 2, total: "R$ 185,00", payment: "PIX", customer: "Juliana M." },
 ];
 
+const categories = ["Todos", "Roupas", "Acessórios", "Calçados", "Bolsas"];
+const statuses = ["Todos", "Disponível", "Reservado", "Vendido"];
+const priceRanges = [
+  { label: "Todos", min: 0, max: Infinity },
+  { label: "Até R$ 50", min: 0, max: 50 },
+  { label: "R$ 50–100", min: 50, max: 100 },
+  { label: "R$ 100–200", min: 100, max: 200 },
+  { label: "Acima de R$ 200", min: 200, max: Infinity },
+];
+
 const statusColor = (status: string) => {
   switch (status) {
     case "Disponível": return "bg-success/10 text-success";
@@ -45,10 +63,30 @@ const statusColor = (status: string) => {
 
 const VendaContent = () => {
   const [search, setSearch] = useState("");
-  const filtered = mockProducts.filter(p =>
-    p.name.toLowerCase().includes(search.toLowerCase()) ||
-    p.sku.toLowerCase().includes(search.toLowerCase())
-  );
+  const [categoryFilter, setCategoryFilter] = useState("Todos");
+  const [statusFilter, setStatusFilter] = useState("Todos");
+  const [priceFilter, setPriceFilter] = useState("Todos");
+  const [showFilters, setShowFilters] = useState(false);
+
+  const activeFiltersCount = [categoryFilter, statusFilter, priceFilter].filter(f => f !== "Todos").length;
+
+  const filtered = useMemo(() => {
+    const priceRange = priceRanges.find(p => p.label === priceFilter) || priceRanges[0];
+    return mockProducts.filter(p => {
+      const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) || p.sku.toLowerCase().includes(search.toLowerCase());
+      const matchCategory = categoryFilter === "Todos" || p.category === categoryFilter;
+      const matchStatus = statusFilter === "Todos" || p.status === statusFilter;
+      const matchPrice = p.price >= priceRange.min && p.price <= priceRange.max;
+      return matchSearch && matchCategory && matchStatus && matchPrice;
+    });
+  }, [search, categoryFilter, statusFilter, priceFilter]);
+
+  const clearFilters = () => {
+    setCategoryFilter("Todos");
+    setStatusFilter("Todos");
+    setPriceFilter("Todos");
+    setSearch("");
+  };
 
   return (
     <div className="space-y-6">
@@ -82,9 +120,19 @@ const VendaContent = () => {
               />
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="border-border">
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-border"
+                onClick={() => setShowFilters(!showFilters)}
+              >
                 <Filter className="h-4 w-4 mr-2" />
                 Filtrar
+                {activeFiltersCount > 0 && (
+                  <span className="ml-1.5 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center">
+                    {activeFiltersCount}
+                  </span>
+                )}
               </Button>
               <Button size="sm" className="bg-gradient-primary text-primary-foreground">
                 <Plus className="h-4 w-4 mr-2" />
@@ -92,6 +140,60 @@ const VendaContent = () => {
               </Button>
             </div>
           </div>
+
+          {/* Advanced Filters */}
+          {showFilters && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="p-4 rounded-xl border border-border bg-card"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-sm font-medium text-foreground">Filtros Avançados</h4>
+                {activeFiltersCount > 0 && (
+                  <button onClick={clearFilters} className="text-xs text-accent hover:underline flex items-center gap-1">
+                    <X className="h-3 w-3" /> Limpar filtros
+                  </button>
+                )}
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="text-xs text-muted-foreground mb-1 block">Categoria</label>
+                  <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                    <SelectTrigger className="bg-secondary border-border">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground mb-1 block">Status</label>
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="bg-secondary border-border">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {statuses.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground mb-1 block">Faixa de Preço</label>
+                  <Select value={priceFilter} onValueChange={setPriceFilter}>
+                    <SelectTrigger className="bg-secondary border-border">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {priceRanges.map(p => <SelectItem key={p.label} value={p.label}>{p.label}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </motion.div>
+          )}
 
           {/* Summary cards */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -133,43 +235,51 @@ const VendaContent = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((product) => (
-                    <motion.tr
-                      key={product.id}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors"
-                    >
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-3">
-                          <span className="text-lg">{product.image}</span>
-                          <span className="text-foreground font-medium">{product.name}</span>
-                        </div>
+                  {filtered.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="py-8 text-center text-muted-foreground">
+                        Nenhum produto encontrado com os filtros selecionados.
                       </td>
-                      <td className="py-3 px-4 text-muted-foreground hidden md:table-cell font-mono text-xs">{product.sku}</td>
-                      <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">{product.category}</td>
-                      <td className="py-3 px-4 text-muted-foreground hidden lg:table-cell">{product.size}</td>
-                      <td className="py-3 px-4 text-foreground font-medium">R$ {product.price.toFixed(2)}</td>
-                      <td className="py-3 px-4">
-                        <span className={`text-xs px-2 py-1 rounded-full ${statusColor(product.status)}`}>
-                          {product.status}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4">
-                        <div className="flex items-center justify-end gap-1">
-                          <button className="p-1.5 rounded-md hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors">
-                            <Eye className="h-3.5 w-3.5" />
-                          </button>
-                          <button className="p-1.5 rounded-md hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors">
-                            <Edit className="h-3.5 w-3.5" />
-                          </button>
-                          <button className="p-1.5 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors">
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
-                      </td>
-                    </motion.tr>
-                  ))}
+                    </tr>
+                  ) : (
+                    filtered.map((product) => (
+                      <motion.tr
+                        key={product.id}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors"
+                      >
+                        <td className="py-3 px-4">
+                          <div className="flex items-center gap-3">
+                            <span className="text-lg">{product.image}</span>
+                            <span className="text-foreground font-medium">{product.name}</span>
+                          </div>
+                        </td>
+                        <td className="py-3 px-4 text-muted-foreground hidden md:table-cell font-mono text-xs">{product.sku}</td>
+                        <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">{product.category}</td>
+                        <td className="py-3 px-4 text-muted-foreground hidden lg:table-cell">{product.size}</td>
+                        <td className="py-3 px-4 text-foreground font-medium">R$ {product.price.toFixed(2)}</td>
+                        <td className="py-3 px-4">
+                          <span className={`text-xs px-2 py-1 rounded-full ${statusColor(product.status)}`}>
+                            {product.status}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4">
+                          <div className="flex items-center justify-end gap-1">
+                            <button className="p-1.5 rounded-md hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors">
+                              <Eye className="h-3.5 w-3.5" />
+                            </button>
+                            <button className="p-1.5 rounded-md hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors">
+                              <Edit className="h-3.5 w-3.5" />
+                            </button>
+                            <button className="p-1.5 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors">
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                      </motion.tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
@@ -177,7 +287,6 @@ const VendaContent = () => {
         </TabsContent>
 
         <TabsContent value="pdv" className="mt-6 space-y-4">
-          {/* PDV Status */}
           <div className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card">
             <div className="w-3 h-3 rounded-full bg-success animate-pulse" />
             <div>
@@ -192,7 +301,6 @@ const VendaContent = () => {
             </div>
           </div>
 
-          {/* Today's summary */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             <div className="p-4 rounded-xl border border-border bg-card">
               <p className="text-xs text-muted-foreground mb-1">Vendas Hoje</p>
@@ -208,7 +316,6 @@ const VendaContent = () => {
             </div>
           </div>
 
-          {/* Recent PDV sales */}
           <div className="rounded-xl border border-border bg-card overflow-hidden">
             <div className="p-4 border-b border-border">
               <h3 className="text-sm font-semibold text-foreground">Vendas do Dia</h3>

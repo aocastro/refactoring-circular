@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
   Search,
@@ -10,17 +10,26 @@ import {
   CheckCircle,
   AlertCircle,
   Eye,
+  Filter,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const mockConsignantes = [
-  { id: 1, name: "Ana Paula Ferreira", items: 12, sold: 8, pending: "R$ 340,00", status: "Ativo", since: "Mar/2025" },
-  { id: 2, name: "Carlos Eduardo Silva", items: 25, sold: 18, pending: "R$ 890,00", status: "Ativo", since: "Jan/2025" },
-  { id: 3, name: "Fernanda Oliveira", items: 7, sold: 3, pending: "R$ 120,00", status: "Ativo", since: "Jun/2025" },
-  { id: 4, name: "Juliana Mendonça", items: 15, sold: 15, pending: "R$ 0,00", status: "Pago", since: "Fev/2025" },
-  { id: 5, name: "Roberto Santos", items: 30, sold: 22, pending: "R$ 1.250,00", status: "Ativo", since: "Nov/2024" },
-  { id: 6, name: "Mariana Costa", items: 9, sold: 5, pending: "R$ 210,00", status: "Ativo", since: "Ago/2025" },
+  { id: 1, name: "Ana Paula Ferreira", items: 12, sold: 8, pending: "R$ 340,00", pendingValue: 340, status: "Ativo", since: "Mar/2025" },
+  { id: 2, name: "Carlos Eduardo Silva", items: 25, sold: 18, pending: "R$ 890,00", pendingValue: 890, status: "Ativo", since: "Jan/2025" },
+  { id: 3, name: "Fernanda Oliveira", items: 7, sold: 3, pending: "R$ 120,00", pendingValue: 120, status: "Ativo", since: "Jun/2025" },
+  { id: 4, name: "Juliana Mendonça", items: 15, sold: 15, pending: "R$ 0,00", pendingValue: 0, status: "Pago", since: "Fev/2025" },
+  { id: 5, name: "Roberto Santos", items: 30, sold: 22, pending: "R$ 1.250,00", pendingValue: 1250, status: "Ativo", since: "Nov/2024" },
+  { id: 6, name: "Mariana Costa", items: 9, sold: 5, pending: "R$ 210,00", pendingValue: 210, status: "Ativo", since: "Ago/2025" },
 ];
 
 const mockContracts = [
@@ -31,16 +40,45 @@ const mockContracts = [
   { id: 5, consignante: "Juliana Mendonça", items: 15, date: "01/11/2025", split: "50/50", status: "Encerrado" },
 ];
 
+const statusOptions = ["Todos", "Ativo", "Pago"];
+const pendingRanges = [
+  { label: "Todos", min: 0, max: Infinity },
+  { label: "Sem pendência", min: 0, max: 0 },
+  { label: "Até R$ 200", min: 0.01, max: 200 },
+  { label: "R$ 200–500", min: 200, max: 500 },
+  { label: "Acima de R$ 500", min: 500, max: Infinity },
+];
+
 const ConsignacaoContent = () => {
   const [search, setSearch] = useState("");
-  const filtered = mockConsignantes.filter(c =>
-    c.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const [statusFilter, setStatusFilter] = useState("Todos");
+  const [pendingFilter, setPendingFilter] = useState("Todos");
+  const [showFilters, setShowFilters] = useState(false);
 
-  const totalPending = mockConsignantes.reduce((acc, c) => {
-    const val = parseFloat(c.pending.replace(/[R$\s.]/g, "").replace(",", "."));
-    return acc + val;
-  }, 0);
+  const activeFiltersCount = [statusFilter, pendingFilter].filter(f => f !== "Todos").length;
+
+  const filtered = useMemo(() => {
+    const range = pendingRanges.find(p => p.label === pendingFilter) || pendingRanges[0];
+    return mockConsignantes.filter(c => {
+      const matchSearch = c.name.toLowerCase().includes(search.toLowerCase());
+      const matchStatus = statusFilter === "Todos" || c.status === statusFilter;
+      let matchPending = true;
+      if (pendingFilter === "Sem pendência") {
+        matchPending = c.pendingValue === 0;
+      } else if (pendingFilter !== "Todos") {
+        matchPending = c.pendingValue >= range.min && c.pendingValue <= range.max;
+      }
+      return matchSearch && matchStatus && matchPending;
+    });
+  }, [search, statusFilter, pendingFilter]);
+
+  const clearFilters = () => {
+    setStatusFilter("Todos");
+    setPendingFilter("Todos");
+    setSearch("");
+  };
+
+  const totalPending = mockConsignantes.reduce((acc, c) => acc + c.pendingValue, 0);
 
   return (
     <div className="space-y-6">
@@ -87,12 +125,67 @@ const ConsignacaoContent = () => {
                 className="pl-10 bg-secondary border-border sm:w-64"
               />
             </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-border shrink-0"
+              onClick={() => setShowFilters(!showFilters)}
+            >
+              <Filter className="h-4 w-4 mr-1" />
+              {activeFiltersCount > 0 && (
+                <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center mr-1">
+                  {activeFiltersCount}
+                </span>
+              )}
+            </Button>
             <Button size="sm" className="bg-gradient-primary text-primary-foreground shrink-0">
               <Plus className="h-4 w-4 mr-2" />
               Novo
             </Button>
           </div>
         </div>
+
+        {/* Advanced Filters */}
+        {showFilters && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            className="p-4 rounded-xl border border-border bg-card"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-sm font-medium text-foreground">Filtros Avançados</h4>
+              {activeFiltersCount > 0 && (
+                <button onClick={clearFilters} className="text-xs text-accent hover:underline flex items-center gap-1">
+                  <X className="h-3 w-3" /> Limpar filtros
+                </button>
+              )}
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Status</label>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="bg-secondary border-border">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {statusOptions.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Valor Pendente</label>
+                <Select value={pendingFilter} onValueChange={setPendingFilter}>
+                  <SelectTrigger className="bg-secondary border-border">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {pendingRanges.map(p => <SelectItem key={p.label} value={p.label}>{p.label}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </motion.div>
+        )}
 
         <div className="rounded-xl border border-border bg-card overflow-hidden">
           <div className="overflow-x-auto">
@@ -108,32 +201,40 @@ const ConsignacaoContent = () => {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((c) => (
-                  <tr key={c.id} className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors">
-                    <td className="py-3 px-4">
-                      <div>
-                        <p className="text-foreground font-medium">{c.name}</p>
-                        <p className="text-xs text-muted-foreground">Desde {c.since}</p>
-                      </div>
-                    </td>
-                    <td className="py-3 px-4 text-foreground hidden sm:table-cell">{c.items}</td>
-                    <td className="py-3 px-4 text-foreground hidden md:table-cell">{c.sold}</td>
-                    <td className="py-3 px-4 text-foreground font-medium">{c.pending}</td>
-                    <td className="py-3 px-4">
-                      <span className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full ${
-                        c.status === "Ativo" ? "bg-success/10 text-success" : "bg-accent/10 text-accent"
-                      }`}>
-                        {c.status === "Ativo" ? <Clock className="h-3 w-3" /> : <CheckCircle className="h-3 w-3" />}
-                        {c.status}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-right">
-                      <button className="p-1.5 rounded-md hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors">
-                        <Eye className="h-3.5 w-3.5" />
-                      </button>
+                {filtered.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="py-8 text-center text-muted-foreground">
+                      Nenhum consignante encontrado.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  filtered.map((c) => (
+                    <tr key={c.id} className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors">
+                      <td className="py-3 px-4">
+                        <div>
+                          <p className="text-foreground font-medium">{c.name}</p>
+                          <p className="text-xs text-muted-foreground">Desde {c.since}</p>
+                        </div>
+                      </td>
+                      <td className="py-3 px-4 text-foreground hidden sm:table-cell">{c.items}</td>
+                      <td className="py-3 px-4 text-foreground hidden md:table-cell">{c.sold}</td>
+                      <td className="py-3 px-4 text-foreground font-medium">{c.pending}</td>
+                      <td className="py-3 px-4">
+                        <span className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full ${
+                          c.status === "Ativo" ? "bg-success/10 text-success" : "bg-accent/10 text-accent"
+                        }`}>
+                          {c.status === "Ativo" ? <Clock className="h-3 w-3" /> : <CheckCircle className="h-3 w-3" />}
+                          {c.status}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        <button className="p-1.5 rounded-md hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors">
+                          <Eye className="h-3.5 w-3.5" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
