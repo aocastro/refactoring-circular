@@ -1,0 +1,88 @@
+import { useState } from "react";
+import { Bell, ShoppingBag, DollarSign, Target, CheckCircle } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+const mockNotifications = [
+  { id: 1, type: "sale", title: "Nova venda realizada", desc: "Vestido Floral Vintage — R$ 89,90", time: "Há 5 min", read: false },
+  { id: 2, type: "payment", title: "Pagamento pendente", desc: "Ana Paula Ferreira — R$ 340,00", time: "Há 30 min", read: false },
+  { id: 3, type: "goal", title: "Meta atingida! 🎉", desc: "Você atingiu 87 vendas este mês", time: "Há 2h", read: false },
+  { id: 4, type: "sale", title: "Nova venda realizada", desc: "Jaqueta Jeans Upcycled — R$ 159,00", time: "Há 3h", read: true },
+  { id: 5, type: "payment", title: "Pagamento confirmado", desc: "Juliana Mendonça — R$ 450,00", time: "Há 5h", read: true },
+];
+
+const iconMap = {
+  sale: ShoppingBag,
+  payment: DollarSign,
+  goal: Target,
+};
+
+const NotificationsDropdown = () => {
+  const [notifications, setNotifications] = useState(mockNotifications);
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
+  const markAllRead = () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+  };
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button className="relative p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors">
+          <Bell className="h-5 w-5" />
+          {unreadCount > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 w-4.5 h-4.5 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center min-w-[18px] h-[18px]">
+              {unreadCount}
+            </span>
+          )}
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80 p-0 bg-card border-border" align="end" sideOffset={8}>
+        <div className="flex items-center justify-between p-3 border-b border-border">
+          <h4 className="text-sm font-semibold text-foreground">Notificações</h4>
+          {unreadCount > 0 && (
+            <button
+              onClick={markAllRead}
+              className="text-xs text-accent hover:underline flex items-center gap-1"
+            >
+              <CheckCircle className="h-3 w-3" />
+              Marcar todas como lidas
+            </button>
+          )}
+        </div>
+        <div className="max-h-80 overflow-y-auto">
+          {notifications.map((n) => {
+            const Icon = iconMap[n.type as keyof typeof iconMap] || ShoppingBag;
+            return (
+              <div
+                key={n.id}
+                className={`flex gap-3 p-3 border-b border-border/50 last:border-0 hover:bg-secondary/30 transition-colors ${
+                  !n.read ? "bg-primary/5" : ""
+                }`}
+              >
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                  n.type === "sale" ? "bg-success/10 text-success" :
+                  n.type === "payment" ? "bg-accent/10 text-accent" :
+                  "bg-primary/10 text-primary"
+                }`}>
+                  <Icon className="h-4 w-4" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground">{n.title}</p>
+                  <p className="text-xs text-muted-foreground truncate">{n.desc}</p>
+                  <p className="text-xs text-muted-foreground/60 mt-0.5">{n.time}</p>
+                </div>
+                {!n.read && <div className="w-2 h-2 rounded-full bg-primary shrink-0 mt-2" />}
+              </div>
+            );
+          })}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+};
+
+export default NotificationsDropdown;
