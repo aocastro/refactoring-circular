@@ -7,6 +7,7 @@ import DashboardContent from "@/components/dashboard/DashboardContent";
 import MyAccountContent from "@/components/dashboard/MyAccountContent";
 import VendaContent from "@/components/dashboard/VendaContent";
 import ConsignacaoContent from "@/components/dashboard/ConsignacaoContent";
+import FinanceiroContent from "@/components/dashboard/FinanceiroContent";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -30,6 +31,7 @@ const Dashboard = () => {
       case "minha-conta": return <MyAccountContent user={user} />;
       case "venda": return <VendaContent />;
       case "consignacao": return <ConsignacaoContent />;
+      case "financeiro": return <FinanceiroContent />;
       default: return <DashboardContent />;
     }
   };

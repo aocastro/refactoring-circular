@@ -24,7 +24,7 @@ const menuItems = [
   { id: "minha-conta", title: "Minha Conta", icon: User },
   { id: "venda", title: "Venda", icon: ShoppingCart },
   { id: "consignacao", title: "Consignação", icon: Handshake },
-  { id: "financeiro", title: "Financeiro", icon: DollarSign, disabled: true },
+  { id: "financeiro", title: "Financeiro", icon: DollarSign },
 ];
 
 interface DashboardSidebarProps {
@@ -64,15 +64,12 @@ export function DashboardSidebar({ activeSection, onSectionChange }: DashboardSi
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.id}>
                   <SidebarMenuButton
-                    onClick={() => !item.disabled && onSectionChange(item.id)}
+                    onClick={() => onSectionChange(item.id)}
                     isActive={activeSection === item.id}
-                    className={item.disabled ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}
+                    className="cursor-pointer"
                   >
                     <item.icon className="h-4 w-4" />
                     {!collapsed && <span>{item.title}</span>}
-                    {!collapsed && item.disabled && (
-                      <span className="ml-auto text-[10px] text-muted-foreground bg-secondary px-1.5 py-0.5 rounded">Em breve</span>
-                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
