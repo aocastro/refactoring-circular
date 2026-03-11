@@ -7,6 +7,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import logo from "@/assets/logo.png";
 import {
   Sidebar,
   SidebarContent,
@@ -47,9 +48,7 @@ export function DashboardSidebar({ activeSection, onSectionChange }: DashboardSi
       <SidebarContent className="pt-4">
         <div className="px-4 mb-6">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold font-display text-sm shrink-0">
-              C
-            </div>
+            <img src={logo} alt="Circular u-Shar" className="w-8 h-8 object-contain shrink-0" />
             {!collapsed && (
               <span className="font-display font-bold text-foreground text-sm">
                 Circular <span className="text-accent text-xs">u-Shar</span>

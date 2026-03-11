@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import logo from "@/assets/logo.png";
 
 const Footer = () => {
   return (
@@ -8,9 +9,7 @@ const Footer = () => {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-7 h-7 rounded-md bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold font-display text-xs">
-                C
-              </div>
+              <img src={logo} alt="Circular u-Shar" className="w-7 h-7 object-contain" />
               <span className="font-display font-semibold text-foreground">
                 Circular <span className="text-accent text-xs">u-Shar</span>
               </span>
