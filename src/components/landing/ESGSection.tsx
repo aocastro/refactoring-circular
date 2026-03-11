@@ -2,10 +2,10 @@ import { motion } from "framer-motion";
 import { Droplets, Wind, Recycle, Activity } from "lucide-react";
 
 const stats = [
-  { icon: Wind, value: "4.15 kg", label: "CO₂ evitado por peça", description: "Emissões de carbono evitadas" },
-  { icon: Droplets, value: "2.700 L", label: "Água preservada por peça", description: "Água que seria usada para novo item" },
-  { icon: Recycle, value: "92%", label: "Desvio de aterros", description: "Itens que ganharam nova vida" },
-  { icon: Activity, value: "Tempo real", label: "Acompanhamento de impacto", description: "Cálculos automáticos com base nas vendas" },
+  { icon: Wind, value: "4.15 kg", label: "CO₂ evitado por peça", description: "Emissões de carbono evitadas pelo prolongamento da vida útil do produto" },
+  { icon: Droplets, value: "2.700 L", label: "Água preservada por peça", description: "Água que seria usada para produzir um novo item" },
+  { icon: Recycle, value: "92%", label: "Desvio de aterros sanitários", description: "Itens que ganharam nova vida em vez de se tornarem lixo" },
+  { icon: Activity, value: "Tempo real", label: "Acompanhamento do impacto", description: "Cálculos automáticos com base nas suas vendas reais" },
 ];
 
 const ESGSection = () => {
@@ -13,6 +13,15 @@ const ESGSection = () => {
     <section className="py-24 relative">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsl(150_80%_45%/0.05)_0%,transparent_60%)]" />
       <div className="container max-w-6xl mx-auto px-4 relative z-10">
+        <motion.div
+          className="text-center mb-4"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+        >
+          <span className="text-xs font-medium text-success uppercase tracking-wider">Rastreamento ESG integrado</span>
+        </motion.div>
+
         <motion.div
           className="text-center mb-16"
           initial={{ opacity: 0, y: 20 }}
@@ -23,11 +32,11 @@ const ESGSection = () => {
             Prove seu <span className="text-gradient">impacto ambiental</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Todas as vendas rastreadas automaticamente. Gere relatórios de impacto verificados.
+            Todas as vendas são rastreadas automaticamente. Gere relatórios de impacto verificados para parceiros, investidores e clientes que se preocupam com a sustentabilidade.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           {stats.map((stat, i) => (
             <motion.div
               key={stat.label}
@@ -46,6 +55,33 @@ const ESGSection = () => {
             </motion.div>
           ))}
         </div>
+
+        {/* ESG Report Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="max-w-md mx-auto"
+        >
+          <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-card">
+            <div className="p-4 border-b border-border bg-success/5">
+              <p className="text-xs text-muted-foreground font-medium">Relatório mensal de impacto</p>
+              <p className="text-sm font-bold font-display text-foreground">Dezembro 2025</p>
+            </div>
+            <div className="grid grid-cols-3 divide-x divide-border">
+              {[
+                { value: "847", label: "Itens vendidos" },
+                { value: "1.9t", label: "CO₂ evitado" },
+                { value: "2.3M L", label: "Água economizada" },
+              ].map((item) => (
+                <div key={item.label} className="p-4 text-center">
+                  <p className="text-xl font-bold font-display text-foreground">{item.value}</p>
+                  <p className="text-[10px] text-muted-foreground mt-1">{item.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
       </div>
     </section>
   );
