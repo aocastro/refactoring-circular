@@ -148,6 +148,7 @@ const ConsignantePainel = () => {
         <ConsignanteCharts />
 
         {/* Products */}
+        <div className="space-y-3">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-semibold text-foreground">Meus Produtos</h3>
             <Button variant="outline" size="sm" className="border-border" onClick={handleExportProducts}>
