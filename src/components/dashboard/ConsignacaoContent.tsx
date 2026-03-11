@@ -12,9 +12,11 @@ import {
   Eye,
   Filter,
   X,
+  Download,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { exportToCSV } from "@/lib/export";
 import {
   Select,
   SelectContent,
@@ -82,9 +84,25 @@ const ConsignacaoContent = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold font-display text-foreground">Consignação</h1>
-        <p className="text-muted-foreground text-sm">Gerencie seus consignantes e contratos</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold font-display text-foreground">Consignação</h1>
+          <p className="text-muted-foreground text-sm">Gerencie seus consignantes e contratos</p>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          className="border-border"
+          onClick={() => {
+            exportToCSV(
+              mockConsignantes.map(c => ({ Nome: c.name, Itens: c.items, Vendidos: c.sold, Pendente: c.pending, Status: c.status, Desde: c.since })),
+              "consignantes"
+            );
+          }}
+        >
+          <Download className="h-4 w-4 mr-2" />
+          Exportar CSV
+        </Button>
       </div>
 
       {/* KPIs */}

@@ -10,10 +10,11 @@ import {
   Droplets,
   Recycle,
   Shirt,
-  Filter,
+  Download,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { exportToCSV } from "@/lib/export";
 import {
   AreaChart,
   Area,
@@ -104,9 +105,25 @@ const FinanceiroContent = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold font-display text-foreground">Financeiro</h1>
-        <p className="text-muted-foreground text-sm">Fluxo de caixa, pagamentos e impacto ESG</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold font-display text-foreground">Financeiro</h1>
+          <p className="text-muted-foreground text-sm">Fluxo de caixa, pagamentos e impacto ESG</p>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          className="border-border"
+          onClick={() => {
+            exportToCSV(
+              recentPayments.map(p => ({ Descrição: p.desc, Valor: p.value, Tipo: p.type, Método: p.method, Data: p.date })),
+              "financeiro-movimentacoes"
+            );
+          }}
+        >
+          <Download className="h-4 w-4 mr-2" />
+          Exportar CSV
+        </Button>
       </div>
 
       <Tabs defaultValue="fluxo" className="w-full">

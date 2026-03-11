@@ -17,6 +17,7 @@ const Footer = () => {
             <Link to="/" className="hover:text-foreground transition-colors">Home</Link>
             <Link to="/planos" className="hover:text-foreground transition-colors">Planos</Link>
             <Link to="/login" className="hover:text-foreground transition-colors">Login</Link>
+            <Link to="/consignante" className="hover:text-foreground transition-colors">Consignante</Link>
           </div>
           <p className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} Circular u-Shar. Todos os direitos reservados.
