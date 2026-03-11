@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/hooks/use-theme";
 import { exportToCSV } from "@/lib/export";
+import ConsignanteCharts from "@/components/consignante/ConsignanteCharts";
 
 const myProducts = [
   { id: 1, name: "Vestido Floral Vintage", price: "R$ 89,90", status: "Vendido", date: "15/12/2025" },
@@ -142,6 +143,9 @@ const ConsignantePainel = () => {
           </div>
           <span className="text-xs px-2 py-1 rounded-full bg-success/10 text-success font-medium shrink-0">Vigente</span>
         </div>
+
+        {/* Charts */}
+        <ConsignanteCharts />
 
         {/* Products */}
         <div className="space-y-3">
