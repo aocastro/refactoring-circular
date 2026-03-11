@@ -83,9 +83,7 @@ const ConsignantePainel = () => {
       <header className="border-b border-border">
         <div className="container max-w-6xl mx-auto px-4 flex items-center justify-between h-14">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold font-display text-sm">
-              C
-            </div>
+            <img src={logo} alt="Circular u-Shar" className="w-8 h-8 object-contain" />
             <span className="font-display font-bold text-foreground text-sm">
               Circular <span className="text-accent text-xs">Consignante</span>
             </span>
