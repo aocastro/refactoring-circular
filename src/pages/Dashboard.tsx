@@ -7,6 +7,7 @@ import DashboardContent from "@/components/dashboard/DashboardContent";
 import MyAccountContent from "@/components/dashboard/MyAccountContent";
 import VendaContent from "@/components/dashboard/VendaContent";
 import ConsignacaoContent from "@/components/dashboard/ConsignacaoContent";
+import FinanceiroContent from "@/components/dashboard/FinanceiroContent";
 
 const Dashboard = () => {
   const navigate = useNavigate();
