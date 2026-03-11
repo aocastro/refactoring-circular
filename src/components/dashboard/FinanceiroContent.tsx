@@ -10,10 +10,11 @@ import {
   Droplets,
   Recycle,
   Shirt,
-  Filter,
+  Download,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { exportToCSV } from "@/lib/export";
 import {
   AreaChart,
   Area,
