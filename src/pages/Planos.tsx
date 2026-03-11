@@ -248,7 +248,7 @@ const Planos = () => {
                             ))}
                           </tr>
                         ))}
-                      </>
+                      </React.Fragment>
                     ))}
                   </tbody>
                 </table>
