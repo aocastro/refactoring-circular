@@ -226,8 +226,8 @@ const Planos = () => {
                   </thead>
                   <tbody>
                     {featureCategories.map((cat) => (
-                      <>
-                        <tr key={cat.title} className="bg-secondary/10">
+                      <React.Fragment key={cat.title}>
+                        <tr className="bg-secondary/10">
                           <td colSpan={6} className="py-3 px-4 font-semibold text-foreground">
                             {cat.emoji} {cat.title}
                           </td>
