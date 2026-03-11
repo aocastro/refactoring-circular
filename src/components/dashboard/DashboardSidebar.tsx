@@ -22,8 +22,8 @@ import {
 const menuItems = [
   { id: "dashboard", title: "Dashboard", icon: LayoutDashboard },
   { id: "minha-conta", title: "Minha Conta", icon: User },
-  { id: "venda", title: "Venda", icon: ShoppingCart, disabled: true },
-  { id: "consignacao", title: "Consignação", icon: Handshake, disabled: true },
+  { id: "venda", title: "Venda", icon: ShoppingCart },
+  { id: "consignacao", title: "Consignação", icon: Handshake },
   { id: "financeiro", title: "Financeiro", icon: DollarSign, disabled: true },
 ];
 

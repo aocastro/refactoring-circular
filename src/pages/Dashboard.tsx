@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import DashboardContent from "@/components/dashboard/DashboardContent";
 import MyAccountContent from "@/components/dashboard/MyAccountContent";
+import VendaContent from "@/components/dashboard/VendaContent";
+import ConsignacaoContent from "@/components/dashboard/ConsignacaoContent";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -21,6 +24,16 @@ const Dashboard = () => {
 
   if (!user) return null;
 
+  const renderContent = () => {
+    switch (activeSection) {
+      case "dashboard": return <DashboardContent />;
+      case "minha-conta": return <MyAccountContent user={user} />;
+      case "venda": return <VendaContent />;
+      case "consignacao": return <ConsignacaoContent />;
+      default: return <DashboardContent />;
+    }
+  };
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
@@ -37,8 +50,17 @@ const Dashboard = () => {
             </div>
           </header>
           <main className="flex-1 p-6 overflow-auto">
-            {activeSection === "dashboard" && <DashboardContent />}
-            {activeSection === "minha-conta" && <MyAccountContent user={user} />}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeSection}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2 }}
+              >
+                {renderContent()}
+              </motion.div>
+            </AnimatePresence>
           </main>
         </div>
       </div>
