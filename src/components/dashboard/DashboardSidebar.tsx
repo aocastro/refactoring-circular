@@ -24,7 +24,7 @@ const menuItems = [
   { id: "minha-conta", title: "Minha Conta", icon: User },
   { id: "venda", title: "Venda", icon: ShoppingCart },
   { id: "consignacao", title: "Consignação", icon: Handshake },
-  { id: "financeiro", title: "Financeiro", icon: DollarSign, disabled: true },
+  { id: "financeiro", title: "Financeiro", icon: DollarSign },
 ];
 
 interface DashboardSidebarProps {

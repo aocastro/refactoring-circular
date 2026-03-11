@@ -31,6 +31,7 @@ const Dashboard = () => {
       case "minha-conta": return <MyAccountContent user={user} />;
       case "venda": return <VendaContent />;
       case "consignacao": return <ConsignacaoContent />;
+      case "financeiro": return <FinanceiroContent />;
       default: return <DashboardContent />;
     }
   };
