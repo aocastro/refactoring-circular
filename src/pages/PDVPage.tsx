@@ -57,7 +57,7 @@ const PDVPage = () => {
   const [search, setSearch] = useState("");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [customerName, setCustomerName] = useState("");
-  const [customerSearch, setCustomerSearch] = useState("");
+  const [customerInput, setCustomerInput] = useState("");
   const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
   const customerRef = useRef<HTMLDivElement>(null);
   const [discount, setDiscount] = useState(0);
