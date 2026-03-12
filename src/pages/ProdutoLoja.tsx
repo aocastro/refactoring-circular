@@ -269,6 +269,7 @@ const ProdutoLoja = () => {
           </p>
         </div>
       </footer>
+      <CartDrawer />
     </div>
   );
 };
