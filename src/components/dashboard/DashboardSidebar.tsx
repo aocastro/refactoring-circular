@@ -203,6 +203,16 @@ export function DashboardSidebar({ activeSection, onSectionChange }: DashboardSi
                       )}
                     </SidebarMenuItem>
                   </Collapsible>
+                ) : item.externalLink ? (
+                  <SidebarMenuItem key={item.id}>
+                    <SidebarMenuButton
+                      onClick={() => window.open(item.externalLink, "_blank")}
+                      className="cursor-pointer"
+                    >
+                      <item.icon className="h-4 w-4" />
+                      {!collapsed && <span>{item.title}</span>}
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
                 ) : (
                   <SidebarMenuItem key={item.id}>
                     <SidebarMenuButton
