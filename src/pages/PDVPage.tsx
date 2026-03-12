@@ -679,8 +679,8 @@ const PDVPage = () => {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button variant="outline" className="flex-1" onClick={() => { toast.success("Cupom enviado para impressão!"); }}>
-                    <Printer className="h-4 w-4 mr-2" />Imprimir
+                  <Button variant="outline" className="flex-1" onClick={() => { if (lastSale) printThermalReceipt(lastSale); }}>
+                    <Printer className="h-4 w-4 mr-2" />Imprimir 80col
                   </Button>
                   <Button className="flex-1 bg-gradient-primary text-primary-foreground" onClick={closeReceipt}>
                     Nova Venda
