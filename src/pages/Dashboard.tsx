@@ -45,6 +45,8 @@ const Dashboard = () => {
       case "inventario": return <InventarioContent />;
       case "clientes": return <ClientesContent />;
       case "cupons": return <CuponsContent />;
+      case "pdv-caixa":
+      case "pdv-historico": return <PDVContent />;
       case "relatorios-financeiro":
       case "relatorios-esg": return <FinanceiroContent />;
       default: return <DashboardContent />;

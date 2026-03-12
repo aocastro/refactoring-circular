@@ -67,7 +67,7 @@ const CartDrawer = () => {
                 <span className="text-foreground">Total</span>
                 <span className="text-foreground">{formatPrice(totalPrice)}</span>
               </div>
-              <Button className="w-full bg-gradient-primary text-primary-foreground py-5 rounded-xl">
+              <Button className="w-full bg-gradient-primary text-primary-foreground py-5 rounded-xl" onClick={() => { setIsOpen(false); navigate("/checkout"); }}>
                 Finalizar Compra
               </Button>
               <Button variant="ghost" size="sm" className="w-full text-muted-foreground" onClick={clearCart}>
