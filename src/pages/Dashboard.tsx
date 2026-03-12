@@ -8,13 +8,20 @@ import DashboardContent from "@/components/dashboard/DashboardContent";
 import MyAccountContent from "@/components/dashboard/MyAccountContent";
 import VendaContent from "@/components/dashboard/VendaContent";
 import ConsignacaoContent from "@/components/dashboard/ConsignacaoContent";
-import FinanceiroContent from "@/components/dashboard/FinanceiroContent";
 import CatalogoContent from "@/components/dashboard/CatalogoContent";
 import InventarioContent from "@/components/dashboard/InventarioContent";
 import ClientesContent from "@/components/dashboard/ClientesContent";
 import CuponsContent from "@/components/dashboard/CuponsContent";
 import PDVContent from "@/components/dashboard/PDVContent";
-import RelatoriosVendasContent from "@/components/dashboard/RelatoriosVendasContent";
+import RelatoriosContent from "@/components/dashboard/RelatoriosContent";
+import ConfiguracoesContent from "@/components/dashboard/ConfiguracoesContent";
+import ServicosContent from "@/components/dashboard/ServicosContent";
+import FornecedoresContent from "@/components/dashboard/FornecedoresContent";
+import NewsletterContent from "@/components/dashboard/NewsletterContent";
+import FuncionariosContent from "@/components/dashboard/FuncionariosContent";
+import BlogContent from "@/components/dashboard/BlogContent";
+import LinktreeContent from "@/components/dashboard/LinktreeContent";
+import LojasContent from "@/components/dashboard/LojasContent";
 import NotificationsDropdown from "@/components/dashboard/NotificationsDropdown";
 import { useTheme } from "@/hooks/use-theme";
 
@@ -39,18 +46,30 @@ const Dashboard = () => {
     switch (activeSection) {
       case "dashboard": return <DashboardContent />;
       case "minha-conta": return <MyAccountContent user={user} />;
+      case "config-geral": return <ConfiguracoesContent defaultTab="geral" />;
+      case "config-pagamento": return <ConfiguracoesContent defaultTab="pagamento" />;
+      case "config-entrega": return <ConfiguracoesContent defaultTab="entrega" />;
       case "venda-catalogo": return <CatalogoContent />;
       case "venda-produtos":
       case "venda-pedidos": return <VendaContent />;
-      case "consignantes": return <ConsignacaoContent />;
+      case "servicos-agendamentos": return <ServicosContent defaultTab="agendamentos" />;
+      case "servicos-lista": return <ServicosContent defaultTab="lista" />;
       case "inventario": return <InventarioContent />;
+      case "consignantes": return <ConsignacaoContent />;
+      case "fornecedores": return <FornecedoresContent />;
       case "clientes": return <ClientesContent />;
-      case "cupons": return <CuponsContent />;
+      case "newsletter": return <NewsletterContent />;
       case "pdv-caixa":
       case "pdv-historico": return <PDVContent />;
-      case "relatorios-vendas": return <RelatoriosVendasContent />;
-      case "relatorios-financeiro":
-      case "relatorios-esg": return <FinanceiroContent />;
+      case "funcionarios": return <FuncionariosContent />;
+      case "cupons": return <CuponsContent />;
+      case "relatorios-vendas": return <RelatoriosContent defaultTab="vendas" />;
+      case "relatorios-financeiro": return <RelatoriosContent defaultTab="financeiro" />;
+      case "relatorios-esg": return <RelatoriosContent defaultTab="esg" />;
+      case "blog-posts": return <BlogContent defaultTab="posts" />;
+      case "blog-categorias": return <BlogContent defaultTab="categorias" />;
+      case "meu-linktree": return <LinktreeContent />;
+      case "lojas": return <LojasContent />;
       default: return <DashboardContent />;
     }
   };
