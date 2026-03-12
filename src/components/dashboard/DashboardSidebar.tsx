@@ -93,16 +93,7 @@ const menuItems: MenuItem[] = [
   },
   { id: "funcionarios", title: "Funcionários", icon: UserCog },
   { id: "cupons", title: "Cupons", icon: Ticket },
-  {
-    id: "relatorios",
-    title: "Relatórios",
-    icon: FileBarChart,
-    children: [
-      { id: "relatorios-vendas", title: "Vendas" },
-      { id: "relatorios-financeiro", title: "Financeiro" },
-      { id: "relatorios-esg", title: "ESG" },
-    ],
-  },
+  { id: "relatorios", title: "Relatórios", icon: FileBarChart },
   {
     id: "blog",
     title: "Blog",
