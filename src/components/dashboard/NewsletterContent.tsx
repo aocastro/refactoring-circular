@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Users, Mail, Send, Plus, TrendingUp, Download, Pencil, Trash2 } from "lucide-react";
+import { Users, Mail, Send, Plus, TrendingUp, Download, Pencil, Trash2, Eye } from "lucide-react";
 import { exportToCSV } from "@/lib/export";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
@@ -11,6 +11,7 @@ import PaginationControls, { usePagination } from "@/components/shared/Paginatio
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from "recharts";
 import { chartTooltipStyle, chartGridStroke, chartAxisStroke, chartAxisFontSize, chartColors } from "@/lib/chart-config";
 import CampaignFormDialog, { type Campaign } from "./CampaignFormDialog";
+import CampaignPreviewDialog from "./CampaignPreviewDialog";
 
 const subscribers = [
   { id: 1, email: "maria@email.com", nome: "Maria Silva", data: "10/01/2026", status: "ativo" },
@@ -54,6 +55,7 @@ const NewsletterContent = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
   const [deletingCampaign, setDeletingCampaign] = useState<Campaign | null>(null);
+  const [previewCampaign, setPreviewCampaign] = useState<Campaign | null>(null);
 
   const filteredSubs = subscribers.filter((s) => {
     const matchSearch = s.email.includes(subSearch) || s.nome.toLowerCase().includes(subSearch.toLowerCase());
@@ -95,6 +97,17 @@ const NewsletterContent = () => {
       setDeletingCampaign(null);
       toast.success("Campanha excluída!");
     }
+  };
+
+  const handleSendCampaign = (campaign: Campaign) => {
+    setCampaignsList((prev) =>
+      prev.map((c) =>
+        c.id === campaign.id
+          ? { ...c, status: "enviada", enviados: 342, abertos: 0, cliques: 0, data: new Date().toLocaleDateString("pt-BR") }
+          : c
+      )
+    );
+    setPreviewCampaign(null);
   };
 
   return (
@@ -192,6 +205,9 @@ const NewsletterContent = () => {
                   </td>
                   <td className="py-3 px-4">
                     <div className="flex gap-1">
+                      <Button variant="ghost" size="icon" className="h-7 w-7" title="Preview & Enviar" onClick={() => setPreviewCampaign(c)}>
+                        <Eye className="h-3.5 w-3.5" />
+                      </Button>
                       <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleEditCampaign(c)}>
                         <Pencil className="h-3.5 w-3.5" />
                       </Button>
@@ -269,6 +285,13 @@ const NewsletterContent = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <CampaignPreviewDialog
+        open={!!previewCampaign}
+        onOpenChange={(open) => !open && setPreviewCampaign(null)}
+        campaign={previewCampaign}
+        onSend={handleSendCampaign}
+      />
     </div>
   );
 };
