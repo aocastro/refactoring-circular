@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { Users, Mail, Send, Plus, TrendingUp, Download, Pencil } from "lucide-react";
+import { Users, Mail, Send, Plus, TrendingUp, Download, Pencil, Trash2 } from "lucide-react";
 import { exportToCSV } from "@/lib/export";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import KpiCard from "@/components/shared/KpiCard";
@@ -51,6 +53,7 @@ const NewsletterContent = () => {
   const [campaignsList, setCampaignsList] = useState<Campaign[]>(initialCampaigns);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
+  const [deletingCampaign, setDeletingCampaign] = useState<Campaign | null>(null);
 
   const filteredSubs = subscribers.filter((s) => {
     const matchSearch = s.email.includes(subSearch) || s.nome.toLowerCase().includes(subSearch.toLowerCase());
@@ -84,6 +87,14 @@ const NewsletterContent = () => {
   const handleEditCampaign = (campaign: Campaign) => {
     setEditingCampaign(campaign);
     setDialogOpen(true);
+  };
+
+  const handleDeleteCampaign = () => {
+    if (deletingCampaign) {
+      setCampaignsList((prev) => prev.filter((c) => c.id !== deletingCampaign.id));
+      setDeletingCampaign(null);
+      toast.success("Campanha excluída!");
+    }
   };
 
   return (
@@ -180,9 +191,14 @@ const NewsletterContent = () => {
                     <Badge variant={c.status === "enviada" ? "default" : "secondary"}>{c.status}</Badge>
                   </td>
                   <td className="py-3 px-4">
-                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleEditCampaign(c)}>
-                      <Pencil className="h-3.5 w-3.5" />
-                    </Button>
+                    <div className="flex gap-1">
+                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleEditCampaign(c)}>
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => setDeletingCampaign(c)}>
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -238,6 +254,21 @@ const NewsletterContent = () => {
         campaign={editingCampaign}
         onSave={handleSaveCampaign}
       />
+
+      <AlertDialog open={!!deletingCampaign} onOpenChange={(open) => !open && setDeletingCampaign(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir campanha</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir "{deletingCampaign?.titulo}"? Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteCampaign} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Excluir</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
