@@ -11,6 +11,8 @@ import Planos from "./pages/Planos";
 import ConsignanteLogin from "./pages/ConsignanteLogin";
 import ConsignantePainel from "./pages/ConsignantePainel";
 import NotFound from "./pages/NotFound";
+import Catalogo from "./pages/Catalogo";
+import ProdutoDetalhe from "./pages/ProdutoDetalhe";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +25,8 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/catalogo" element={<Catalogo />} />
+            <Route path="/catalogo/:id" element={<ProdutoDetalhe />} />
             <Route path="/login" element={<Login />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/planos" element={<Planos />} />
