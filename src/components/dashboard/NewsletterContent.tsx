@@ -88,6 +88,14 @@ const NewsletterContent = () => {
     setDialogOpen(true);
   };
 
+  const handleDeleteCampaign = () => {
+    if (deletingCampaign) {
+      setCampaignsList((prev) => prev.filter((c) => c.id !== deletingCampaign.id));
+      setDeletingCampaign(null);
+      toast.success("Campanha excluída!");
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
