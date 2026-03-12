@@ -42,6 +42,14 @@ const FornecedoresContent = () => {
     { id: 3, nome: "Aviamentos Verde", categoria: "Aviamentos", contato: "(31) 9876-5432", email: "orcamento@aviamentosverde.com", cidade: "Belo Horizonte, MG", status: "ativo" },
     { id: 4, nome: "Tintas Naturais Co.", categoria: "Tingimento", contato: "(41) 8765-4321", email: "contato@tintasnaturais.com", cidade: "Curitiba, PR", status: "inativo" },
     { id: 5, nome: "Botões & Cia", categoria: "Aviamentos", contato: "(11) 5678-1234", email: "pedidos@botoescia.com.br", cidade: "São Paulo, SP", status: "ativo" },
+    { id: 6, nome: "Malhas Premium", categoria: "Tecidos", contato: "(51) 3344-5566", email: "contato@malhaspremium.com", cidade: "Porto Alegre, RS", status: "ativo" },
+    { id: 7, nome: "Embalagens Eco Pack", categoria: "Embalagens", contato: "(47) 3322-1100", email: "vendas@ecopack.com.br", cidade: "Joinville, SC", status: "ativo" },
+    { id: 8, nome: "Zíperes Brasil", categoria: "Aviamentos", contato: "(11) 2233-4455", email: "comercial@ziperesbr.com", cidade: "São Paulo, SP", status: "ativo" },
+    { id: 9, nome: "Corantes Naturais Ltda", categoria: "Tingimento", contato: "(71) 3456-7890", email: "vendas@corantesnaturais.com", cidade: "Salvador, BA", status: "inativo" },
+    { id: 10, nome: "Fios Orgânicos Sul", categoria: "Tecidos", contato: "(48) 9876-5432", email: "contato@fiosorganicos.com", cidade: "Florianópolis, SC", status: "ativo" },
+    { id: 11, nome: "Etiquetas Verdes", categoria: "Embalagens", contato: "(62) 3344-2211", email: "pedidos@etiquetasverdes.com", cidade: "Goiânia, GO", status: "ativo" },
+    { id: 12, nome: "Linhas & Agulhas", categoria: "Aviamentos", contato: "(85) 2233-4455", email: "vendas@linhasagulhas.com", cidade: "Fortaleza, CE", status: "ativo" },
+    { id: 13, nome: "Tecidos Reciclados Norte", categoria: "Tecidos", contato: "(92) 3456-7890", email: "contato@tecidosreciclados.com", cidade: "Manaus, AM", status: "inativo" },
   ]);
 
   const [nome, setNome] = useState("");
