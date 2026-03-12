@@ -41,11 +41,12 @@ interface MenuItem {
   title: string;
   icon: React.ElementType;
   children?: { id: string; title: string }[];
+  externalLink?: string;
 }
 
 const menuItems: MenuItem[] = [
   { id: "dashboard", title: "Dashboard", icon: LayoutDashboard },
-  { id: "minha-loja", title: "Minha Loja", icon: Store },
+  { id: "minha-loja", title: "Minha Loja", icon: Store, externalLink: "/loja/fashion-store" },
   { id: "minha-conta", title: "Minha Conta", icon: User },
   {
     id: "configuracoes",
@@ -202,6 +203,16 @@ export function DashboardSidebar({ activeSection, onSectionChange }: DashboardSi
                       )}
                     </SidebarMenuItem>
                   </Collapsible>
+                ) : item.externalLink ? (
+                  <SidebarMenuItem key={item.id}>
+                    <SidebarMenuButton
+                      onClick={() => window.open(item.externalLink, "_blank")}
+                      className="cursor-pointer"
+                    >
+                      <item.icon className="h-4 w-4" />
+                      {!collapsed && <span>{item.title}</span>}
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
                 ) : (
                   <SidebarMenuItem key={item.id}>
                     <SidebarMenuButton

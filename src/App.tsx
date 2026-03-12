@@ -11,6 +11,7 @@ import Planos from "./pages/Planos";
 import ConsignanteLogin from "./pages/ConsignanteLogin";
 import ConsignantePainel from "./pages/ConsignantePainel";
 import NotFound from "./pages/NotFound";
+import Loja from "./pages/Loja";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,8 @@ const App = () => (
             <Route path="/planos" element={<Planos />} />
             <Route path="/consignante" element={<ConsignanteLogin />} />
             <Route path="/consignante/painel" element={<ConsignantePainel />} />
+            <Route path="/loja/:slug" element={<Loja />} />
+            <Route path="/loja/:slug/p/:id" element={<Loja />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
