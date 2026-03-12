@@ -10,6 +10,7 @@ import VendaContent from "@/components/dashboard/VendaContent";
 import ConsignacaoContent from "@/components/dashboard/ConsignacaoContent";
 import FinanceiroContent from "@/components/dashboard/FinanceiroContent";
 import CatalogoContent from "@/components/dashboard/CatalogoContent";
+import InventarioContent from "@/components/dashboard/InventarioContent";
 import NotificationsDropdown from "@/components/dashboard/NotificationsDropdown";
 import { useTheme } from "@/hooks/use-theme";
 
@@ -38,6 +39,7 @@ const Dashboard = () => {
       case "venda-produtos":
       case "venda-pedidos": return <VendaContent />;
       case "consignantes": return <ConsignacaoContent />;
+      case "inventario": return <InventarioContent />;
       case "relatorios-financeiro":
       case "relatorios-esg": return <FinanceiroContent />;
       default: return <DashboardContent />;
