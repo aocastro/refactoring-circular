@@ -121,6 +121,7 @@ const featureCategories = [
 
 const Planos = () => {
   const [billing, setBilling] = useState<BillingPeriod>("anual");
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background">
