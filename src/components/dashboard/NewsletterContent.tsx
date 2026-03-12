@@ -5,7 +5,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import KpiCard from "@/components/shared/KpiCard";
+import SparklineKpiCard from "@/components/shared/SparklineKpiCard";
 import FilterToolbar from "@/components/shared/FilterToolbar";
 import PaginationControls, { usePagination } from "@/components/shared/PaginationControls";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from "recharts";
