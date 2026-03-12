@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { BookOpen, Tag, Plus, Eye, Edit, Trash2 } from "lucide-react";
+import PaginationControls, { usePagination } from "@/components/shared/PaginationControls";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
