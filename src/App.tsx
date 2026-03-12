@@ -11,8 +11,6 @@ import Planos from "./pages/Planos";
 import ConsignanteLogin from "./pages/ConsignanteLogin";
 import ConsignantePainel from "./pages/ConsignantePainel";
 import NotFound from "./pages/NotFound";
-import Catalogo from "./pages/Catalogo";
-import ProdutoDetalhe from "./pages/ProdutoDetalhe";
 
 const queryClient = new QueryClient();
 
