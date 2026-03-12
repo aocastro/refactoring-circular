@@ -15,6 +15,7 @@ import NotFound from "./pages/NotFound";
 import Loja from "./pages/Loja";
 import ProdutoLoja from "./pages/ProdutoLoja";
 import Checkout from "./pages/Checkout";
+import CriarLoja from "./pages/CriarLoja";
 
 const queryClient = new QueryClient();
 
