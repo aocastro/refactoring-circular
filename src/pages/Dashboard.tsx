@@ -14,6 +14,7 @@ import InventarioContent from "@/components/dashboard/InventarioContent";
 import ClientesContent from "@/components/dashboard/ClientesContent";
 import CuponsContent from "@/components/dashboard/CuponsContent";
 import PDVContent from "@/components/dashboard/PDVContent";
+import RelatoriosVendasContent from "@/components/dashboard/RelatoriosVendasContent";
 import NotificationsDropdown from "@/components/dashboard/NotificationsDropdown";
 import { useTheme } from "@/hooks/use-theme";
 
