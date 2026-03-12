@@ -28,6 +28,9 @@ const NewsletterContent = () => {
   const [subStatus, setSubStatus] = useState("Todos");
   const [campSearch, setCampSearch] = useState("");
   const [campStatus, setCampStatus] = useState("Todos");
+  const [campPage, setCampPage] = useState(1);
+  const [subPage, setSubPage] = useState(1);
+  const perPage = 5;
 
   const filteredSubs = subscribers.filter((s) => {
     const matchSearch = s.email.includes(subSearch) || s.nome.toLowerCase().includes(subSearch.toLowerCase());
