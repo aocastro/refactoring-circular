@@ -1,78 +1,23 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import {
-  Search,
-  Plus,
-  Filter,
-  Package,
-  Eye,
-  Edit,
-  Trash2,
-  ShoppingCart,
-  Tag,
-  X,
-} from "lucide-react";
+import { Plus, Package, Eye, Edit, Trash2, ShoppingCart, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
-const mockProducts = [
-  { id: 1, name: "Vestido Floral Vintage", sku: "VFV-001", category: "Roupas", size: "M", condition: "Excelente", price: 89.9, status: "Disponível", image: "👗" },
-  { id: 2, name: "Jaqueta Jeans Upcycled", sku: "JJU-002", category: "Roupas", size: "G", condition: "Bom", price: 159.0, status: "Disponível", image: "🧥" },
-  { id: 3, name: "Bolsa de Couro Retrô", sku: "BCR-003", category: "Bolsas", size: "Único", condition: "Excelente", price: 210.0, status: "Reservado", image: "👜" },
-  { id: 4, name: "Tênis Vintage Adidas", sku: "TVA-004", category: "Calçados", size: "40", condition: "Bom", price: 120.0, status: "Vendido", image: "👟" },
-  { id: 5, name: "Colar Artesanal Boho", sku: "CAB-005", category: "Acessórios", size: "Único", condition: "Novo", price: 45.0, status: "Disponível", image: "📿" },
-  { id: 6, name: "Camisa Hawaiana 90s", sku: "CH9-006", category: "Roupas", size: "GG", condition: "Bom", price: 65.0, status: "Disponível", image: "👔" },
-  { id: 7, name: "Saia Midi Plissada", sku: "SMP-007", category: "Roupas", size: "P", condition: "Excelente", price: 78.0, status: "Disponível", image: "👗" },
-  { id: 8, name: "Óculos Retrô Ray-Ban", sku: "ORR-008", category: "Acessórios", size: "Único", condition: "Excelente", price: 195.0, status: "Reservado", image: "🕶️" },
-];
-
-const mockPDVSales = [
-  { id: 1, time: "14:30", items: 2, total: "R$ 248,90", payment: "PIX", customer: "Cliente avulso" },
-  { id: 2, time: "13:15", items: 1, total: "R$ 159,00", payment: "Cartão Crédito", customer: "Ana Paula" },
-  { id: 3, time: "11:45", items: 3, total: "R$ 312,00", payment: "Dinheiro", customer: "Cliente avulso" },
-  { id: 4, time: "10:20", items: 1, total: "R$ 89,90", payment: "Cartão Débito", customer: "Fernanda S." },
-  { id: 5, time: "09:05", items: 2, total: "R$ 185,00", payment: "PIX", customer: "Juliana M." },
-];
-
-const categories = ["Todos", "Roupas", "Acessórios", "Calçados", "Bolsas"];
-const statuses = ["Todos", "Disponível", "Reservado", "Vendido"];
-const priceRanges = [
-  { label: "Todos", min: 0, max: Infinity },
-  { label: "Até R$ 50", min: 0, max: 50 },
-  { label: "R$ 50–100", min: 50, max: 100 },
-  { label: "R$ 100–200", min: 100, max: 200 },
-  { label: "Acima de R$ 200", min: 200, max: Infinity },
-];
-
-const statusColor = (status: string) => {
-  switch (status) {
-    case "Disponível": return "bg-success/10 text-success";
-    case "Reservado": return "bg-accent/10 text-accent";
-    case "Vendido": return "bg-muted text-muted-foreground";
-    default: return "bg-secondary text-secondary-foreground";
-  }
-};
+import KpiCard from "@/components/shared/KpiCard";
+import FilterToolbar from "@/components/shared/FilterToolbar";
+import { mockProducts, mockPDVSales, productCategories, productStatuses, priceRanges } from "@/data/products";
+import { getStatusColor } from "@/lib/status-colors";
+import type { KpiItem } from "@/types";
 
 const VendaContent = () => {
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("Todos");
   const [statusFilter, setStatusFilter] = useState("Todos");
   const [priceFilter, setPriceFilter] = useState("Todos");
-  const [showFilters, setShowFilters] = useState(false);
-
-  const activeFiltersCount = [categoryFilter, statusFilter, priceFilter].filter(f => f !== "Todos").length;
 
   const filtered = useMemo(() => {
-    const priceRange = priceRanges.find(p => p.label === priceFilter) || priceRanges[0];
-    return mockProducts.filter(p => {
+    const priceRange = priceRanges.find((p) => p.label === priceFilter) || priceRanges[0];
+    return mockProducts.filter((p) => {
       const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) || p.sku.toLowerCase().includes(search.toLowerCase());
       const matchCategory = categoryFilter === "Todos" || p.category === categoryFilter;
       const matchStatus = statusFilter === "Todos" || p.status === statusFilter;
@@ -81,12 +26,12 @@ const VendaContent = () => {
     });
   }, [search, categoryFilter, statusFilter, priceFilter]);
 
-  const clearFilters = () => {
-    setCategoryFilter("Todos");
-    setStatusFilter("Todos");
-    setPriceFilter("Todos");
-    setSearch("");
-  };
+  const summaryKpis: KpiItem[] = [
+    { label: "Total", value: mockProducts.length, icon: Package },
+    { label: "Disponíveis", value: mockProducts.filter((p) => p.status === "Disponível").length, icon: Tag },
+    { label: "Reservados", value: mockProducts.filter((p) => p.status === "Reservado").length, icon: Eye },
+    { label: "Vendidos", value: mockProducts.filter((p) => p.status === "Vendido").length, icon: ShoppingCart },
+  ];
 
   return (
     <div className="space-y-6">
@@ -108,114 +53,27 @@ const VendaContent = () => {
         </TabsList>
 
         <TabsContent value="produtos" className="mt-6 space-y-4">
-          {/* Toolbar */}
-          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Buscar por nome ou SKU..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-10 bg-secondary border-border"
-              />
-            </div>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-border"
-                onClick={() => setShowFilters(!showFilters)}
-              >
-                <Filter className="h-4 w-4 mr-2" />
-                Filtrar
-                {activeFiltersCount > 0 && (
-                  <span className="ml-1.5 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center">
-                    {activeFiltersCount}
-                  </span>
-                )}
-              </Button>
+          <FilterToolbar
+            search={search}
+            onSearchChange={setSearch}
+            searchPlaceholder="Buscar por nome ou SKU..."
+            filters={[
+              { key: "category", label: "Categoria", options: productCategories, value: categoryFilter, onChange: setCategoryFilter },
+              { key: "status", label: "Status", options: productStatuses, value: statusFilter, onChange: setStatusFilter },
+              { key: "price", label: "Faixa de Preço", options: priceRanges.map((p) => p.label), value: priceFilter, onChange: setPriceFilter },
+            ]}
+            actions={
               <Button size="sm" className="bg-gradient-primary text-primary-foreground">
                 <Plus className="h-4 w-4 mr-2" />
                 Novo Produto
               </Button>
-            </div>
-          </div>
-
-          {/* Advanced Filters */}
-          {showFilters && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="p-4 rounded-xl border border-border bg-card"
-            >
-              <div className="flex items-center justify-between mb-3">
-                <h4 className="text-sm font-medium text-foreground">Filtros Avançados</h4>
-                {activeFiltersCount > 0 && (
-                  <button onClick={clearFilters} className="text-xs text-accent hover:underline flex items-center gap-1">
-                    <X className="h-3 w-3" /> Limpar filtros
-                  </button>
-                )}
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                  <label className="text-xs text-muted-foreground mb-1 block">Categoria</label>
-                  <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                    <SelectTrigger className="bg-secondary border-border">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <label className="text-xs text-muted-foreground mb-1 block">Status</label>
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="bg-secondary border-border">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {statuses.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <label className="text-xs text-muted-foreground mb-1 block">Faixa de Preço</label>
-                  <Select value={priceFilter} onValueChange={setPriceFilter}>
-                    <SelectTrigger className="bg-secondary border-border">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {priceRanges.map(p => <SelectItem key={p.label} value={p.label}>{p.label}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </motion.div>
-          )}
+            }
+          />
 
           {/* Summary cards */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {[
-              { label: "Total", value: mockProducts.length, icon: Package },
-              { label: "Disponíveis", value: mockProducts.filter(p => p.status === "Disponível").length, icon: Tag },
-              { label: "Reservados", value: mockProducts.filter(p => p.status === "Reservado").length, icon: Eye },
-              { label: "Vendidos", value: mockProducts.filter(p => p.status === "Vendido").length, icon: ShoppingCart },
-            ].map((s, i) => (
-              <motion.div
-                key={s.label}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05 }}
-                className="p-4 rounded-xl border border-border bg-card"
-              >
-                <div className="flex items-center gap-2 mb-1">
-                  <s.icon className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-xs text-muted-foreground">{s.label}</span>
-                </div>
-                <p className="text-xl font-bold font-display text-foreground">{s.value}</p>
-              </motion.div>
+            {summaryKpis.map((kpi, i) => (
+              <KpiCard key={kpi.label} {...kpi} delay={i * 0.05} />
             ))}
           </div>
 
@@ -260,7 +118,7 @@ const VendaContent = () => {
                         <td className="py-3 px-4 text-muted-foreground hidden lg:table-cell">{product.size}</td>
                         <td className="py-3 px-4 text-foreground font-medium">R$ {product.price.toFixed(2)}</td>
                         <td className="py-3 px-4">
-                          <span className={`text-xs px-2 py-1 rounded-full ${statusColor(product.status)}`}>
+                          <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(product.status)}`}>
                             {product.status}
                           </span>
                         </td>
