@@ -48,16 +48,7 @@ const menuItems: MenuItem[] = [
   { id: "dashboard", title: "Dashboard", icon: LayoutDashboard },
   { id: "minha-loja", title: "Minha Loja", icon: Store, externalLink: "/loja/fashion-store" },
   { id: "minha-conta", title: "Minha Conta", icon: User },
-  {
-    id: "configuracoes",
-    title: "Configurações",
-    icon: Settings,
-    children: [
-      { id: "config-geral", title: "Geral" },
-      { id: "config-pagamento", title: "Pagamento" },
-      { id: "config-entrega", title: "Entrega" },
-    ],
-  },
+  { id: "configuracoes", title: "Configurações", icon: Settings },
   {
     id: "venda",
     title: "Venda",
