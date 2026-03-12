@@ -34,6 +34,7 @@ const Dashboard = () => {
     switch (activeSection) {
       case "dashboard": return <DashboardContent />;
       case "minha-conta": return <MyAccountContent user={user} />;
+      case "catalogo": return <CatalogoContent />;
       case "venda": return <VendaContent />;
       case "consignacao": return <ConsignacaoContent />;
       case "financeiro": return <FinanceiroContent />;
