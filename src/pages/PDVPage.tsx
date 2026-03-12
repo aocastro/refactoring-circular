@@ -3,12 +3,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search, Plus, Minus, Trash2, CreditCard, Banknote, Smartphone,
-  Receipt, ArrowLeft, Package, ShoppingCart, X, Barcode, Hash,
+  Receipt, ArrowLeft, Package, ShoppingCart, X, Barcode,
   Clock, User, PercentCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { storeProducts } from "@/data/store";
 

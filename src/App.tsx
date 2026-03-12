@@ -39,6 +39,7 @@ const App = () => (
             <Route path="/loja/:slug/p/:id" element={<ProdutoLoja />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/criar-loja" element={<CriarLoja />} />
+            <Route path="/pdv/:id" element={<PDVPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           </BrowserRouter>
