@@ -55,9 +55,12 @@ const Dashboard = () => {
       case "config-pagamento": return <ConfiguracoesContent defaultTab="pagamento" />;
       case "config-entrega": return <ConfiguracoesContent defaultTab="entrega" />;
       case "venda":
+      case "venda-produtos": return <CatalogoContent />;
+      case "venda-smartlock": return <SmartLockContent />;
+      case "venda-pedidos": return <PedidosContent />;
+      case "venda-subestoques": return <SubestoquesContent />;
+      case "venda-sacolinhas": return <SacolinhasContent />;
       case "venda-catalogo": return <CatalogoContent />;
-      case "venda-produtos":
-      case "venda-pedidos": return <VendaContent />;
       case "servicos":
       case "servicos-agendamentos": return <ServicosContent defaultTab="agendamentos" />;
       case "servicos-lista": return <ServicosContent defaultTab="lista" />;
