@@ -5,6 +5,7 @@ import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 
 const CartDrawer = () => {
+  const navigate = useNavigate();
   const { items, isOpen, setIsOpen, removeItem, updateQuantity, totalItems, totalPrice, clearCart } = useCart();
   const formatPrice = (p: number) => `R$ ${p.toFixed(2).replace(".", ",")}`;
 
