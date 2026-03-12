@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { Users, Mail, Send, Plus, TrendingUp, Download, Pencil } from "lucide-react";
+import { Users, Mail, Send, Plus, TrendingUp, Download, Pencil, Trash2 } from "lucide-react";
 import { exportToCSV } from "@/lib/export";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import KpiCard from "@/components/shared/KpiCard";
