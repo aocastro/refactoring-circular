@@ -4,8 +4,6 @@ import {
   DollarSign,
   TrendingUp,
   TrendingDown,
-  ArrowUpRight,
-  ArrowDownRight,
   Leaf,
   Droplets,
   Recycle,
@@ -29,78 +27,15 @@ import {
   Pie,
   Cell,
 } from "recharts";
-
-const cashFlowData = [
-  { month: "Jul", entrada: 8200, saida: 4100 },
-  { month: "Ago", entrada: 9100, saida: 4800 },
-  { month: "Set", entrada: 7800, saida: 3900 },
-  { month: "Out", entrada: 10500, saida: 5200 },
-  { month: "Nov", entrada: 11200, saida: 5800 },
-  { month: "Dez", entrada: 12450, saida: 6100 },
-];
-
-const paymentMethods = [
-  { name: "PIX", value: 42, color: "hsl(180, 100%, 50%)" },
-  { name: "Cartão Crédito", value: 28, color: "hsl(270, 80%, 60%)" },
-  { name: "Cartão Débito", value: 18, color: "hsl(150, 80%, 45%)" },
-  { name: "Dinheiro", value: 12, color: "hsl(0, 0%, 55%)" },
-];
-
-const recentPayments = [
-  { id: 1, desc: "Venda #1247 — Vestido Floral", value: "R$ 89,90", type: "entrada", method: "PIX", date: "Hoje, 14:30" },
-  { id: 2, desc: "Pagamento Consignante — Ana Paula", value: "R$ 340,00", type: "saida", method: "Transferência", date: "Hoje, 10:00" },
-  { id: 3, desc: "Venda #1246 — Jaqueta Jeans", value: "R$ 159,00", type: "entrada", method: "Cartão Crédito", date: "Ontem, 18:45" },
-  { id: 4, desc: "Fornecedor — Cabides Eco", value: "R$ 85,00", type: "saida", method: "PIX", date: "Ontem, 15:30" },
-  { id: 5, desc: "Venda #1245 — Bolsa Retrô", value: "R$ 210,00", type: "entrada", method: "Cartão Débito", date: "22/12, 16:00" },
-  { id: 6, desc: "Aluguel Loja", value: "R$ 2.800,00", type: "saida", method: "Boleto", date: "20/12, 09:00" },
-  { id: 7, desc: "Venda #1244 — Tênis Vintage", value: "R$ 120,00", type: "entrada", method: "Dinheiro", date: "20/12, 14:20" },
-];
-
-const esgMonthly = [
-  { month: "Jul", co2: 48, agua: 31200, pecas: 65 },
-  { month: "Ago", co2: 55, agua: 35800, pecas: 72 },
-  { month: "Set", co2: 42, agua: 28900, pecas: 58 },
-  { month: "Out", co2: 68, agua: 42100, pecas: 89 },
-  { month: "Nov", co2: 72, agua: 46200, pecas: 94 },
-  { month: "Dez", co2: 76, agua: 50700, pecas: 102 },
-];
-
-const tooltipStyle = {
-  background: "hsl(260, 10%, 8%)",
-  border: "1px solid hsl(260, 15%, 16%)",
-  borderRadius: "8px",
-  color: "hsl(0, 0%, 95%)",
-  fontSize: 12,
-};
-
-const KpiCard = ({ label, value, change, icon: Icon, positive, delay }: {
-  label: string; value: string; change: string; icon: any; positive: boolean; delay: number;
-}) => (
-  <motion.div
-    initial={{ opacity: 0, y: 10 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ delay }}
-    className="p-4 rounded-xl border border-border bg-card"
-  >
-    <div className="flex items-center justify-between mb-2">
-      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-        <Icon className="h-4 w-4 text-primary" />
-      </div>
-      <span className={`text-xs font-medium flex items-center gap-0.5 ${positive ? "text-success" : "text-destructive"}`}>
-        {positive ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
-        {change}
-      </span>
-    </div>
-    <p className="text-xl font-bold font-display text-foreground">{value}</p>
-    <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
-  </motion.div>
-);
+import KpiCard from "@/components/shared/KpiCard";
+import { cashFlowData, paymentMethods, recentPayments, esgMonthly } from "@/data/financeiro";
+import { chartTooltipStyle, chartGridStroke, chartAxisStroke, chartAxisFontSize, chartColors } from "@/lib/chart-config";
 
 const FinanceiroContent = () => {
   const [paymentFilter, setPaymentFilter] = useState<"all" | "entrada" | "saida">("all");
 
   const filteredPayments = recentPayments.filter(
-    p => paymentFilter === "all" || p.type === paymentFilter
+    (p) => paymentFilter === "all" || p.type === paymentFilter
   );
 
   return (
@@ -116,7 +51,7 @@ const FinanceiroContent = () => {
           className="border-border"
           onClick={() => {
             exportToCSV(
-              recentPayments.map(p => ({ Descrição: p.desc, Valor: p.value, Tipo: p.type, Método: p.method, Data: p.date })),
+              recentPayments.map((p) => ({ Descrição: p.desc, Valor: p.value, Tipo: p.type, Método: p.method, Data: p.date })),
               "financeiro-movimentacoes"
             );
           }}
@@ -140,7 +75,6 @@ const FinanceiroContent = () => {
 
         {/* FLUXO DE CAIXA */}
         <TabsContent value="fluxo" className="mt-6 space-y-6">
-          {/* KPIs */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             <KpiCard label="Receita Mensal" value="R$ 12.450" change="+12%" icon={TrendingUp} positive delay={0} />
             <KpiCard label="Despesas" value="R$ 6.100" change="+5%" icon={TrendingDown} positive={false} delay={0.05} />
@@ -148,33 +82,31 @@ const FinanceiroContent = () => {
             <KpiCard label="Margem" value="51%" change="+3pp" icon={TrendingUp} positive delay={0.15} />
           </div>
 
-          {/* Chart */}
           <div className="p-6 rounded-xl border border-border bg-card">
             <h3 className="text-sm font-semibold text-foreground mb-4">Entradas vs Saídas</h3>
             <ResponsiveContainer width="100%" height={280}>
               <AreaChart data={cashFlowData}>
                 <defs>
                   <linearGradient id="colorEntrada" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(150, 80%, 45%)" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="hsl(150, 80%, 45%)" stopOpacity={0} />
+                    <stop offset="5%" stopColor={chartColors.success} stopOpacity={0.3} />
+                    <stop offset="95%" stopColor={chartColors.success} stopOpacity={0} />
                   </linearGradient>
                   <linearGradient id="colorSaida" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(0, 84%, 60%)" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="hsl(0, 84%, 60%)" stopOpacity={0} />
+                    <stop offset="5%" stopColor={chartColors.destructive} stopOpacity={0.3} />
+                    <stop offset="95%" stopColor={chartColors.destructive} stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(260, 15%, 16%)" />
-                <XAxis dataKey="month" stroke="hsl(0, 0%, 55%)" fontSize={12} />
-                <YAxis stroke="hsl(0, 0%, 55%)" fontSize={12} />
-                <Tooltip contentStyle={tooltipStyle} />
-                <Area type="monotone" dataKey="entrada" stroke="hsl(150, 80%, 45%)" fill="url(#colorEntrada)" strokeWidth={2} name="Entradas" />
-                <Area type="monotone" dataKey="saida" stroke="hsl(0, 84%, 60%)" fill="url(#colorSaida)" strokeWidth={2} name="Saídas" />
+                <CartesianGrid strokeDasharray="3 3" stroke={chartGridStroke} />
+                <XAxis dataKey="month" stroke={chartAxisStroke} fontSize={chartAxisFontSize} />
+                <YAxis stroke={chartAxisStroke} fontSize={chartAxisFontSize} />
+                <Tooltip contentStyle={chartTooltipStyle} />
+                <Area type="monotone" dataKey="entrada" stroke={chartColors.success} fill="url(#colorEntrada)" strokeWidth={2} name="Entradas" />
+                <Area type="monotone" dataKey="saida" stroke={chartColors.destructive} fill="url(#colorSaida)" strokeWidth={2} name="Saídas" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Payment methods pie */}
             <div className="p-6 rounded-xl border border-border bg-card">
               <h3 className="text-sm font-semibold text-foreground mb-4">Métodos de Pagamento</h3>
               <ResponsiveContainer width="100%" height={200}>
@@ -184,7 +116,7 @@ const FinanceiroContent = () => {
                       <Cell key={i} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={tooltipStyle} />
+                  <Tooltip contentStyle={chartTooltipStyle} />
                 </PieChart>
               </ResponsiveContainer>
               <div className="flex flex-wrap gap-3 mt-2 justify-center">
@@ -197,7 +129,6 @@ const FinanceiroContent = () => {
               </div>
             </div>
 
-            {/* Recent payments */}
             <div className="lg:col-span-2 rounded-xl border border-border bg-card overflow-hidden">
               <div className="p-4 border-b border-border flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <h3 className="text-sm font-semibold text-foreground">Movimentações Recentes</h3>
@@ -247,7 +178,6 @@ const FinanceiroContent = () => {
 
         {/* ESG */}
         <TabsContent value="esg" className="mt-6 space-y-6">
-          {/* ESG KPIs */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             <KpiCard label="CO₂ Evitado (mês)" value="76 kg" change="+15%" icon={Leaf} positive delay={0} />
             <KpiCard label="Água Economizada" value="50.700 L" change="+12%" icon={Droplets} positive delay={0.05} />
@@ -255,17 +185,16 @@ const FinanceiroContent = () => {
             <KpiCard label="Itens Desviados Aterro" value="480" change="+22%" icon={Shirt} positive delay={0.15} />
           </div>
 
-          {/* ESG Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="p-6 rounded-xl border border-border bg-card">
               <h3 className="text-sm font-semibold text-foreground mb-4">CO₂ Evitado (kg/mês)</h3>
               <ResponsiveContainer width="100%" height={250}>
                 <BarChart data={esgMonthly}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(260, 15%, 16%)" />
-                  <XAxis dataKey="month" stroke="hsl(0, 0%, 55%)" fontSize={12} />
-                  <YAxis stroke="hsl(0, 0%, 55%)" fontSize={12} />
-                  <Tooltip contentStyle={tooltipStyle} />
-                  <Bar dataKey="co2" fill="hsl(150, 80%, 45%)" radius={[4, 4, 0, 0]} name="CO₂ (kg)" />
+                  <CartesianGrid strokeDasharray="3 3" stroke={chartGridStroke} />
+                  <XAxis dataKey="month" stroke={chartAxisStroke} fontSize={chartAxisFontSize} />
+                  <YAxis stroke={chartAxisStroke} fontSize={chartAxisFontSize} />
+                  <Tooltip contentStyle={chartTooltipStyle} />
+                  <Bar dataKey="co2" fill={chartColors.success} radius={[4, 4, 0, 0]} name="CO₂ (kg)" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -276,21 +205,20 @@ const FinanceiroContent = () => {
                 <AreaChart data={esgMonthly}>
                   <defs>
                     <linearGradient id="colorPecas" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(180, 100%, 50%)" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="hsl(180, 100%, 50%)" stopOpacity={0} />
+                      <stop offset="5%" stopColor={chartColors.accent} stopOpacity={0.3} />
+                      <stop offset="95%" stopColor={chartColors.accent} stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(260, 15%, 16%)" />
-                  <XAxis dataKey="month" stroke="hsl(0, 0%, 55%)" fontSize={12} />
-                  <YAxis stroke="hsl(0, 0%, 55%)" fontSize={12} />
-                  <Tooltip contentStyle={tooltipStyle} />
-                  <Area type="monotone" dataKey="pecas" stroke="hsl(180, 100%, 50%)" fill="url(#colorPecas)" strokeWidth={2} name="Peças" />
+                  <CartesianGrid strokeDasharray="3 3" stroke={chartGridStroke} />
+                  <XAxis dataKey="month" stroke={chartAxisStroke} fontSize={chartAxisFontSize} />
+                  <YAxis stroke={chartAxisStroke} fontSize={chartAxisFontSize} />
+                  <Tooltip contentStyle={chartTooltipStyle} />
+                  <Area type="monotone" dataKey="pecas" stroke={chartColors.accent} fill="url(#colorPecas)" strokeWidth={2} name="Peças" />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
           </div>
 
-          {/* ESG Summary Card */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
