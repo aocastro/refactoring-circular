@@ -285,6 +285,13 @@ const NewsletterContent = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <CampaignPreviewDialog
+        open={!!previewCampaign}
+        onOpenChange={(open) => !open && setPreviewCampaign(null)}
+        campaign={previewCampaign}
+        onSend={handleSendCampaign}
+      />
     </div>
   );
 };
