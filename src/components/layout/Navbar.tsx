@@ -12,7 +12,6 @@ const Navbar = () => {
 
   const links = [
     { label: "Home", href: "/" },
-    { label: "Catálogo", href: "/catalogo" },
     { label: "Planos de Loja", href: "/planos" },
   ];
 
