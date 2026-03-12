@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Users, Mail, Send, Plus, TrendingUp } from "lucide-react";
+import { Users, Mail, Send, Plus, TrendingUp, Download } from "lucide-react";
+import { exportToCSV } from "@/lib/export";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import KpiCard from "@/components/shared/KpiCard";
