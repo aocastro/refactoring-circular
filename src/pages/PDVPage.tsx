@@ -116,7 +116,7 @@ const PDVPage = () => {
         </Button>
         <div className="h-6 w-px bg-border" />
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+          <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
           <span className="text-sm font-bold text-foreground">Caixa {caixaId || "01"}</span>
         </div>
         <div className="flex-1" />
