@@ -16,6 +16,7 @@ import Loja from "./pages/Loja";
 import ProdutoLoja from "./pages/ProdutoLoja";
 import Checkout from "./pages/Checkout";
 import CriarLoja from "./pages/CriarLoja";
+import PDVPage from "./pages/PDVPage";
 
 const queryClient = new QueryClient();
 
