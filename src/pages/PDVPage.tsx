@@ -162,7 +162,65 @@ const PDVPage = () => {
     setPaymentStep("receipt");
   };
 
-  const filteredClients = useMemo(() => {
+  const printThermalReceipt = (sale: RegisteredSale) => {
+    const LINE = "─".repeat(42);
+    const DLINE = "═".repeat(42);
+    const pad = (left: string, right: string, width = 42) => {
+      const space = width - left.length - right.length;
+      return left + " ".repeat(Math.max(1, space)) + right;
+    };
+    const center = (text: string, width = 42) => {
+      const space = Math.max(0, width - text.length);
+      const left = Math.floor(space / 2);
+      return " ".repeat(left) + text;
+    };
+
+    const lines: string[] = [];
+    lines.push(center("CIRCULAR u-SHAR"));
+    lines.push(center("CNPJ: 00.000.000/0001-00"));
+    lines.push(center("Cupom Não Fiscal"));
+    lines.push(DLINE);
+    lines.push(pad("Venda #:", String(sale.id)));
+    lines.push(pad("Data:", `${new Date().toLocaleDateString("pt-BR")} ${sale.time}`));
+    lines.push(pad("Caixa:", caixaId || "01"));
+    lines.push(pad("Cliente:", sale.customer));
+    lines.push(LINE);
+    lines.push("ITEM                        QTD    VALOR");
+    lines.push(LINE);
+    sale.items.forEach((item) => {
+      const name = item.name.length > 28 ? item.name.substring(0, 25) + "..." : item.name;
+      lines.push(pad(name, `${item.quantity}  ${formatPrice(item.price * item.quantity)}`));
+    });
+    lines.push(LINE);
+    if (sale.discount > 0) {
+      lines.push(pad(`Desconto (${sale.discount}%):`, `-${formatPrice(sale.total * sale.discount / (100 - sale.discount))}`));
+    }
+    lines.push(pad("TOTAL:", formatPrice(sale.total)));
+    lines.push(DLINE);
+    lines.push("PAGAMENTO:");
+    sale.payments.forEach((p) => {
+      lines.push(pad(`  ${p.method}`, formatPrice(p.amount)));
+    });
+    lines.push(LINE);
+    lines.push(center("Obrigado pela compra!"));
+    lines.push(center("circular.store"));
+    lines.push("");
+    lines.push("");
+    lines.push("");
+
+    const printWindow = window.open("", "_blank", "width=360,height=600");
+    if (!printWindow) { toast.error("Popup bloqueado. Permita popups para imprimir."); return; }
+    printWindow.document.write(`<!DOCTYPE html><html><head><title>Cupom</title>
+<style>
+  @page { margin: 0; size: 80mm auto; }
+  body { font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.4; margin: 0; padding: 4mm; width: 72mm; color: #000; }
+  pre { margin: 0; white-space: pre-wrap; word-break: break-all; }
+</style></head><body><pre>${lines.join("\n")}</pre>
+<script>window.onload=function(){window.print();setTimeout(function(){window.close()},500);}<\/script>
+</body></html>`);
+    printWindow.document.close();
+  };
+
     if (!customerInput) return [];
     return mockClientes.filter((c) =>
       c.name.toLowerCase().includes(customerInput.toLowerCase()) ||
