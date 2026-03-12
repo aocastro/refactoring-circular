@@ -4,6 +4,9 @@ import { motion } from "framer-motion";
 import { ArrowLeft, ShoppingCart, Heart, Share2, Truck, Shield, Recycle, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { mockStore, storeProducts } from "@/data/store";
+import { useCart } from "@/hooks/use-cart";
+import CartDrawer from "@/components/store/CartDrawer";
+import { useToast } from "@/hooks/use-toast";
 
 const ProdutoLoja = () => {
   const { slug, id } = useParams();
