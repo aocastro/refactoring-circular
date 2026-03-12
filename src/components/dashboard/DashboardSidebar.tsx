@@ -5,6 +5,7 @@ import {
   Handshake,
   DollarSign,
   LogOut,
+  Store,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import logo from "@/assets/logo.png";
@@ -23,6 +24,7 @@ import {
 const menuItems = [
   { id: "dashboard", title: "Dashboard", icon: LayoutDashboard },
   { id: "minha-conta", title: "Minha Conta", icon: User },
+  { id: "catalogo", title: "Catálogo", icon: Store },
   { id: "venda", title: "Venda", icon: ShoppingCart },
   { id: "consignacao", title: "Consignação", icon: Handshake },
   { id: "financeiro", title: "Financeiro", icon: DollarSign },

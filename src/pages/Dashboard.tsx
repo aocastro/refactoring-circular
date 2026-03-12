@@ -9,6 +9,7 @@ import MyAccountContent from "@/components/dashboard/MyAccountContent";
 import VendaContent from "@/components/dashboard/VendaContent";
 import ConsignacaoContent from "@/components/dashboard/ConsignacaoContent";
 import FinanceiroContent from "@/components/dashboard/FinanceiroContent";
+import CatalogoContent from "@/components/dashboard/CatalogoContent";
 import NotificationsDropdown from "@/components/dashboard/NotificationsDropdown";
 import { useTheme } from "@/hooks/use-theme";
 
@@ -33,6 +34,7 @@ const Dashboard = () => {
     switch (activeSection) {
       case "dashboard": return <DashboardContent />;
       case "minha-conta": return <MyAccountContent user={user} />;
+      case "catalogo": return <CatalogoContent />;
       case "venda": return <VendaContent />;
       case "consignacao": return <ConsignacaoContent />;
       case "financeiro": return <FinanceiroContent />;
