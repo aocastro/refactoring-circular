@@ -176,7 +176,7 @@ const PDVPage = () => {
   }, [paymentStep]);
 
   const dayTotal = sales.reduce((a, s) => a + s.total, 0);
-  const cashChange = Number(cashReceived) - (splitMode && splitAmount ? Number(splitAmount) : remaining);
+  
 
   const currentPayAmount = splitMode && splitAmount ? Math.min(Number(splitAmount), remaining) : remaining;
 
