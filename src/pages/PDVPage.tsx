@@ -570,7 +570,12 @@ const PDVPage = () => {
 
                   <div className="border-b border-dashed border-border pb-3 space-y-1">
                     <p className="text-muted-foreground font-bold">ITENS</p>
-                    <div className="flex justify-between"><span className="text-muted-foreground">{lastSale.items} itens</span></div>
+                    {lastSale.items.map((item, i) => (
+                      <div key={i} className="flex justify-between">
+                        <span className="text-foreground">{item.quantity}x {item.name}</span>
+                        <span className="text-muted-foreground">{formatPrice(item.price * item.quantity)}</span>
+                      </div>
+                    ))}
                     {lastSale.discount > 0 && (
                       <div className="flex justify-between text-destructive"><span>Desconto ({lastSale.discount}%)</span><span>-{formatPrice(lastSale.total * lastSale.discount / (100 - lastSale.discount))}</span></div>
                     )}
