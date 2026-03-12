@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { storeProducts } from "@/data/store";
+import { mockClientes } from "@/data/clientes";
 
 interface CartItem {
   id: number;
@@ -32,7 +33,7 @@ interface PaymentEntry {
 interface RegisteredSale {
   id: number;
   time: string;
-  items: number;
+  items: CartItem[];
   total: number;
   payments: PaymentEntry[];
   customer: string;
@@ -56,6 +57,9 @@ const PDVPage = () => {
   const [search, setSearch] = useState("");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [customerName, setCustomerName] = useState("");
+  const [customerSearch, setCustomerSearch] = useState("");
+  const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
+  const customerRef = useRef<HTMLDivElement>(null);
   const [discount, setDiscount] = useState(0);
   const [sales, setSales] = useState<RegisteredSale[]>([]);
   const [showHistory, setShowHistory] = useState(false);
