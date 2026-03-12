@@ -53,6 +53,10 @@ const FornecedoresContent = () => {
     f.nome.toLowerCase().includes(search.toLowerCase()) || f.categoria.toLowerCase().includes(search.toLowerCase())
   );
 
+  const [page, setPage] = useState(1);
+  const perPage = 6;
+  const { paginatedItems, totalPages, safePage, totalItems } = usePagination(filtered, perPage, page);
+
   const resetForm = () => { setNome(""); setCategoria(""); setContato(""); setEmail(""); setCidade(""); setEditing(null); setErrors({}); };
 
   const openEdit = (f: Fornecedor) => {
