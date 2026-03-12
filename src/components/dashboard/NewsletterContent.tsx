@@ -57,6 +57,15 @@ const NewsletterContent = () => {
   const [deletingCampaign, setDeletingCampaign] = useState<Campaign | null>(null);
   const [previewCampaign, setPreviewCampaign] = useState<Campaign | null>(null);
 
+  // Real-time KPI metrics derived from campaign state
+  const totalAssinantes = subscribers.filter(s => s.status === "ativo").length;
+  const campanhasEnviadas = campaignsList.filter(c => c.status === "enviada");
+  const totalEnviados = campanhasEnviadas.reduce((sum, c) => sum + c.enviados, 0);
+  const totalAbertos = campanhasEnviadas.reduce((sum, c) => sum + c.abertos, 0);
+  const totalCliques = campanhasEnviadas.reduce((sum, c) => sum + c.cliques, 0);
+  const taxaAbertura = totalEnviados > 0 ? Math.round((totalAbertos / totalEnviados) * 100) : 0;
+  const taxaCliques = totalEnviados > 0 ? Math.round((totalCliques / totalEnviados) * 100) : 0;
+
   const filteredSubs = subscribers.filter((s) => {
     const matchSearch = s.email.includes(subSearch) || s.nome.toLowerCase().includes(subSearch.toLowerCase());
     const matchStatus = subStatus === "Todos" || s.status === subStatus;
