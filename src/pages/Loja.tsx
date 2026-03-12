@@ -5,6 +5,8 @@ import { Search, ShoppingCart, ChevronLeft, ChevronRight, Leaf, Recycle, TreePin
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { mockStore, storeProducts } from "@/data/store";
+import { useCart } from "@/hooks/use-cart";
+import CartDrawer from "@/components/store/CartDrawer";
 
 const Loja = () => {
   const { slug } = useParams();
