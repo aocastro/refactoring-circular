@@ -13,6 +13,7 @@ import CatalogoContent from "@/components/dashboard/CatalogoContent";
 import InventarioContent from "@/components/dashboard/InventarioContent";
 import ClientesContent from "@/components/dashboard/ClientesContent";
 import CuponsContent from "@/components/dashboard/CuponsContent";
+import PDVContent from "@/components/dashboard/PDVContent";
 import NotificationsDropdown from "@/components/dashboard/NotificationsDropdown";
 import { useTheme } from "@/hooks/use-theme";
 
@@ -44,6 +45,8 @@ const Dashboard = () => {
       case "inventario": return <InventarioContent />;
       case "clientes": return <ClientesContent />;
       case "cupons": return <CuponsContent />;
+      case "pdv-caixa":
+      case "pdv-historico": return <PDVContent />;
       case "relatorios-financeiro":
       case "relatorios-esg": return <FinanceiroContent />;
       default: return <DashboardContent />;
