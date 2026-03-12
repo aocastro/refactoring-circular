@@ -147,7 +147,7 @@ const PDVPage = () => {
     const newSale: RegisteredSale = {
       id: sales.length + 1,
       time: `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`,
-      items: totalItems,
+      items: [...cart],
       total: cartTotalWithDiscount,
       payments: finalPayments,
       customer: customerName || "Cliente Avulso",
@@ -157,9 +157,30 @@ const PDVPage = () => {
     setLastSale(newSale);
     setCart([]);
     setCustomerName("");
+    setCustomerInput("");
     setDiscount(0);
     setPaymentStep("receipt");
   };
+
+  const filteredClients = useMemo(() => {
+    if (!customerInput) return [];
+    return mockClientes.filter((c) =>
+      c.name.toLowerCase().includes(customerInput.toLowerCase()) ||
+      c.phone.includes(customerInput) ||
+      c.email.toLowerCase().includes(customerInput.toLowerCase())
+    ).slice(0, 5);
+  }, [customerInput]);
+
+  // Click outside to close customer dropdown
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (customerRef.current && !customerRef.current.contains(e.target as Node)) {
+        setShowCustomerDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   const closeReceipt = () => {
     setPaymentStep("idle");
