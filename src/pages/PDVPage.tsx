@@ -221,6 +221,7 @@ const PDVPage = () => {
     printWindow.document.close();
   };
 
+  const filteredClients = useMemo(() => {
     if (!customerInput) return [];
     return mockClientes.filter((c) =>
       c.name.toLowerCase().includes(customerInput.toLowerCase()) ||
