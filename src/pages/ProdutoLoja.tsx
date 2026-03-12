@@ -194,7 +194,13 @@ const ProdutoLoja = () => {
 
             {/* Actions */}
             <div className="flex gap-3 pt-2">
-              <Button className="flex-1 bg-gradient-primary text-primary-foreground py-6 rounded-xl text-base">
+              <Button
+                className="flex-1 bg-gradient-primary text-primary-foreground py-6 rounded-xl text-base"
+                onClick={() => {
+                  addItem({ id: product.id, name: product.name, price: product.price, image: product.image, size: selectedSize || product.size }, quantity);
+                  toast({ title: "Adicionado ao carrinho!", description: `${product.name} × ${quantity}` });
+                }}
+              >
                 <ShoppingCart className="h-5 w-5 mr-2" />
                 Adicionar ao Carrinho
               </Button>
