@@ -41,11 +41,12 @@ interface MenuItem {
   title: string;
   icon: React.ElementType;
   children?: { id: string; title: string }[];
+  externalLink?: string;
 }
 
 const menuItems: MenuItem[] = [
   { id: "dashboard", title: "Dashboard", icon: LayoutDashboard },
-  { id: "minha-loja", title: "Minha Loja", icon: Store },
+  { id: "minha-loja", title: "Minha Loja", icon: Store, externalLink: "/loja/fashion-store" },
   { id: "minha-conta", title: "Minha Conta", icon: User },
   {
     id: "configuracoes",
