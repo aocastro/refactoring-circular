@@ -338,7 +338,7 @@ const PDVPage = () => {
                 ) : sales.map((sale) => (
                   <div key={sale.id} className="p-3 text-xs space-y-1">
                     <div className="flex justify-between"><span className="text-muted-foreground">#{sale.id} • {sale.time}</span><span className="font-bold text-foreground">{formatPrice(sale.total)}</span></div>
-                    <div className="flex justify-between text-muted-foreground"><span>{sale.customer}</span><span>{sale.items} itens</span></div>
+                    <div className="flex justify-between text-muted-foreground"><span>{sale.customer}</span><span>{sale.items.reduce((a, i) => a + i.quantity, 0)} itens</span></div>
                     <div className="flex flex-wrap gap-1 mt-1">
                       {sale.payments.map((p, i) => (
                         <span key={i} className="px-1.5 py-0.5 rounded bg-secondary text-foreground text-[10px]">{p.method} {formatPrice(p.amount)}</span>
