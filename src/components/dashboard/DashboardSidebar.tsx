@@ -48,16 +48,7 @@ const menuItems: MenuItem[] = [
   { id: "dashboard", title: "Dashboard", icon: LayoutDashboard },
   { id: "minha-loja", title: "Minha Loja", icon: Store, externalLink: "/loja/fashion-store" },
   { id: "minha-conta", title: "Minha Conta", icon: User },
-  {
-    id: "configuracoes",
-    title: "Configurações",
-    icon: Settings,
-    children: [
-      { id: "config-geral", title: "Geral" },
-      { id: "config-pagamento", title: "Pagamento" },
-      { id: "config-entrega", title: "Entrega" },
-    ],
-  },
+  { id: "configuracoes", title: "Configurações", icon: Settings },
   {
     id: "venda",
     title: "Venda",
@@ -68,15 +59,7 @@ const menuItems: MenuItem[] = [
       { id: "venda-catalogo", title: "Catálogo" },
     ],
   },
-  {
-    id: "servicos",
-    title: "Serviços",
-    icon: Scissors,
-    children: [
-      { id: "servicos-agendamentos", title: "Agendamentos" },
-      { id: "servicos-lista", title: "Lista de Serviços" },
-    ],
-  },
+  { id: "servicos", title: "Serviços", icon: Scissors },
   { id: "inventario", title: "Inventário", icon: ClipboardList },
   { id: "consignantes", title: "Consignantes", icon: Handshake },
   { id: "fornecedores", title: "Fornecedores", icon: Truck },
