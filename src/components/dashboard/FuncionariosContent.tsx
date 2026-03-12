@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { UserCog, Plus, Search, Phone, Mail } from "lucide-react";
+import { UserCog, Plus, Phone, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import FilterToolbar from "@/components/shared/FilterToolbar";
 
-const funcionarios = [
+const funcionariosData = [
   { id: 1, nome: "Juliana Mendes", cargo: "Gerente", email: "juliana@loja.com", telefone: "(11) 99888-7766", status: "ativo", avatar: "JM" },
   { id: 2, nome: "Carlos Ribeiro", cargo: "Vendedor", email: "carlos@loja.com", telefone: "(11) 99777-6655", status: "ativo", avatar: "CR" },
   { id: 3, nome: "Fernanda Alves", cargo: "Costureira", email: "fernanda@loja.com", telefone: "(11) 99666-5544", status: "ativo", avatar: "FA" },
@@ -20,11 +20,20 @@ const statusColors: Record<string, string> = {
   férias: "bg-warning/10 text-warning",
 };
 
+const cargos = ["Todos", "Gerente", "Vendedor", "Vendedora", "Costureira", "Estoquista", "Social Media"];
+const statusOptions = ["Todos", "ativo", "inativo", "férias"];
+
 const FuncionariosContent = () => {
   const [search, setSearch] = useState("");
-  const filtered = funcionarios.filter((f) =>
-    f.nome.toLowerCase().includes(search.toLowerCase()) || f.cargo.toLowerCase().includes(search.toLowerCase())
-  );
+  const [filterCargo, setFilterCargo] = useState("Todos");
+  const [filterStatus, setFilterStatus] = useState("Todos");
+
+  const filtered = funcionariosData.filter((f) => {
+    const matchSearch = f.nome.toLowerCase().includes(search.toLowerCase()) || f.cargo.toLowerCase().includes(search.toLowerCase());
+    const matchCargo = filterCargo === "Todos" || f.cargo === filterCargo;
+    const matchStatus = filterStatus === "Todos" || f.status === filterStatus;
+    return matchSearch && matchCargo && matchStatus;
+  });
 
   return (
     <div className="space-y-6">
@@ -36,10 +45,15 @@ const FuncionariosContent = () => {
         <Button size="sm"><Plus className="h-4 w-4 mr-2" />Novo Funcionário</Button>
       </div>
 
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input placeholder="Buscar funcionário..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10 bg-secondary border-border" />
-      </div>
+      <FilterToolbar
+        search={search}
+        onSearchChange={setSearch}
+        searchPlaceholder="Buscar funcionário..."
+        filters={[
+          { key: "cargo", label: "Cargo", options: cargos, value: filterCargo, onChange: setFilterCargo },
+          { key: "status", label: "Status", options: statusOptions, value: filterStatus, onChange: setFilterStatus },
+        ]}
+      />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {filtered.map((f, i) => (
@@ -59,6 +73,9 @@ const FuncionariosContent = () => {
             </div>
           </motion.div>
         ))}
+        {filtered.length === 0 && (
+          <div className="col-span-full text-center py-8 text-muted-foreground">Nenhum funcionário encontrado.</div>
+        )}
       </div>
     </div>
   );

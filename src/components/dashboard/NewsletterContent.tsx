@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { Newspaper, Users, Mail, Send, Plus, TrendingUp } from "lucide-react";
+import { Users, Mail, Send, Plus, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import KpiCard from "@/components/shared/KpiCard";
+import FilterToolbar from "@/components/shared/FilterToolbar";
 
 const subscribers = [
   { id: 1, email: "maria@email.com", nome: "Maria Silva", data: "10/01/2026", status: "ativo" },
@@ -20,9 +19,26 @@ const campaigns = [
   { id: 3, titulo: "Lançamento Coleção Eco", enviados: 0, abertos: 0, cliques: 0, data: "20/03/2026", status: "rascunho" },
 ];
 
+const statusSubOptions = ["Todos", "ativo", "inativo"];
+const statusCampOptions = ["Todos", "enviada", "rascunho"];
+
 const NewsletterContent = () => {
-  const [search, setSearch] = useState("");
-  const filtered = subscribers.filter((s) => s.email.includes(search) || s.nome.toLowerCase().includes(search.toLowerCase()));
+  const [subSearch, setSubSearch] = useState("");
+  const [subStatus, setSubStatus] = useState("Todos");
+  const [campSearch, setCampSearch] = useState("");
+  const [campStatus, setCampStatus] = useState("Todos");
+
+  const filteredSubs = subscribers.filter((s) => {
+    const matchSearch = s.email.includes(subSearch) || s.nome.toLowerCase().includes(subSearch.toLowerCase());
+    const matchStatus = subStatus === "Todos" || s.status === subStatus;
+    return matchSearch && matchStatus;
+  });
+
+  const filteredCamps = campaigns.filter((c) => {
+    const matchSearch = c.titulo.toLowerCase().includes(campSearch.toLowerCase());
+    const matchStatus = campStatus === "Todos" || c.status === campStatus;
+    return matchSearch && matchStatus;
+  });
 
   return (
     <div className="space-y-6">
@@ -42,64 +58,83 @@ const NewsletterContent = () => {
       </div>
 
       {/* Campanhas */}
-      <div className="rounded-xl border border-border bg-card overflow-hidden">
-        <div className="p-4 border-b border-border">
-          <h3 className="font-semibold text-foreground text-sm">Campanhas Recentes</h3>
-        </div>
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-border bg-secondary/30">
-              <th className="text-left py-3 px-4 text-muted-foreground font-medium">Título</th>
-              <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden sm:table-cell">Enviados</th>
-              <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden sm:table-cell">Abertos</th>
-              <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden md:table-cell">Data</th>
-              <th className="text-left py-3 px-4 text-muted-foreground font-medium">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {campaigns.map((c) => (
-              <tr key={c.id} className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors">
-                <td className="py-3 px-4 text-foreground font-medium">{c.titulo}</td>
-                <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">{c.enviados}</td>
-                <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">{c.abertos}</td>
-                <td className="py-3 px-4 text-muted-foreground hidden md:table-cell">{c.data}</td>
-                <td className="py-3 px-4">
-                  <Badge variant={c.status === "enviada" ? "default" : "secondary"}>{c.status}</Badge>
-                </td>
+      <div className="space-y-3">
+        <h3 className="font-semibold text-foreground text-sm">Campanhas</h3>
+        <FilterToolbar
+          search={campSearch}
+          onSearchChange={setCampSearch}
+          searchPlaceholder="Buscar campanha..."
+          filters={[
+            { key: "status", label: "Status", options: statusCampOptions, value: campStatus, onChange: setCampStatus },
+          ]}
+        />
+        <div className="rounded-xl border border-border bg-card overflow-hidden">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border bg-secondary/30">
+                <th className="text-left py-3 px-4 text-muted-foreground font-medium">Título</th>
+                <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden sm:table-cell">Enviados</th>
+                <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden sm:table-cell">Abertos</th>
+                <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden md:table-cell">Data</th>
+                <th className="text-left py-3 px-4 text-muted-foreground font-medium">Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredCamps.length === 0 ? (
+                <tr><td colSpan={5} className="py-8 text-center text-muted-foreground">Nenhuma campanha encontrada.</td></tr>
+              ) : filteredCamps.map((c) => (
+                <tr key={c.id} className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors">
+                  <td className="py-3 px-4 text-foreground font-medium">{c.titulo}</td>
+                  <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">{c.enviados}</td>
+                  <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">{c.abertos}</td>
+                  <td className="py-3 px-4 text-muted-foreground hidden md:table-cell">{c.data}</td>
+                  <td className="py-3 px-4">
+                    <Badge variant={c.status === "enviada" ? "default" : "secondary"}>{c.status}</Badge>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Assinantes */}
-      <div className="rounded-xl border border-border bg-card overflow-hidden">
-        <div className="p-4 border-b border-border flex items-center justify-between gap-2">
-          <h3 className="font-semibold text-foreground text-sm">Assinantes</h3>
-          <Input placeholder="Buscar..." value={search} onChange={(e) => setSearch(e.target.value)} className="max-w-xs bg-secondary border-border text-sm h-8" />
-        </div>
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-border bg-secondary/30">
-              <th className="text-left py-3 px-4 text-muted-foreground font-medium">Nome</th>
-              <th className="text-left py-3 px-4 text-muted-foreground font-medium">E-mail</th>
-              <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden sm:table-cell">Data</th>
-              <th className="text-left py-3 px-4 text-muted-foreground font-medium">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((s) => (
-              <tr key={s.id} className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors">
-                <td className="py-3 px-4 text-foreground font-medium">{s.nome}</td>
-                <td className="py-3 px-4 text-muted-foreground">{s.email}</td>
-                <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">{s.data}</td>
-                <td className="py-3 px-4">
-                  <Badge variant={s.status === "ativo" ? "default" : "secondary"}>{s.status}</Badge>
-                </td>
+      <div className="space-y-3">
+        <h3 className="font-semibold text-foreground text-sm">Assinantes</h3>
+        <FilterToolbar
+          search={subSearch}
+          onSearchChange={setSubSearch}
+          searchPlaceholder="Buscar assinante..."
+          filters={[
+            { key: "status", label: "Status", options: statusSubOptions, value: subStatus, onChange: setSubStatus },
+          ]}
+        />
+        <div className="rounded-xl border border-border bg-card overflow-hidden">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border bg-secondary/30">
+                <th className="text-left py-3 px-4 text-muted-foreground font-medium">Nome</th>
+                <th className="text-left py-3 px-4 text-muted-foreground font-medium">E-mail</th>
+                <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden sm:table-cell">Data</th>
+                <th className="text-left py-3 px-4 text-muted-foreground font-medium">Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredSubs.length === 0 ? (
+                <tr><td colSpan={4} className="py-8 text-center text-muted-foreground">Nenhum assinante encontrado.</td></tr>
+              ) : filteredSubs.map((s) => (
+                <tr key={s.id} className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors">
+                  <td className="py-3 px-4 text-foreground font-medium">{s.nome}</td>
+                  <td className="py-3 px-4 text-muted-foreground">{s.email}</td>
+                  <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">{s.data}</td>
+                  <td className="py-3 px-4">
+                    <Badge variant={s.status === "ativo" ? "default" : "secondary"}>{s.status}</Badge>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
