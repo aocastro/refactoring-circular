@@ -5,7 +5,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import KpiCard from "@/components/shared/KpiCard";
+import SparklineKpiCard from "@/components/shared/SparklineKpiCard";
 import FilterToolbar from "@/components/shared/FilterToolbar";
 import PaginationControls, { usePagination } from "@/components/shared/PaginationControls";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from "recharts";
@@ -135,10 +135,10 @@ const NewsletterContent = () => {
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <KpiCard label="Assinantes Ativos" value={String(totalAssinantes)} change="+18" icon={Users} positive delay={0} />
-        <KpiCard label="Taxa de Abertura" value={`${taxaAbertura}%`} change="+3%" icon={Mail} positive delay={0.05} />
-        <KpiCard label="Taxa de Cliques" value={`${taxaCliques}%`} change="+2%" icon={TrendingUp} positive delay={0.1} />
-        <KpiCard label="Campanhas Enviadas" value={String(campanhasEnviadas.length)} change="+2" icon={Send} positive delay={0.15} />
+        <SparklineKpiCard label="Assinantes Ativos" value={String(totalAssinantes)} change="+18" icon={Users} positive delay={0} sparklineData={[{value:2},{value:2},{value:3},{value:3},{value:3},{value:totalAssinantes}]} sparklineColor="hsl(270,80%,60%)" />
+        <SparklineKpiCard label="Taxa de Abertura" value={`${taxaAbertura}%`} change="+3%" icon={Mail} positive delay={0.05} sparklineData={[{value:48},{value:55},{value:61},{value:55},{value:69},{value:taxaAbertura}]} sparklineColor="hsl(180,100%,50%)" />
+        <SparklineKpiCard label="Taxa de Cliques" value={`${taxaCliques}%`} change="+2%" icon={TrendingUp} positive delay={0.1} sparklineData={[{value:10},{value:14},{value:18},{value:14},{value:23},{value:taxaCliques}]} sparklineColor="hsl(150,80%,45%)" />
+        <SparklineKpiCard label="Campanhas Enviadas" value={String(campanhasEnviadas.length)} change="+2" icon={Send} positive delay={0.15} sparklineData={[{value:1},{value:2},{value:3},{value:4},{value:5},{value:campanhasEnviadas.length}]} sparklineColor="hsl(45,90%,55%)" />
       </div>
 
       {/* Gráficos de Performance */}
