@@ -5,14 +5,16 @@ import { Search, ShoppingCart, ChevronLeft, ChevronRight, Leaf, Recycle, TreePin
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { mockStore, storeProducts } from "@/data/store";
+import { useCart } from "@/hooks/use-cart";
+import CartDrawer from "@/components/store/CartDrawer";
 
 const Loja = () => {
   const { slug } = useParams();
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("Todos");
   const [bannerIndex, setBannerIndex] = useState(0);
-
-  const store = mockStore; // In production, fetch by slug
+  const { totalItems, setIsOpen } = useCart();
+  const store = mockStore;
 
   const newArrivals = storeProducts.slice(0, 10);
   const featured = storeProducts.filter((p) => p.highlight);
@@ -81,11 +83,13 @@ const Loja = () => {
                 className="pl-9 h-9 bg-secondary border-border text-sm"
               />
             </div>
-            <button className="relative p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors">
+            <button onClick={() => setIsOpen(true)} className="relative p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors">
               <ShoppingCart className="h-5 w-5" />
-              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center">
-                0
-              </span>
+              {totalItems > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center">
+                  {totalItems}
+                </span>
+              )}
             </button>
           </div>
         </div>
@@ -227,6 +231,7 @@ const Loja = () => {
           </p>
         </div>
       </footer>
+      <CartDrawer />
     </div>
   );
 };

@@ -4,6 +4,9 @@ import { motion } from "framer-motion";
 import { ArrowLeft, ShoppingCart, Heart, Share2, Truck, Shield, Recycle, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { mockStore, storeProducts } from "@/data/store";
+import { useCart } from "@/hooks/use-cart";
+import CartDrawer from "@/components/store/CartDrawer";
+import { useToast } from "@/hooks/use-toast";
 
 const ProdutoLoja = () => {
   const { slug, id } = useParams();
@@ -12,6 +15,8 @@ const ProdutoLoja = () => {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const { addItem, totalItems, setIsOpen } = useCart();
+  const { toast } = useToast();
 
   if (!product) {
     return (
@@ -51,8 +56,13 @@ const ProdutoLoja = () => {
             <span className="text-2xl">{mockStore.logo}</span>
             <span className="font-display font-bold text-foreground text-lg">{mockStore.name}</span>
           </Link>
-          <button className="relative p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors">
+          <button onClick={() => setIsOpen(true)} className="relative p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors">
             <ShoppingCart className="h-5 w-5" />
+            {totalItems > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center">
+                {totalItems}
+              </span>
+            )}
           </button>
         </div>
       </header>
@@ -184,7 +194,13 @@ const ProdutoLoja = () => {
 
             {/* Actions */}
             <div className="flex gap-3 pt-2">
-              <Button className="flex-1 bg-gradient-primary text-primary-foreground py-6 rounded-xl text-base">
+              <Button
+                className="flex-1 bg-gradient-primary text-primary-foreground py-6 rounded-xl text-base"
+                onClick={() => {
+                  addItem({ id: product.id, name: product.name, price: product.price, image: product.image, size: selectedSize || product.size }, quantity);
+                  toast({ title: "Adicionado ao carrinho!", description: `${product.name} × ${quantity}` });
+                }}
+              >
                 <ShoppingCart className="h-5 w-5 mr-2" />
                 Adicionar ao Carrinho
               </Button>
@@ -253,6 +269,7 @@ const ProdutoLoja = () => {
           </p>
         </div>
       </footer>
+      <CartDrawer />
     </div>
   );
 };
