@@ -30,6 +30,15 @@ interface StoreData {
   telefone: string;
 }
 
+type FieldErrors = Partial<Record<string, string>>;
+
+const FieldError = ({ message }: { message?: string }) =>
+  message ? (
+    <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="text-xs text-destructive mt-1">
+      {message}
+    </motion.p>
+  ) : null;
+
 const CriarLoja = () => {
   const [params] = useSearchParams();
   const navigate = useNavigate();
@@ -41,6 +50,8 @@ const CriarLoja = () => {
   const [storeData, setStoreData] = useState<StoreData>({ nome: "", slug: "", email: "", telefone: "" });
   const [cardData, setCardData] = useState({ number: "", name: "", expiry: "", cvv: "" });
   const [processing, setProcessing] = useState(false);
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [triedAdvance, setTriedAdvance] = useState(false);
 
   const price = billingParam === "anual" ? plan.price * 12 * 0.8 : plan.price;
 
@@ -62,16 +73,54 @@ const CriarLoja = () => {
     setCardData((prev) => ({ ...prev, [field]: value }));
   };
 
+  const markTouched = (field: string) => setTouched((p) => ({ ...p, [field]: true }));
+
+  // Validation
+  const getStoreErrors = (): FieldErrors => {
+    const errors: FieldErrors = {};
+    if (storeData.nome.length === 0) errors.nome = "Nome da loja é obrigatório";
+    else if (storeData.nome.length < 3) errors.nome = "Nome deve ter pelo menos 3 caracteres";
+    else if (storeData.nome.length > 60) errors.nome = "Nome deve ter no máximo 60 caracteres";
+    if (storeData.slug.length === 0) errors.slug = "URL é obrigatória";
+    else if (!/^[a-z0-9-]+$/.test(storeData.slug)) errors.slug = "URL deve conter apenas letras minúsculas, números e hífens";
+    if (storeData.email.length === 0) errors.email = "E-mail é obrigatório";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(storeData.email)) errors.email = "E-mail inválido";
+    else if (storeData.email.length > 255) errors.email = "E-mail muito longo";
+    return errors;
+  };
+
+  const getCardErrors = (): FieldErrors => {
+    if (plan.price === 0) return {};
+    const errors: FieldErrors = {};
+    const num = cardData.number.replace(/\s/g, "");
+    if (num.length === 0) errors.number = "Número do cartão é obrigatório";
+    else if (num.length < 16) errors.number = "Número deve ter 16 dígitos";
+    if (cardData.name.length === 0) errors.name = "Nome no cartão é obrigatório";
+    else if (cardData.name.length < 3) errors.name = "Nome deve ter pelo menos 3 caracteres";
+    if (cardData.expiry.length === 0) errors.expiry = "Validade é obrigatória";
+    else if (cardData.expiry.length < 5) errors.expiry = "Formato: MM/AA";
+    if (cardData.cvv.length === 0) errors.cvv = "CVV é obrigatório";
+    else if (cardData.cvv.length < 3) errors.cvv = "CVV deve ter 3 dígitos";
+    return errors;
+  };
+
+  const storeErrors = getStoreErrors();
+  const cardErrors = getCardErrors();
+
+  const showError = (field: string, errors: FieldErrors) =>
+    (touched[field] || triedAdvance) ? errors[field] : undefined;
+
   const canAdvance = () => {
-    if (step === 0) return storeData.nome.length >= 3 && storeData.email.includes("@");
-    if (step === 1) {
-      if (plan.price === 0) return true;
-      return cardData.number.replace(/\s/g, "").length === 16 && cardData.name.length >= 3 && cardData.expiry.length === 5 && cardData.cvv.length === 3;
-    }
+    if (step === 0) return Object.keys(storeErrors).length === 0;
+    if (step === 1) return Object.keys(cardErrors).length === 0;
     return true;
   };
 
   const handleNext = async () => {
+    setTriedAdvance(true);
+    if (!canAdvance()) return;
+    setTriedAdvance(false);
+
     if (step === 1) {
       setProcessing(true);
       await new Promise((r) => setTimeout(r, 2000));
@@ -123,18 +172,41 @@ const CriarLoja = () => {
                   <div className="space-y-3">
                     <div>
                       <Label>Nome da Loja *</Label>
-                      <Input placeholder="Minha Loja Circular" value={storeData.nome} onChange={(e) => handleStoreChange("nome", e.target.value)} />
+                      <Input
+                        placeholder="Minha Loja Circular"
+                        value={storeData.nome}
+                        onChange={(e) => handleStoreChange("nome", e.target.value)}
+                        onBlur={() => markTouched("nome")}
+                        className={showError("nome", storeErrors) ? "border-destructive" : ""}
+                        maxLength={60}
+                      />
+                      <FieldError message={showError("nome", storeErrors)} />
                     </div>
                     <div>
                       <Label>URL da Loja</Label>
-                      <div className="flex items-center gap-0 rounded-md border border-border overflow-hidden">
+                      <div className={`flex items-center gap-0 rounded-md border overflow-hidden ${showError("slug", storeErrors) ? "border-destructive" : "border-border"}`}>
                         <span className="px-3 py-2 bg-secondary text-muted-foreground text-sm border-r border-border whitespace-nowrap">circular.store/</span>
-                        <Input className="border-0 rounded-none" value={storeData.slug} onChange={(e) => setStoreData((p) => ({ ...p, slug: e.target.value }))} />
+                        <Input
+                          className="border-0 rounded-none"
+                          value={storeData.slug}
+                          onChange={(e) => setStoreData((p) => ({ ...p, slug: e.target.value }))}
+                          onBlur={() => markTouched("slug")}
+                        />
                       </div>
+                      <FieldError message={showError("slug", storeErrors)} />
                     </div>
                     <div>
                       <Label>E-mail *</Label>
-                      <Input type="email" placeholder="contato@minhaloja.com" value={storeData.email} onChange={(e) => handleStoreChange("email", e.target.value)} />
+                      <Input
+                        type="email"
+                        placeholder="contato@minhaloja.com"
+                        value={storeData.email}
+                        onChange={(e) => handleStoreChange("email", e.target.value)}
+                        onBlur={() => markTouched("email")}
+                        className={showError("email", storeErrors) ? "border-destructive" : ""}
+                        maxLength={255}
+                      />
+                      <FieldError message={showError("email", storeErrors)} />
                     </div>
                     <div>
                       <Label>Telefone</Label>
@@ -160,20 +232,48 @@ const CriarLoja = () => {
                     <div className="space-y-3">
                       <div>
                         <Label>Número do Cartão</Label>
-                        <Input placeholder="0000 0000 0000 0000" value={cardData.number} onChange={(e) => handleCardChange("number", e.target.value)} />
+                        <Input
+                          placeholder="0000 0000 0000 0000"
+                          value={cardData.number}
+                          onChange={(e) => handleCardChange("number", e.target.value)}
+                          onBlur={() => markTouched("number")}
+                          className={showError("number", cardErrors) ? "border-destructive" : ""}
+                        />
+                        <FieldError message={showError("number", cardErrors)} />
                       </div>
                       <div>
                         <Label>Nome no Cartão</Label>
-                        <Input placeholder="MARIA SILVA" value={cardData.name} onChange={(e) => handleCardChange("name", e.target.value.toUpperCase())} />
+                        <Input
+                          placeholder="MARIA SILVA"
+                          value={cardData.name}
+                          onChange={(e) => handleCardChange("name", e.target.value.toUpperCase())}
+                          onBlur={() => markTouched("name")}
+                          className={showError("name", cardErrors) ? "border-destructive" : ""}
+                        />
+                        <FieldError message={showError("name", cardErrors)} />
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         <div>
                           <Label>Validade</Label>
-                          <Input placeholder="MM/AA" value={cardData.expiry} onChange={(e) => handleCardChange("expiry", e.target.value)} />
+                          <Input
+                            placeholder="MM/AA"
+                            value={cardData.expiry}
+                            onChange={(e) => handleCardChange("expiry", e.target.value)}
+                            onBlur={() => markTouched("expiry")}
+                            className={showError("expiry", cardErrors) ? "border-destructive" : ""}
+                          />
+                          <FieldError message={showError("expiry", cardErrors)} />
                         </div>
                         <div>
                           <Label>CVV</Label>
-                          <Input placeholder="123" value={cardData.cvv} onChange={(e) => handleCardChange("cvv", e.target.value)} />
+                          <Input
+                            placeholder="123"
+                            value={cardData.cvv}
+                            onChange={(e) => handleCardChange("cvv", e.target.value)}
+                            onBlur={() => markTouched("cvv")}
+                            className={showError("cvv", cardErrors) ? "border-destructive" : ""}
+                          />
+                          <FieldError message={showError("cvv", cardErrors)} />
                         </div>
                       </div>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground mt-2">
@@ -240,7 +340,7 @@ const CriarLoja = () => {
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Voltar
               </Button>
-              <Button onClick={handleNext} disabled={!canAdvance() || processing}>
+              <Button onClick={handleNext} disabled={processing}>
                 {processing ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
