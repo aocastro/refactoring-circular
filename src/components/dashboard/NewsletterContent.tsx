@@ -99,6 +99,17 @@ const NewsletterContent = () => {
     }
   };
 
+  const handleSendCampaign = (campaign: Campaign) => {
+    setCampaignsList((prev) =>
+      prev.map((c) =>
+        c.id === campaign.id
+          ? { ...c, status: "enviada", enviados: 342, abertos: 0, cliques: 0, data: new Date().toLocaleDateString("pt-BR") }
+          : c
+      )
+    );
+    setPreviewCampaign(null);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
