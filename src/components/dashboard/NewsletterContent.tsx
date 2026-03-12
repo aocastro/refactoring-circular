@@ -11,6 +11,7 @@ import PaginationControls, { usePagination } from "@/components/shared/Paginatio
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from "recharts";
 import { chartTooltipStyle, chartGridStroke, chartAxisStroke, chartAxisFontSize, chartColors } from "@/lib/chart-config";
 import CampaignFormDialog, { type Campaign } from "./CampaignFormDialog";
+import CampaignPreviewDialog from "./CampaignPreviewDialog";
 
 const subscribers = [
   { id: 1, email: "maria@email.com", nome: "Maria Silva", data: "10/01/2026", status: "ativo" },
