@@ -303,9 +303,34 @@ const PDVPage = () => {
 
           {/* Bottom totals + pay button */}
           <div className="border-t border-border p-3 space-y-3 bg-card">
-            <div className="flex items-center gap-2">
-              <User className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-              <Input placeholder="Cliente (opcional)" value={customerName} onChange={(e) => setCustomerName(e.target.value)} className="h-8 text-xs bg-secondary border-border" />
+            <div className="relative" ref={customerRef}>
+              <div className="flex items-center gap-2">
+                <User className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                <Input
+                  placeholder="Buscar cliente por nome, telefone ou e-mail..."
+                  value={customerInput}
+                  onChange={(e) => { setCustomerInput(e.target.value); setCustomerName(e.target.value); setShowCustomerDropdown(true); }}
+                  onFocus={() => setShowCustomerDropdown(true)}
+                  className="h-8 text-xs bg-secondary border-border"
+                />
+                {customerName && (
+                  <button onClick={() => { setCustomerName(""); setCustomerInput(""); }} className="text-muted-foreground hover:text-foreground"><X className="h-3.5 w-3.5" /></button>
+                )}
+              </div>
+              {showCustomerDropdown && filteredClients.length > 0 && (
+                <div className="absolute bottom-full left-0 right-0 mb-1 rounded-lg border border-border bg-card shadow-lg z-50 max-h-48 overflow-y-auto">
+                  {filteredClients.map((client) => (
+                    <button
+                      key={client.id}
+                      onClick={() => { setCustomerName(client.name); setCustomerInput(client.name); setShowCustomerDropdown(false); }}
+                      className="w-full text-left px-3 py-2 hover:bg-secondary/50 transition-colors border-b border-border last:border-0"
+                    >
+                      <p className="text-xs font-medium text-foreground">{client.name}</p>
+                      <p className="text-[10px] text-muted-foreground">{client.phone} • {client.email} • {client.totalPurchases} compras</p>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="flex items-center gap-2">
               <PercentCircle className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
