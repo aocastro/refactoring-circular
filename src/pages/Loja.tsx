@@ -13,8 +13,7 @@ const Loja = () => {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("Todos");
   const [bannerIndex, setBannerIndex] = useState(0);
-
-  const store = mockStore; // In production, fetch by slug
+  const { totalItems, setIsOpen } = useCart();
 
   const newArrivals = storeProducts.slice(0, 10);
   const featured = storeProducts.filter((p) => p.highlight);
