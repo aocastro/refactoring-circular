@@ -203,6 +203,7 @@ const Planos = () => {
                         : "bg-secondary text-foreground hover:bg-secondary/80"
                     }`}
                     size="sm"
+                    onClick={() => navigate(`/criar-loja?plano=${plan.name.toLowerCase()}&billing=${billing}`)}
                   >
                     {plan.cta}
                   </Button>
