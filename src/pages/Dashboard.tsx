@@ -13,6 +13,7 @@ import CatalogoContent from "@/components/dashboard/CatalogoContent";
 import InventarioContent from "@/components/dashboard/InventarioContent";
 import ClientesContent from "@/components/dashboard/ClientesContent";
 import CuponsContent from "@/components/dashboard/CuponsContent";
+import PDVContent from "@/components/dashboard/PDVContent";
 import NotificationsDropdown from "@/components/dashboard/NotificationsDropdown";
 import { useTheme } from "@/hooks/use-theme";
 
