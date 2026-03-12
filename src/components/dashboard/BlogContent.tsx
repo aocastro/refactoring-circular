@@ -83,6 +83,10 @@ const BlogContent = ({ defaultTab = "posts" }: Props) => {
   // Categoria form
   const [cNome, setCNome] = useState("");
 
+  // Pagination
+  const [postsPage, setPostsPage] = useState(1);
+  const postsPerPage = 5;
+
   const resetPostForm = () => { setPTitulo(""); setPCategoria(""); setPConteudo(""); setPStatus("rascunho"); setEditingPost(null); setErrors({}); };
   const resetCatForm = () => { setCNome(""); setEditingCat(null); setErrors({}); };
 
