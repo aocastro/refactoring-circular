@@ -15,6 +15,7 @@ import NotFound from "./pages/NotFound";
 import Loja from "./pages/Loja";
 import ProdutoLoja from "./pages/ProdutoLoja";
 import Checkout from "./pages/Checkout";
+import CriarLoja from "./pages/CriarLoja";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () => (
             <Route path="/loja/:slug" element={<Loja />} />
             <Route path="/loja/:slug/p/:id" element={<ProdutoLoja />} />
             <Route path="/checkout" element={<Checkout />} />
+            <Route path="/criar-loja" element={<CriarLoja />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           </BrowserRouter>
