@@ -56,8 +56,13 @@ const ProdutoLoja = () => {
             <span className="text-2xl">{mockStore.logo}</span>
             <span className="font-display font-bold text-foreground text-lg">{mockStore.name}</span>
           </Link>
-          <button className="relative p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors">
+          <button onClick={() => setIsOpen(true)} className="relative p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors">
             <ShoppingCart className="h-5 w-5" />
+            {totalItems > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center">
+                {totalItems}
+              </span>
+            )}
           </button>
         </div>
       </header>
