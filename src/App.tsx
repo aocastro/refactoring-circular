@@ -16,6 +16,7 @@ import Loja from "./pages/Loja";
 import ProdutoLoja from "./pages/ProdutoLoja";
 import Checkout from "./pages/Checkout";
 import CriarLoja from "./pages/CriarLoja";
+import PDVPage from "./pages/PDVPage";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/loja/:slug/p/:id" element={<ProdutoLoja />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/criar-loja" element={<CriarLoja />} />
+            <Route path="/pdv/:id" element={<PDVPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           </BrowserRouter>
