@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Truck, Plus, Search, Phone, Mail, MapPin, Edit, Trash2 } from "lucide-react";
+import { Truck, Plus, Search, Phone, Mail, MapPin, Edit, Trash2, Download } from "lucide-react";
+import { exportToCSV } from "@/lib/export";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
