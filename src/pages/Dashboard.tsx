@@ -68,6 +68,7 @@ const Dashboard = () => {
       case "funcionarios": return <FuncionariosContent />;
       case "cupons": return <CuponsContent />;
       case "relatorios": return <RelatoriosContent />;
+      case "blog":
       case "blog-posts": return <BlogContent defaultTab="posts" />;
       case "blog-categorias": return <BlogContent defaultTab="categorias" />;
       case "meu-linktree": return <LinktreeContent />;
