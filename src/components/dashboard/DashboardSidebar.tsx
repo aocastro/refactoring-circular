@@ -59,15 +59,7 @@ const menuItems: MenuItem[] = [
       { id: "venda-catalogo", title: "Catálogo" },
     ],
   },
-  {
-    id: "servicos",
-    title: "Serviços",
-    icon: Scissors,
-    children: [
-      { id: "servicos-agendamentos", title: "Agendamentos" },
-      { id: "servicos-lista", title: "Lista de Serviços" },
-    ],
-  },
+  { id: "servicos", title: "Serviços", icon: Scissors },
   { id: "inventario", title: "Inventário", icon: ClipboardList },
   { id: "consignantes", title: "Consignantes", icon: Handshake },
   { id: "fornecedores", title: "Fornecedores", icon: Truck },
