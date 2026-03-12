@@ -36,9 +36,10 @@ const App = () => (
             <Route path="/loja/:slug/p/:id" element={<ProdutoLoja />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
+          </BrowserRouter>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </CartProvider>
   </ThemeProvider>
 );
 
