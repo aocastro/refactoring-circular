@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Users, Mail, Send, Plus, TrendingUp, Download } from "lucide-react";
+import { Users, Mail, Send, Plus, TrendingUp, Download, Pencil } from "lucide-react";
 import { exportToCSV } from "@/lib/export";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +8,7 @@ import FilterToolbar from "@/components/shared/FilterToolbar";
 import PaginationControls, { usePagination } from "@/components/shared/PaginationControls";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from "recharts";
 import { chartTooltipStyle, chartGridStroke, chartAxisStroke, chartAxisFontSize, chartColors } from "@/lib/chart-config";
+import CampaignFormDialog, { type Campaign } from "./CampaignFormDialog";
 
 const subscribers = [
   { id: 1, email: "maria@email.com", nome: "Maria Silva", data: "10/01/2026", status: "ativo" },
@@ -17,13 +18,13 @@ const subscribers = [
   { id: 5, email: "carla@email.com", nome: "Carla Dias", data: "08/03/2026", status: "ativo" },
 ];
 
-const campaigns = [
-  { id: 1, titulo: "Novidades de Março", enviados: 342, abertos: 198, cliques: 45, data: "01/03/2026", status: "enviada" },
-  { id: 2, titulo: "Promoção de Verão", enviados: 310, abertos: 215, cliques: 72, data: "15/02/2026", status: "enviada" },
-  { id: 3, titulo: "Lançamento Coleção Eco", enviados: 0, abertos: 0, cliques: 0, data: "20/03/2026", status: "rascunho" },
-  { id: 4, titulo: "Black Friday Sustentável", enviados: 450, abertos: 290, cliques: 95, data: "25/11/2025", status: "enviada" },
-  { id: 5, titulo: "Natal Consciente", enviados: 380, abertos: 245, cliques: 68, data: "20/12/2025", status: "enviada" },
-  { id: 6, titulo: "Ano Novo, Moda Nova", enviados: 290, abertos: 170, cliques: 42, data: "05/01/2026", status: "enviada" },
+const initialCampaigns: Campaign[] = [
+  { id: 1, titulo: "Novidades de Março", assunto: "Confira as novidades!", conteudo: "Conteúdo da campanha de março.", enviados: 342, abertos: 198, cliques: 45, data: "01/03/2026", status: "enviada" },
+  { id: 2, titulo: "Promoção de Verão", assunto: "Descontos especiais de verão", conteudo: "Aproveite os descontos de verão.", enviados: 310, abertos: 215, cliques: 72, data: "15/02/2026", status: "enviada" },
+  { id: 3, titulo: "Lançamento Coleção Eco", assunto: "Nova coleção sustentável", conteudo: "Conheça nossa nova coleção eco-friendly.", enviados: 0, abertos: 0, cliques: 0, data: "20/03/2026", status: "rascunho" },
+  { id: 4, titulo: "Black Friday Sustentável", assunto: "Black Friday chegou!", conteudo: "Ofertas imperdíveis na Black Friday.", enviados: 450, abertos: 290, cliques: 95, data: "25/11/2025", status: "enviada" },
+  { id: 5, titulo: "Natal Consciente", assunto: "Presentes com propósito", conteudo: "Sugestões de presentes sustentáveis.", enviados: 380, abertos: 245, cliques: 68, data: "20/12/2025", status: "enviada" },
+  { id: 6, titulo: "Ano Novo, Moda Nova", assunto: "Comece o ano com estilo", conteudo: "Tendências para o novo ano.", enviados: 290, abertos: 170, cliques: 42, data: "05/01/2026", status: "enviada" },
 ];
 
 const performanceData = [
@@ -47,13 +48,17 @@ const NewsletterContent = () => {
   const [subPage, setSubPage] = useState(1);
   const perPage = 5;
 
+  const [campaignsList, setCampaignsList] = useState<Campaign[]>(initialCampaigns);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
+
   const filteredSubs = subscribers.filter((s) => {
     const matchSearch = s.email.includes(subSearch) || s.nome.toLowerCase().includes(subSearch.toLowerCase());
     const matchStatus = subStatus === "Todos" || s.status === subStatus;
     return matchSearch && matchStatus;
   });
 
-  const filteredCamps = campaigns.filter((c) => {
+  const filteredCamps = campaignsList.filter((c) => {
     const matchSearch = c.titulo.toLowerCase().includes(campSearch.toLowerCase());
     const matchStatus = campStatus === "Todos" || c.status === campStatus;
     return matchSearch && matchStatus;
@@ -61,6 +66,25 @@ const NewsletterContent = () => {
 
   const campPagination = usePagination(filteredCamps, perPage, campPage);
   const subPagination = usePagination(filteredSubs, perPage, subPage);
+
+  const handleSaveCampaign = (campaign: Campaign) => {
+    setCampaignsList((prev) => {
+      const exists = prev.find((c) => c.id === campaign.id);
+      if (exists) return prev.map((c) => (c.id === campaign.id ? campaign : c));
+      return [campaign, ...prev];
+    });
+    setEditingCampaign(null);
+  };
+
+  const handleNewCampaign = () => {
+    setEditingCampaign(null);
+    setDialogOpen(true);
+  };
+
+  const handleEditCampaign = (campaign: Campaign) => {
+    setEditingCampaign(campaign);
+    setDialogOpen(true);
+  };
 
   return (
     <div className="space-y-6">
@@ -73,7 +97,7 @@ const NewsletterContent = () => {
           <Button variant="outline" size="sm" className="border-border" onClick={() => {
             exportToCSV(subscribers.map(s => ({ Nome: s.nome, Email: s.email, Data: s.data, Status: s.status })), "newsletter-assinantes");
           }}><Download className="h-4 w-4 mr-2" />Exportar</Button>
-          <Button size="sm"><Plus className="h-4 w-4 mr-2" />Nova Campanha</Button>
+          <Button size="sm" onClick={handleNewCampaign}><Plus className="h-4 w-4 mr-2" />Nova Campanha</Button>
         </div>
       </div>
 
@@ -81,7 +105,7 @@ const NewsletterContent = () => {
         <KpiCard label="Assinantes" value="342" change="+18" icon={Users} positive delay={0} />
         <KpiCard label="Taxa de Abertura" value="57%" change="+3%" icon={Mail} positive delay={0.05} />
         <KpiCard label="Taxa de Cliques" value="13%" change="+2%" icon={TrendingUp} positive delay={0.1} />
-        <KpiCard label="Campanhas Enviadas" value="12" change="+2" icon={Send} positive delay={0.15} />
+        <KpiCard label="Campanhas Enviadas" value={String(campaignsList.filter(c => c.status === "enviada").length)} change="+2" icon={Send} positive delay={0.15} />
       </div>
 
       {/* Gráficos de Performance */}
@@ -140,11 +164,12 @@ const NewsletterContent = () => {
                 <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden sm:table-cell">Abertos</th>
                 <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden md:table-cell">Data</th>
                 <th className="text-left py-3 px-4 text-muted-foreground font-medium">Status</th>
+                <th className="text-left py-3 px-4 text-muted-foreground font-medium w-12"></th>
               </tr>
             </thead>
             <tbody>
               {campPagination.paginatedItems.length === 0 ? (
-                <tr><td colSpan={5} className="py-8 text-center text-muted-foreground">Nenhuma campanha encontrada.</td></tr>
+                <tr><td colSpan={6} className="py-8 text-center text-muted-foreground">Nenhuma campanha encontrada.</td></tr>
               ) : campPagination.paginatedItems.map((c) => (
                 <tr key={c.id} className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors">
                   <td className="py-3 px-4 text-foreground font-medium">{c.titulo}</td>
@@ -153,6 +178,11 @@ const NewsletterContent = () => {
                   <td className="py-3 px-4 text-muted-foreground hidden md:table-cell">{c.data}</td>
                   <td className="py-3 px-4">
                     <Badge variant={c.status === "enviada" ? "default" : "secondary"}>{c.status}</Badge>
+                  </td>
+                  <td className="py-3 px-4">
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleEditCampaign(c)}>
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
                   </td>
                 </tr>
               ))}
@@ -201,6 +231,13 @@ const NewsletterContent = () => {
         </div>
         <PaginationControls currentPage={subPagination.safePage} totalPages={subPagination.totalPages} totalItems={subPagination.totalItems} itemsPerPage={perPage} onPageChange={setSubPage} />
       </div>
+
+      <CampaignFormDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        campaign={editingCampaign}
+        onSave={handleSaveCampaign}
+      />
     </div>
   );
 };
