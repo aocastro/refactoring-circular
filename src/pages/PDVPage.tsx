@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { storeProducts } from "@/data/store";
+import { mockClientes } from "@/data/clientes";
 
 interface CartItem {
   id: number;
@@ -32,7 +33,7 @@ interface PaymentEntry {
 interface RegisteredSale {
   id: number;
   time: string;
-  items: number;
+  items: CartItem[];
   total: number;
   payments: PaymentEntry[];
   customer: string;
@@ -56,6 +57,9 @@ const PDVPage = () => {
   const [search, setSearch] = useState("");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [customerName, setCustomerName] = useState("");
+  const [customerInput, setCustomerInput] = useState("");
+  const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
+  const customerRef = useRef<HTMLDivElement>(null);
   const [discount, setDiscount] = useState(0);
   const [sales, setSales] = useState<RegisteredSale[]>([]);
   const [showHistory, setShowHistory] = useState(false);
@@ -143,7 +147,7 @@ const PDVPage = () => {
     const newSale: RegisteredSale = {
       id: sales.length + 1,
       time: `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`,
-      items: totalItems,
+      items: [...cart],
       total: cartTotalWithDiscount,
       payments: finalPayments,
       customer: customerName || "Cliente Avulso",
@@ -153,9 +157,89 @@ const PDVPage = () => {
     setLastSale(newSale);
     setCart([]);
     setCustomerName("");
+    setCustomerInput("");
     setDiscount(0);
     setPaymentStep("receipt");
   };
+
+  const printThermalReceipt = (sale: RegisteredSale) => {
+    const LINE = "─".repeat(42);
+    const DLINE = "═".repeat(42);
+    const pad = (left: string, right: string, width = 42) => {
+      const space = width - left.length - right.length;
+      return left + " ".repeat(Math.max(1, space)) + right;
+    };
+    const center = (text: string, width = 42) => {
+      const space = Math.max(0, width - text.length);
+      const left = Math.floor(space / 2);
+      return " ".repeat(left) + text;
+    };
+
+    const lines: string[] = [];
+    lines.push(center("CIRCULAR u-SHAR"));
+    lines.push(center("CNPJ: 00.000.000/0001-00"));
+    lines.push(center("Cupom Não Fiscal"));
+    lines.push(DLINE);
+    lines.push(pad("Venda #:", String(sale.id)));
+    lines.push(pad("Data:", `${new Date().toLocaleDateString("pt-BR")} ${sale.time}`));
+    lines.push(pad("Caixa:", caixaId || "01"));
+    lines.push(pad("Cliente:", sale.customer));
+    lines.push(LINE);
+    lines.push("ITEM                        QTD    VALOR");
+    lines.push(LINE);
+    sale.items.forEach((item) => {
+      const name = item.name.length > 28 ? item.name.substring(0, 25) + "..." : item.name;
+      lines.push(pad(name, `${item.quantity}  ${formatPrice(item.price * item.quantity)}`));
+    });
+    lines.push(LINE);
+    if (sale.discount > 0) {
+      lines.push(pad(`Desconto (${sale.discount}%):`, `-${formatPrice(sale.total * sale.discount / (100 - sale.discount))}`));
+    }
+    lines.push(pad("TOTAL:", formatPrice(sale.total)));
+    lines.push(DLINE);
+    lines.push("PAGAMENTO:");
+    sale.payments.forEach((p) => {
+      lines.push(pad(`  ${p.method}`, formatPrice(p.amount)));
+    });
+    lines.push(LINE);
+    lines.push(center("Obrigado pela compra!"));
+    lines.push(center("circular.store"));
+    lines.push("");
+    lines.push("");
+    lines.push("");
+
+    const printWindow = window.open("", "_blank", "width=360,height=600");
+    if (!printWindow) { toast.error("Popup bloqueado. Permita popups para imprimir."); return; }
+    printWindow.document.write(`<!DOCTYPE html><html><head><title>Cupom</title>
+<style>
+  @page { margin: 0; size: 80mm auto; }
+  body { font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.4; margin: 0; padding: 4mm; width: 72mm; color: #000; }
+  pre { margin: 0; white-space: pre-wrap; word-break: break-all; }
+</style></head><body><pre>${lines.join("\n")}</pre>
+<script>window.onload=function(){window.print();setTimeout(function(){window.close()},500);}<\/script>
+</body></html>`);
+    printWindow.document.close();
+  };
+
+  const filteredClients = useMemo(() => {
+    if (!customerInput) return [];
+    return mockClientes.filter((c) =>
+      c.name.toLowerCase().includes(customerInput.toLowerCase()) ||
+      c.phone.includes(customerInput) ||
+      c.email.toLowerCase().includes(customerInput.toLowerCase())
+    ).slice(0, 5);
+  }, [customerInput]);
+
+  // Click outside to close customer dropdown
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (customerRef.current && !customerRef.current.contains(e.target as Node)) {
+        setShowCustomerDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   const closeReceipt = () => {
     setPaymentStep("idle");
@@ -278,9 +362,34 @@ const PDVPage = () => {
 
           {/* Bottom totals + pay button */}
           <div className="border-t border-border p-3 space-y-3 bg-card">
-            <div className="flex items-center gap-2">
-              <User className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-              <Input placeholder="Cliente (opcional)" value={customerName} onChange={(e) => setCustomerName(e.target.value)} className="h-8 text-xs bg-secondary border-border" />
+            <div className="relative" ref={customerRef}>
+              <div className="flex items-center gap-2">
+                <User className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                <Input
+                  placeholder="Buscar cliente por nome, telefone ou e-mail..."
+                  value={customerInput}
+                  onChange={(e) => { setCustomerInput(e.target.value); setCustomerName(e.target.value); setShowCustomerDropdown(true); }}
+                  onFocus={() => setShowCustomerDropdown(true)}
+                  className="h-8 text-xs bg-secondary border-border"
+                />
+                {customerName && (
+                  <button onClick={() => { setCustomerName(""); setCustomerInput(""); }} className="text-muted-foreground hover:text-foreground"><X className="h-3.5 w-3.5" /></button>
+                )}
+              </div>
+              {showCustomerDropdown && filteredClients.length > 0 && (
+                <div className="absolute bottom-full left-0 right-0 mb-1 rounded-lg border border-border bg-card shadow-lg z-50 max-h-48 overflow-y-auto">
+                  {filteredClients.map((client) => (
+                    <button
+                      key={client.id}
+                      onClick={() => { setCustomerName(client.name); setCustomerInput(client.name); setShowCustomerDropdown(false); }}
+                      className="w-full text-left px-3 py-2 hover:bg-secondary/50 transition-colors border-b border-border last:border-0"
+                    >
+                      <p className="text-xs font-medium text-foreground">{client.name}</p>
+                      <p className="text-[10px] text-muted-foreground">{client.phone} • {client.email} • {client.totalPurchases} compras</p>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="flex items-center gap-2">
               <PercentCircle className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
@@ -313,7 +422,7 @@ const PDVPage = () => {
                 ) : sales.map((sale) => (
                   <div key={sale.id} className="p-3 text-xs space-y-1">
                     <div className="flex justify-between"><span className="text-muted-foreground">#{sale.id} • {sale.time}</span><span className="font-bold text-foreground">{formatPrice(sale.total)}</span></div>
-                    <div className="flex justify-between text-muted-foreground"><span>{sale.customer}</span><span>{sale.items} itens</span></div>
+                    <div className="flex justify-between text-muted-foreground"><span>{sale.customer}</span><span>{sale.items.reduce((a, i) => a + i.quantity, 0)} itens</span></div>
                     <div className="flex flex-wrap gap-1 mt-1">
                       {sale.payments.map((p, i) => (
                         <span key={i} className="px-1.5 py-0.5 rounded bg-secondary text-foreground text-[10px]">{p.method} {formatPrice(p.amount)}</span>
@@ -545,7 +654,12 @@ const PDVPage = () => {
 
                   <div className="border-b border-dashed border-border pb-3 space-y-1">
                     <p className="text-muted-foreground font-bold">ITENS</p>
-                    <div className="flex justify-between"><span className="text-muted-foreground">{lastSale.items} itens</span></div>
+                    {lastSale.items.map((item, i) => (
+                      <div key={i} className="flex justify-between">
+                        <span className="text-foreground">{item.quantity}x {item.name}</span>
+                        <span className="text-muted-foreground">{formatPrice(item.price * item.quantity)}</span>
+                      </div>
+                    ))}
                     {lastSale.discount > 0 && (
                       <div className="flex justify-between text-destructive"><span>Desconto ({lastSale.discount}%)</span><span>-{formatPrice(lastSale.total * lastSale.discount / (100 - lastSale.discount))}</span></div>
                     )}
@@ -566,8 +680,8 @@ const PDVPage = () => {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button variant="outline" className="flex-1" onClick={() => { toast.success("Cupom enviado para impressão!"); }}>
-                    <Printer className="h-4 w-4 mr-2" />Imprimir
+                  <Button variant="outline" className="flex-1" onClick={() => { if (lastSale) printThermalReceipt(lastSale); }}>
+                    <Printer className="h-4 w-4 mr-2" />Imprimir 80col
                   </Button>
                   <Button className="flex-1 bg-gradient-primary text-primary-foreground" onClick={closeReceipt}>
                     Nova Venda
