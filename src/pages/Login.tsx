@@ -196,11 +196,15 @@ const Login = () => {
           </div>
 
           {/* Demo credentials */}
-          <div className="mt-4 p-3 rounded-lg bg-secondary/50 border border-border">
+          <button
+            type="button"
+            onClick={() => { setEmail(MOCK_USER.email); setPassword(MOCK_USER.password); }}
+            className="mt-4 w-full p-3 rounded-lg bg-secondary/50 border border-border hover:bg-secondary transition-colors cursor-pointer"
+          >
             <p className="text-xs text-muted-foreground text-center">
               <strong className="text-foreground">Demo:</strong> maria_demo@uorak.com / Senha@123
             </p>
-          </div>
+          </button>
         </motion.div>
       </div>
     </div>
