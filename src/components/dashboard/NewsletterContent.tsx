@@ -72,34 +72,42 @@ const NewsletterContent = () => {
             { key: "status", label: "Status", options: statusCampOptions, value: campStatus, onChange: setCampStatus },
           ]}
         />
-        <div className="rounded-xl border border-border bg-card overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border bg-secondary/30">
-                <th className="text-left py-3 px-4 text-muted-foreground font-medium">Título</th>
-                <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden sm:table-cell">Enviados</th>
-                <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden sm:table-cell">Abertos</th>
-                <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden md:table-cell">Data</th>
-                <th className="text-left py-3 px-4 text-muted-foreground font-medium">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredCamps.length === 0 ? (
-                <tr><td colSpan={5} className="py-8 text-center text-muted-foreground">Nenhuma campanha encontrada.</td></tr>
-              ) : filteredCamps.map((c) => (
-                <tr key={c.id} className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors">
-                  <td className="py-3 px-4 text-foreground font-medium">{c.titulo}</td>
-                  <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">{c.enviados}</td>
-                  <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">{c.abertos}</td>
-                  <td className="py-3 px-4 text-muted-foreground hidden md:table-cell">{c.data}</td>
-                  <td className="py-3 px-4">
-                    <Badge variant={c.status === "enviada" ? "default" : "secondary"}>{c.status}</Badge>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        {(() => {
+          const { paginatedItems, totalPages, safePage, totalItems } = usePagination(filteredCamps, perPage, campPage);
+          return (
+            <>
+              <div className="rounded-xl border border-border bg-card overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-border bg-secondary/30">
+                      <th className="text-left py-3 px-4 text-muted-foreground font-medium">Título</th>
+                      <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden sm:table-cell">Enviados</th>
+                      <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden sm:table-cell">Abertos</th>
+                      <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden md:table-cell">Data</th>
+                      <th className="text-left py-3 px-4 text-muted-foreground font-medium">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {paginatedItems.length === 0 ? (
+                      <tr><td colSpan={5} className="py-8 text-center text-muted-foreground">Nenhuma campanha encontrada.</td></tr>
+                    ) : paginatedItems.map((c) => (
+                      <tr key={c.id} className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors">
+                        <td className="py-3 px-4 text-foreground font-medium">{c.titulo}</td>
+                        <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">{c.enviados}</td>
+                        <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">{c.abertos}</td>
+                        <td className="py-3 px-4 text-muted-foreground hidden md:table-cell">{c.data}</td>
+                        <td className="py-3 px-4">
+                          <Badge variant={c.status === "enviada" ? "default" : "secondary"}>{c.status}</Badge>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <PaginationControls currentPage={safePage} totalPages={totalPages} totalItems={totalItems} itemsPerPage={perPage} onPageChange={setCampPage} />
+            </>
+          );
+        })()}
       </div>
 
       {/* Assinantes */}
