@@ -231,6 +231,7 @@ const Loja = () => {
           </p>
         </div>
       </footer>
+      <CartDrawer />
     </div>
   );
 };

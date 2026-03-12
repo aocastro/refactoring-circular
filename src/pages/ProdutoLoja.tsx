@@ -15,6 +15,8 @@ const ProdutoLoja = () => {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const { addItem, totalItems, setIsOpen } = useCart();
+  const { toast } = useToast();
 
   if (!product) {
     return (
