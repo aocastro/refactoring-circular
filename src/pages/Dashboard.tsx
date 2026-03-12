@@ -9,6 +9,7 @@ import MyAccountContent from "@/components/dashboard/MyAccountContent";
 import VendaContent from "@/components/dashboard/VendaContent";
 import ConsignacaoContent from "@/components/dashboard/ConsignacaoContent";
 import FinanceiroContent from "@/components/dashboard/FinanceiroContent";
+import CatalogoContent from "@/components/dashboard/CatalogoContent";
 import NotificationsDropdown from "@/components/dashboard/NotificationsDropdown";
 import { useTheme } from "@/hooks/use-theme";
 
