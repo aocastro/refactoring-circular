@@ -135,10 +135,10 @@ const NewsletterContent = () => {
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <KpiCard label="Assinantes" value="342" change="+18" icon={Users} positive delay={0} />
-        <KpiCard label="Taxa de Abertura" value="57%" change="+3%" icon={Mail} positive delay={0.05} />
-        <KpiCard label="Taxa de Cliques" value="13%" change="+2%" icon={TrendingUp} positive delay={0.1} />
-        <KpiCard label="Campanhas Enviadas" value={String(campaignsList.filter(c => c.status === "enviada").length)} change="+2" icon={Send} positive delay={0.15} />
+        <KpiCard label="Assinantes Ativos" value={String(totalAssinantes)} change="+18" icon={Users} positive delay={0} />
+        <KpiCard label="Taxa de Abertura" value={`${taxaAbertura}%`} change="+3%" icon={Mail} positive delay={0.05} />
+        <KpiCard label="Taxa de Cliques" value={`${taxaCliques}%`} change="+2%" icon={TrendingUp} positive delay={0.1} />
+        <KpiCard label="Campanhas Enviadas" value={String(campanhasEnviadas.length)} change="+2" icon={Send} positive delay={0.15} />
       </div>
 
       {/* Gráficos de Performance */}
