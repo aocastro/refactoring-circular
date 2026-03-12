@@ -12,6 +12,7 @@ import ConsignanteLogin from "./pages/ConsignanteLogin";
 import ConsignantePainel from "./pages/ConsignantePainel";
 import NotFound from "./pages/NotFound";
 import Loja from "./pages/Loja";
+import ProdutoLoja from "./pages/ProdutoLoja";
 
 const queryClient = new QueryClient();
 
