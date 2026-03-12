@@ -52,7 +52,7 @@ const NewsletterContent = () => {
 
   const [campaignsList, setCampaignsList] = useState<Campaign[]>(initialCampaigns);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
+  const [deletingCampaign, setDeletingCampaign] = useState<Campaign | null>(null);
 
   const filteredSubs = subscribers.filter((s) => {
     const matchSearch = s.email.includes(subSearch) || s.nome.toLowerCase().includes(subSearch.toLowerCase());
