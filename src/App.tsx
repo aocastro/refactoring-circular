@@ -14,6 +14,7 @@ import ConsignantePainel from "./pages/ConsignantePainel";
 import NotFound from "./pages/NotFound";
 import Loja from "./pages/Loja";
 import ProdutoLoja from "./pages/ProdutoLoja";
+import Checkout from "./pages/Checkout";
 
 const queryClient = new QueryClient();
 
