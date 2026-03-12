@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import KpiCard from "@/components/shared/KpiCard";
 import FilterToolbar from "@/components/shared/FilterToolbar";
+import PaginationControls, { usePagination } from "@/components/shared/PaginationControls";
 
 const subscribers = [
   { id: 1, email: "maria@email.com", nome: "Maria Silva", data: "10/01/2026", status: "ativo" },
