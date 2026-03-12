@@ -209,7 +209,7 @@ const PDVPage = () => {
                 </div>
               ) : (
                 <div className="divide-y divide-border">
-                  {cart.map((item, idx) => (
+                  {cart.map((item) => (
                     <motion.div
                       key={item.id}
                       initial={{ opacity: 0, x: 20 }}
