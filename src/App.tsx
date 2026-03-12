@@ -11,6 +11,7 @@ import Planos from "./pages/Planos";
 import ConsignanteLogin from "./pages/ConsignanteLogin";
 import ConsignantePainel from "./pages/ConsignantePainel";
 import NotFound from "./pages/NotFound";
+import Loja from "./pages/Loja";
 
 const queryClient = new QueryClient();
 
