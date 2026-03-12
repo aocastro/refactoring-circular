@@ -110,7 +110,10 @@ const FornecedoresContent = () => {
           <h1 className="text-2xl font-bold font-display text-foreground">Fornecedores</h1>
           <p className="text-muted-foreground text-sm">Gerencie seus fornecedores e parceiros</p>
         </div>
-        <Button size="sm" onClick={() => { resetForm(); setDialogOpen(true); }}><Plus className="h-4 w-4 mr-2" />Novo Fornecedor</Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" className="border-border" onClick={() => exportToCSV(fornecedores.map(f => ({ Nome: f.nome, Categoria: f.categoria, Telefone: f.contato, Email: f.email, Cidade: f.cidade, Status: f.status })), "fornecedores")}><Download className="h-4 w-4 mr-2" />Exportar</Button>
+          <Button size="sm" onClick={() => { resetForm(); setDialogOpen(true); }}><Plus className="h-4 w-4 mr-2" />Novo Fornecedor</Button>
+        </div>
       </div>
 
       <div className="relative max-w-sm">
