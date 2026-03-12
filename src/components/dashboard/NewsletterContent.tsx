@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import KpiCard from "@/components/shared/KpiCard";
 import FilterToolbar from "@/components/shared/FilterToolbar";
 import PaginationControls, { usePagination } from "@/components/shared/PaginationControls";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from "recharts";
+import { chartTooltipStyle, chartGridStroke, chartAxisStroke, chartAxisFontSize, chartColors } from "@/lib/chart-config";
 
 const subscribers = [
   { id: 1, email: "maria@email.com", nome: "Maria Silva", data: "10/01/2026", status: "ativo" },
@@ -19,6 +21,18 @@ const campaigns = [
   { id: 1, titulo: "Novidades de Março", enviados: 342, abertos: 198, cliques: 45, data: "01/03/2026", status: "enviada" },
   { id: 2, titulo: "Promoção de Verão", enviados: 310, abertos: 215, cliques: 72, data: "15/02/2026", status: "enviada" },
   { id: 3, titulo: "Lançamento Coleção Eco", enviados: 0, abertos: 0, cliques: 0, data: "20/03/2026", status: "rascunho" },
+  { id: 4, titulo: "Black Friday Sustentável", enviados: 450, abertos: 290, cliques: 95, data: "25/11/2025", status: "enviada" },
+  { id: 5, titulo: "Natal Consciente", enviados: 380, abertos: 245, cliques: 68, data: "20/12/2025", status: "enviada" },
+  { id: 6, titulo: "Ano Novo, Moda Nova", enviados: 290, abertos: 170, cliques: 42, data: "05/01/2026", status: "enviada" },
+];
+
+const performanceData = [
+  { mes: "Out", abertura: 48, cliques: 10 },
+  { mes: "Nov", abertura: 64, cliques: 21 },
+  { mes: "Dez", abertura: 61, cliques: 18 },
+  { mes: "Jan", abertura: 55, cliques: 14 },
+  { mes: "Fev", abertura: 69, cliques: 23 },
+  { mes: "Mar", abertura: 58, cliques: 13 },
 ];
 
 const statusSubOptions = ["Todos", "ativo", "inativo"];
@@ -45,6 +59,9 @@ const NewsletterContent = () => {
     return matchSearch && matchStatus;
   });
 
+  const campPagination = usePagination(filteredCamps, perPage, campPage);
+  const subPagination = usePagination(filteredSubs, perPage, subPage);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -67,6 +84,42 @@ const NewsletterContent = () => {
         <KpiCard label="Campanhas Enviadas" value="12" change="+2" icon={Send} positive delay={0.15} />
       </div>
 
+      {/* Gráficos de Performance */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="rounded-xl border border-border bg-card p-5 space-y-3">
+          <h3 className="font-semibold text-foreground text-sm">Taxa de Abertura (%)</h3>
+          <ResponsiveContainer width="100%" height={220}>
+            <AreaChart data={performanceData}>
+              <defs>
+                <linearGradient id="gradAbertura" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={chartColors.primary} stopOpacity={0.3} />
+                  <stop offset="95%" stopColor={chartColors.primary} stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke={chartGridStroke} />
+              <XAxis dataKey="mes" stroke={chartAxisStroke} fontSize={chartAxisFontSize} />
+              <YAxis stroke={chartAxisStroke} fontSize={chartAxisFontSize} unit="%" />
+              <Tooltip contentStyle={chartTooltipStyle} />
+              <Area type="monotone" dataKey="abertura" stroke={chartColors.primary} fill="url(#gradAbertura)" strokeWidth={2} name="Abertura" />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="rounded-xl border border-border bg-card p-5 space-y-3">
+          <h3 className="font-semibold text-foreground text-sm">Abertura vs Cliques por Campanha</h3>
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart data={performanceData}>
+              <CartesianGrid strokeDasharray="3 3" stroke={chartGridStroke} />
+              <XAxis dataKey="mes" stroke={chartAxisStroke} fontSize={chartAxisFontSize} />
+              <YAxis stroke={chartAxisStroke} fontSize={chartAxisFontSize} unit="%" />
+              <Tooltip contentStyle={chartTooltipStyle} />
+              <Legend />
+              <Bar dataKey="abertura" fill={chartColors.primary} name="Abertura" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="cliques" fill={chartColors.accent} name="Cliques" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
       {/* Campanhas */}
       <div className="space-y-3">
         <h3 className="font-semibold text-foreground text-sm">Campanhas</h3>
@@ -78,42 +131,35 @@ const NewsletterContent = () => {
             { key: "status", label: "Status", options: statusCampOptions, value: campStatus, onChange: setCampStatus },
           ]}
         />
-        {(() => {
-          const { paginatedItems, totalPages, safePage, totalItems } = usePagination(filteredCamps, perPage, campPage);
-          return (
-            <>
-              <div className="rounded-xl border border-border bg-card overflow-hidden">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-border bg-secondary/30">
-                      <th className="text-left py-3 px-4 text-muted-foreground font-medium">Título</th>
-                      <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden sm:table-cell">Enviados</th>
-                      <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden sm:table-cell">Abertos</th>
-                      <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden md:table-cell">Data</th>
-                      <th className="text-left py-3 px-4 text-muted-foreground font-medium">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {paginatedItems.length === 0 ? (
-                      <tr><td colSpan={5} className="py-8 text-center text-muted-foreground">Nenhuma campanha encontrada.</td></tr>
-                    ) : paginatedItems.map((c) => (
-                      <tr key={c.id} className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors">
-                        <td className="py-3 px-4 text-foreground font-medium">{c.titulo}</td>
-                        <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">{c.enviados}</td>
-                        <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">{c.abertos}</td>
-                        <td className="py-3 px-4 text-muted-foreground hidden md:table-cell">{c.data}</td>
-                        <td className="py-3 px-4">
-                          <Badge variant={c.status === "enviada" ? "default" : "secondary"}>{c.status}</Badge>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <PaginationControls currentPage={safePage} totalPages={totalPages} totalItems={totalItems} itemsPerPage={perPage} onPageChange={setCampPage} />
-            </>
-          );
-        })()}
+        <div className="rounded-xl border border-border bg-card overflow-hidden">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border bg-secondary/30">
+                <th className="text-left py-3 px-4 text-muted-foreground font-medium">Título</th>
+                <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden sm:table-cell">Enviados</th>
+                <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden sm:table-cell">Abertos</th>
+                <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden md:table-cell">Data</th>
+                <th className="text-left py-3 px-4 text-muted-foreground font-medium">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {campPagination.paginatedItems.length === 0 ? (
+                <tr><td colSpan={5} className="py-8 text-center text-muted-foreground">Nenhuma campanha encontrada.</td></tr>
+              ) : campPagination.paginatedItems.map((c) => (
+                <tr key={c.id} className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors">
+                  <td className="py-3 px-4 text-foreground font-medium">{c.titulo}</td>
+                  <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">{c.enviados}</td>
+                  <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">{c.abertos}</td>
+                  <td className="py-3 px-4 text-muted-foreground hidden md:table-cell">{c.data}</td>
+                  <td className="py-3 px-4">
+                    <Badge variant={c.status === "enviada" ? "default" : "secondary"}>{c.status}</Badge>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <PaginationControls currentPage={campPagination.safePage} totalPages={campPagination.totalPages} totalItems={campPagination.totalItems} itemsPerPage={perPage} onPageChange={setCampPage} />
       </div>
 
       {/* Assinantes */}
@@ -127,40 +173,33 @@ const NewsletterContent = () => {
             { key: "status", label: "Status", options: statusSubOptions, value: subStatus, onChange: setSubStatus },
           ]}
         />
-        {(() => {
-          const { paginatedItems, totalPages, safePage, totalItems } = usePagination(filteredSubs, perPage, subPage);
-          return (
-            <>
-              <div className="rounded-xl border border-border bg-card overflow-hidden">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-border bg-secondary/30">
-                      <th className="text-left py-3 px-4 text-muted-foreground font-medium">Nome</th>
-                      <th className="text-left py-3 px-4 text-muted-foreground font-medium">E-mail</th>
-                      <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden sm:table-cell">Data</th>
-                      <th className="text-left py-3 px-4 text-muted-foreground font-medium">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {paginatedItems.length === 0 ? (
-                      <tr><td colSpan={4} className="py-8 text-center text-muted-foreground">Nenhum assinante encontrado.</td></tr>
-                    ) : paginatedItems.map((s) => (
-                      <tr key={s.id} className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors">
-                        <td className="py-3 px-4 text-foreground font-medium">{s.nome}</td>
-                        <td className="py-3 px-4 text-muted-foreground">{s.email}</td>
-                        <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">{s.data}</td>
-                        <td className="py-3 px-4">
-                          <Badge variant={s.status === "ativo" ? "default" : "secondary"}>{s.status}</Badge>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <PaginationControls currentPage={safePage} totalPages={totalPages} totalItems={totalItems} itemsPerPage={perPage} onPageChange={setSubPage} />
-            </>
-          );
-        })()}
+        <div className="rounded-xl border border-border bg-card overflow-hidden">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border bg-secondary/30">
+                <th className="text-left py-3 px-4 text-muted-foreground font-medium">Nome</th>
+                <th className="text-left py-3 px-4 text-muted-foreground font-medium">E-mail</th>
+                <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden sm:table-cell">Data</th>
+                <th className="text-left py-3 px-4 text-muted-foreground font-medium">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {subPagination.paginatedItems.length === 0 ? (
+                <tr><td colSpan={4} className="py-8 text-center text-muted-foreground">Nenhum assinante encontrado.</td></tr>
+              ) : subPagination.paginatedItems.map((s) => (
+                <tr key={s.id} className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors">
+                  <td className="py-3 px-4 text-foreground font-medium">{s.nome}</td>
+                  <td className="py-3 px-4 text-muted-foreground">{s.email}</td>
+                  <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">{s.data}</td>
+                  <td className="py-3 px-4">
+                    <Badge variant={s.status === "ativo" ? "default" : "secondary"}>{s.status}</Badge>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <PaginationControls currentPage={subPagination.safePage} totalPages={subPagination.totalPages} totalItems={subPagination.totalItems} itemsPerPage={perPage} onPageChange={setSubPage} />
       </div>
     </div>
   );
