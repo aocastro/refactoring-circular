@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Users, Mail, Send, Plus, TrendingUp } from "lucide-react";
+import { Users, Mail, Send, Plus, TrendingUp, Download } from "lucide-react";
+import { exportToCSV } from "@/lib/export";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import KpiCard from "@/components/shared/KpiCard";
@@ -51,7 +52,12 @@ const NewsletterContent = () => {
           <h1 className="text-2xl font-bold font-display text-foreground">Newsletter</h1>
           <p className="text-muted-foreground text-sm">Gerencie assinantes e campanhas</p>
         </div>
-        <Button size="sm"><Plus className="h-4 w-4 mr-2" />Nova Campanha</Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" className="border-border" onClick={() => {
+            exportToCSV(subscribers.map(s => ({ Nome: s.nome, Email: s.email, Data: s.data, Status: s.status })), "newsletter-assinantes");
+          }}><Download className="h-4 w-4 mr-2" />Exportar</Button>
+          <Button size="sm"><Plus className="h-4 w-4 mr-2" />Nova Campanha</Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">

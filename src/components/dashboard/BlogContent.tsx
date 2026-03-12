@@ -58,6 +58,14 @@ const BlogContent = ({ defaultTab = "posts" }: Props) => {
     { id: 3, titulo: "Guia de upcycling para iniciantes", categoria: "Tutoriais", data: "01/03/2026", views: 312, status: "publicado", conteudo: "Conteúdo..." },
     { id: 4, titulo: "O impacto da moda sustentável", categoria: "Sustentabilidade", data: "20/03/2026", views: 0, status: "rascunho", conteudo: "Rascunho..." },
     { id: 5, titulo: "Novidades da coleção outono", categoria: "Novidades", data: "25/03/2026", views: 0, status: "agendado", conteudo: "Em breve..." },
+    { id: 6, titulo: "Tecidos orgânicos: vale a pena?", categoria: "Sustentabilidade", data: "28/02/2026", views: 145, status: "publicado", conteudo: "Conteúdo..." },
+    { id: 7, titulo: "Como montar um closet cápsula", categoria: "Dicas", data: "22/02/2026", views: 298, status: "publicado", conteudo: "Conteúdo..." },
+    { id: 8, titulo: "Economia circular na prática", categoria: "Tutoriais", data: "18/02/2026", views: 176, status: "publicado", conteudo: "Conteúdo..." },
+    { id: 9, titulo: "Entrevista: designers locais", categoria: "Novidades", data: "12/02/2026", views: 89, status: "publicado", conteudo: "Conteúdo..." },
+    { id: 10, titulo: "Moda ética e consumo consciente", categoria: "Sustentabilidade", data: "05/02/2026", views: 421, status: "publicado", conteudo: "Conteúdo..." },
+    { id: 11, titulo: "DIY: transforme sua calça jeans", categoria: "Tutoriais", data: "30/01/2026", views: 267, status: "publicado", conteudo: "Conteúdo..." },
+    { id: 12, titulo: "Cores tendência para 2026", categoria: "Tendências", data: "25/01/2026", views: 334, status: "publicado", conteudo: "Conteúdo..." },
+    { id: 13, titulo: "Brechós online: guia completo", categoria: "Dicas", data: "18/01/2026", views: 198, status: "publicado", conteudo: "Conteúdo..." },
   ]);
 
   const [categoriasList, setCategoriasList] = useState<Categoria[]>([
