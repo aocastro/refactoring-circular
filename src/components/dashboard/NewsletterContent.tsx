@@ -121,32 +121,40 @@ const NewsletterContent = () => {
             { key: "status", label: "Status", options: statusSubOptions, value: subStatus, onChange: setSubStatus },
           ]}
         />
-        <div className="rounded-xl border border-border bg-card overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border bg-secondary/30">
-                <th className="text-left py-3 px-4 text-muted-foreground font-medium">Nome</th>
-                <th className="text-left py-3 px-4 text-muted-foreground font-medium">E-mail</th>
-                <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden sm:table-cell">Data</th>
-                <th className="text-left py-3 px-4 text-muted-foreground font-medium">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredSubs.length === 0 ? (
-                <tr><td colSpan={4} className="py-8 text-center text-muted-foreground">Nenhum assinante encontrado.</td></tr>
-              ) : filteredSubs.map((s) => (
-                <tr key={s.id} className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors">
-                  <td className="py-3 px-4 text-foreground font-medium">{s.nome}</td>
-                  <td className="py-3 px-4 text-muted-foreground">{s.email}</td>
-                  <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">{s.data}</td>
-                  <td className="py-3 px-4">
-                    <Badge variant={s.status === "ativo" ? "default" : "secondary"}>{s.status}</Badge>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        {(() => {
+          const { paginatedItems, totalPages, safePage, totalItems } = usePagination(filteredSubs, perPage, subPage);
+          return (
+            <>
+              <div className="rounded-xl border border-border bg-card overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-border bg-secondary/30">
+                      <th className="text-left py-3 px-4 text-muted-foreground font-medium">Nome</th>
+                      <th className="text-left py-3 px-4 text-muted-foreground font-medium">E-mail</th>
+                      <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden sm:table-cell">Data</th>
+                      <th className="text-left py-3 px-4 text-muted-foreground font-medium">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {paginatedItems.length === 0 ? (
+                      <tr><td colSpan={4} className="py-8 text-center text-muted-foreground">Nenhum assinante encontrado.</td></tr>
+                    ) : paginatedItems.map((s) => (
+                      <tr key={s.id} className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors">
+                        <td className="py-3 px-4 text-foreground font-medium">{s.nome}</td>
+                        <td className="py-3 px-4 text-muted-foreground">{s.email}</td>
+                        <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">{s.data}</td>
+                        <td className="py-3 px-4">
+                          <Badge variant={s.status === "ativo" ? "default" : "secondary"}>{s.status}</Badge>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <PaginationControls currentPage={safePage} totalPages={totalPages} totalItems={totalItems} itemsPerPage={perPage} onPageChange={setSubPage} />
+            </>
+          );
+        })()}
       </div>
     </div>
   );
