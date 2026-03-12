@@ -1,21 +1,28 @@
 import { useState, useMemo } from "react";
 import { Plus, Users, FileText, DollarSign, Clock, CheckCircle, AlertCircle, Eye, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import KpiCard from "@/components/shared/KpiCard";
 import FilterToolbar from "@/components/shared/FilterToolbar";
-import { mockConsignantes, mockContracts, consignanteStatusOptions, pendingRanges } from "@/data/consignacao";
+import { mockConsignantes as initialConsignantes, mockContracts, consignanteStatusOptions, pendingRanges } from "@/data/consignacao";
 import { getStatusColor } from "@/lib/status-colors";
 import { exportToCSV } from "@/lib/export";
 import type { KpiItem } from "@/types";
+import { toast } from "sonner";
 
 const ConsignacaoContent = () => {
+  const [consignantes, setConsignantes] = useState(initialConsignantes);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("Todos");
   const [pendingFilter, setPendingFilter] = useState("Todos");
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [form, setForm] = useState({ name: "", email: "", phone: "", comissao: "50/50" });
 
   const filtered = useMemo(() => {
     const range = pendingRanges.find((p) => p.label === pendingFilter) || pendingRanges[0];
-    return mockConsignantes.filter((c) => {
+    return consignantes.filter((c) => {
       const matchSearch = c.name.toLowerCase().includes(search.toLowerCase());
       const matchStatus = statusFilter === "Todos" || c.status === statusFilter;
       let matchPending = true;
@@ -26,16 +33,38 @@ const ConsignacaoContent = () => {
       }
       return matchSearch && matchStatus && matchPending;
     });
-  }, [search, statusFilter, pendingFilter]);
+  }, [search, statusFilter, pendingFilter, consignantes]);
 
-  const totalPending = mockConsignantes.reduce((acc, c) => acc + c.pendingValue, 0);
+  const totalPending = consignantes.reduce((acc, c) => acc + c.pendingValue, 0);
 
   const kpis: KpiItem[] = [
-    { label: "Consignantes", value: mockConsignantes.length, icon: Users },
+    { label: "Consignantes", value: consignantes.length, icon: Users },
     { label: "Contratos Ativos", value: mockContracts.filter((c) => c.status === "Vigente").length, icon: FileText },
     { label: "Pagamento Pendente", value: `R$ ${totalPending.toFixed(2).replace(".", ",")}`, icon: DollarSign },
-    { label: "Itens Consignados", value: mockConsignantes.reduce((a, c) => a + c.items, 0), icon: Clock },
+    { label: "Itens Consignados", value: consignantes.reduce((a, c) => a + c.items, 0), icon: Clock },
   ];
+
+  const handleAdd = () => {
+    if (!form.name.trim()) {
+      toast.error("Nome é obrigatório.");
+      return;
+    }
+    const now = new Date();
+    const newConsignante = {
+      id: Date.now(),
+      name: form.name,
+      items: 0,
+      sold: 0,
+      pending: "R$ 0,00",
+      pendingValue: 0,
+      status: "Ativo" as const,
+      since: `${String(now.getMonth() + 1).padStart(2, "0")}/${now.getFullYear()}`,
+    };
+    setConsignantes((prev) => [newConsignante, ...prev]);
+    setForm({ name: "", email: "", phone: "", comissao: "50/50" });
+    setShowAddDialog(false);
+    toast.success(`Consignante ${form.name} cadastrado com sucesso!`);
+  };
 
   return (
     <div className="space-y-6">
@@ -44,33 +73,17 @@ const ConsignacaoContent = () => {
           <h1 className="text-2xl font-bold font-display text-foreground">Consignação</h1>
           <p className="text-muted-foreground text-sm">Gerencie seus consignantes e contratos</p>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          className="border-border"
-          onClick={() => {
-            exportToCSV(
-              mockConsignantes.map((c) => ({ Nome: c.name, Itens: c.items, Vendidos: c.sold, Pendente: c.pending, Status: c.status, Desde: c.since })),
-              "consignantes"
-            );
-          }}
-        >
-          <Download className="h-4 w-4 mr-2" />
-          Exportar CSV
+        <Button variant="outline" size="sm" className="border-border" onClick={() => exportToCSV(consignantes.map((c) => ({ Nome: c.name, Itens: c.items, Vendidos: c.sold, Pendente: c.pending, Status: c.status, Desde: c.since })), "consignantes")}>
+          <Download className="h-4 w-4 mr-2" />Exportar CSV
         </Button>
       </div>
 
-      {/* KPIs */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {kpis.map((kpi, i) => (
-          <KpiCard key={kpi.label} {...kpi} delay={i * 0.05} />
-        ))}
+        {kpis.map((kpi, i) => <KpiCard key={kpi.label} {...kpi} delay={i * 0.05} />)}
       </div>
 
-      {/* Consignantes */}
       <div className="space-y-3">
         <h3 className="text-sm font-semibold text-foreground">Consignantes</h3>
-
         <FilterToolbar
           search={search}
           onSearchChange={setSearch}
@@ -80,9 +93,8 @@ const ConsignacaoContent = () => {
             { key: "pending", label: "Valor Pendente", options: pendingRanges.map((p) => p.label), value: pendingFilter, onChange: setPendingFilter },
           ]}
           actions={
-            <Button size="sm" className="bg-gradient-primary text-primary-foreground shrink-0">
-              <Plus className="h-4 w-4 mr-2" />
-              Novo
+            <Button size="sm" className="bg-gradient-primary text-primary-foreground shrink-0" onClick={() => setShowAddDialog(true)}>
+              <Plus className="h-4 w-4 mr-2" />Novo
             </Button>
           }
         />
@@ -102,37 +114,31 @@ const ConsignacaoContent = () => {
               </thead>
               <tbody>
                 {filtered.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="py-8 text-center text-muted-foreground">
-                      Nenhum consignante encontrado.
+                  <tr><td colSpan={6} className="py-8 text-center text-muted-foreground">Nenhum consignante encontrado.</td></tr>
+                ) : filtered.map((c) => (
+                  <tr key={c.id} className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors">
+                    <td className="py-3 px-4">
+                      <div>
+                        <p className="text-foreground font-medium">{c.name}</p>
+                        <p className="text-xs text-muted-foreground">Desde {c.since}</p>
+                      </div>
+                    </td>
+                    <td className="py-3 px-4 text-foreground hidden sm:table-cell">{c.items}</td>
+                    <td className="py-3 px-4 text-foreground hidden md:table-cell">{c.sold}</td>
+                    <td className="py-3 px-4 text-foreground font-medium">{c.pending}</td>
+                    <td className="py-3 px-4">
+                      <span className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full ${getStatusColor(c.status)}`}>
+                        {c.status === "Ativo" ? <Clock className="h-3 w-3" /> : <CheckCircle className="h-3 w-3" />}
+                        {c.status}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-right">
+                      <button className="p-1.5 rounded-md hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors">
+                        <Eye className="h-3.5 w-3.5" />
+                      </button>
                     </td>
                   </tr>
-                ) : (
-                  filtered.map((c) => (
-                    <tr key={c.id} className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors">
-                      <td className="py-3 px-4">
-                        <div>
-                          <p className="text-foreground font-medium">{c.name}</p>
-                          <p className="text-xs text-muted-foreground">Desde {c.since}</p>
-                        </div>
-                      </td>
-                      <td className="py-3 px-4 text-foreground hidden sm:table-cell">{c.items}</td>
-                      <td className="py-3 px-4 text-foreground hidden md:table-cell">{c.sold}</td>
-                      <td className="py-3 px-4 text-foreground font-medium">{c.pending}</td>
-                      <td className="py-3 px-4">
-                        <span className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full ${getStatusColor(c.status)}`}>
-                          {c.status === "Ativo" ? <Clock className="h-3 w-3" /> : <CheckCircle className="h-3 w-3" />}
-                          {c.status}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 text-right">
-                        <button className="p-1.5 rounded-md hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors">
-                          <Eye className="h-3.5 w-3.5" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                )}
+                ))}
               </tbody>
             </table>
           </div>
@@ -174,6 +180,20 @@ const ConsignacaoContent = () => {
           </div>
         </div>
       </div>
+
+      {/* Add Consignante Dialog */}
+      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader><DialogTitle className="font-display">Novo Consignante</DialogTitle></DialogHeader>
+          <div className="space-y-4">
+            <div><Label>Nome *</Label><Input placeholder="Nome do consignante" value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} className="mt-1 bg-secondary border-border" /></div>
+            <div><Label>E-mail</Label><Input type="email" placeholder="email@exemplo.com" value={form.email} onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))} className="mt-1 bg-secondary border-border" /></div>
+            <div><Label>Telefone</Label><Input placeholder="(11) 99999-9999" value={form.phone} onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))} className="mt-1 bg-secondary border-border" /></div>
+            <div><Label>Divisão de Comissão</Label><Input placeholder="50/50" value={form.comissao} onChange={(e) => setForm((p) => ({ ...p, comissao: e.target.value }))} className="mt-1 bg-secondary border-border" /></div>
+            <Button className="w-full bg-gradient-primary text-primary-foreground" onClick={handleAdd}>Cadastrar Consignante</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

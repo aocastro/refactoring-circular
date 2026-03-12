@@ -4,31 +4,36 @@ import { Users, Search, Plus, Download, Eye, ShoppingBag, DollarSign, UserCheck 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import KpiCard from "@/components/shared/KpiCard";
 import { exportToCSV } from "@/lib/export";
-import { mockClientes, mockPurchaseHistory } from "@/data/clientes";
+import { mockClientes as initialClientes, mockPurchaseHistory } from "@/data/clientes";
 import type { Cliente } from "@/data/clientes";
 import type { KpiItem } from "@/types";
+import { toast } from "sonner";
 
 const ClientesContent = () => {
+  const [clientes, setClientes] = useState<Cliente[]>(initialClientes);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("Todos");
   const [selectedCliente, setSelectedCliente] = useState<Cliente | null>(null);
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [form, setForm] = useState({ name: "", email: "", phone: "", cpf: "" });
 
   const filtered = useMemo(() => {
-    return mockClientes.filter((c) => {
+    return clientes.filter((c) => {
       const matchSearch = search === "" || c.name.toLowerCase().includes(search.toLowerCase()) || c.email.toLowerCase().includes(search.toLowerCase());
       const matchStatus = statusFilter === "Todos" || c.status === statusFilter;
       return matchSearch && matchStatus;
     });
-  }, [search, statusFilter]);
+  }, [search, statusFilter, clientes]);
 
-  const totalClientes = mockClientes.length;
-  const ativos = mockClientes.filter((c) => c.status === "Ativo").length;
-  const totalRevenue = mockClientes.reduce((a, c) => a + c.totalSpent, 0);
-  const avgTicket = Math.round(totalRevenue / mockClientes.reduce((a, c) => a + c.totalPurchases, 0));
+  const totalClientes = clientes.length;
+  const ativos = clientes.filter((c) => c.status === "Ativo").length;
+  const totalRevenue = clientes.reduce((a, c) => a + c.totalSpent, 0);
+  const totalPurchases = clientes.reduce((a, c) => a + c.totalPurchases, 0);
+  const avgTicket = totalPurchases > 0 ? Math.round(totalRevenue / totalPurchases) : 0;
 
   const kpis: KpiItem[] = [
     { label: "Total de Clientes", value: totalClientes, icon: Users },
@@ -39,6 +44,29 @@ const ClientesContent = () => {
 
   const clienteHistory = selectedCliente ? mockPurchaseHistory.filter((p) => p.clienteId === selectedCliente.id) : [];
 
+  const handleAdd = () => {
+    if (!form.name.trim() || !form.email.trim()) {
+      toast.error("Nome e e-mail são obrigatórios.");
+      return;
+    }
+    const now = new Date();
+    const newCliente: Cliente = {
+      id: Date.now(),
+      name: form.name,
+      email: form.email,
+      phone: form.phone || "(00) 00000-0000",
+      totalPurchases: 0,
+      totalSpent: 0,
+      lastPurchase: "-",
+      since: `${String(now.getMonth() + 1).padStart(2, "0")}/${now.getFullYear()}`,
+      status: "Ativo",
+    };
+    setClientes((prev) => [newCliente, ...prev]);
+    setForm({ name: "", email: "", phone: "", cpf: "" });
+    setShowAddDialog(false);
+    toast.success(`Cliente ${form.name} cadastrado com sucesso!`);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -47,10 +75,10 @@ const ClientesContent = () => {
           <p className="text-muted-foreground text-sm">Gestão de clientes e histórico de compras</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="border-border" onClick={() => exportToCSV(mockClientes.map((c) => ({ Nome: c.name, Email: c.email, Telefone: c.phone, Compras: c.totalPurchases, "Total Gasto": c.totalSpent, Status: c.status })), "clientes")}>
+          <Button variant="outline" size="sm" className="border-border" onClick={() => exportToCSV(clientes.map((c) => ({ Nome: c.name, Email: c.email, Telefone: c.phone, Compras: c.totalPurchases, "Total Gasto": c.totalSpent, Status: c.status })), "clientes")}>
             <Download className="h-4 w-4 mr-2" />Exportar
           </Button>
-          <Button size="sm" className="bg-gradient-primary text-primary-foreground">
+          <Button size="sm" className="bg-gradient-primary text-primary-foreground" onClick={() => setShowAddDialog(true)}>
             <Plus className="h-4 w-4 mr-2" />Novo Cliente
           </Button>
         </div>
@@ -125,6 +153,20 @@ const ClientesContent = () => {
           </table>
         </div>
       </div>
+
+      {/* Add Cliente Dialog */}
+      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader><DialogTitle className="font-display">Novo Cliente</DialogTitle></DialogHeader>
+          <div className="space-y-4">
+            <div><Label>Nome *</Label><Input placeholder="Nome completo" value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} className="mt-1 bg-secondary border-border" /></div>
+            <div><Label>E-mail *</Label><Input type="email" placeholder="email@exemplo.com" value={form.email} onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))} className="mt-1 bg-secondary border-border" /></div>
+            <div><Label>Telefone</Label><Input placeholder="(11) 99999-9999" value={form.phone} onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))} className="mt-1 bg-secondary border-border" /></div>
+            <div><Label>CPF</Label><Input placeholder="000.000.000-00" value={form.cpf} onChange={(e) => setForm((p) => ({ ...p, cpf: e.target.value }))} className="mt-1 bg-secondary border-border" /></div>
+            <Button className="w-full bg-gradient-primary text-primary-foreground" onClick={handleAdd}>Cadastrar Cliente</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Cliente Detail Dialog */}
       <Dialog open={!!selectedCliente} onOpenChange={(open) => !open && setSelectedCliente(null)}>
