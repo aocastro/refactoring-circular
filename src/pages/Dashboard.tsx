@@ -39,6 +39,7 @@ const Dashboard = () => {
       case "venda-produtos":
       case "venda-pedidos": return <VendaContent />;
       case "consignantes": return <ConsignacaoContent />;
+      case "inventario": return <InventarioContent />;
       case "relatorios-financeiro":
       case "relatorios-esg": return <FinanceiroContent />;
       default: return <DashboardContent />;
