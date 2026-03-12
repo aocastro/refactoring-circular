@@ -50,6 +50,7 @@ const Dashboard = () => {
       case "config-geral": return <ConfiguracoesContent defaultTab="geral" />;
       case "config-pagamento": return <ConfiguracoesContent defaultTab="pagamento" />;
       case "config-entrega": return <ConfiguracoesContent defaultTab="entrega" />;
+      case "venda":
       case "venda-catalogo": return <CatalogoContent />;
       case "venda-produtos":
       case "venda-pedidos": return <VendaContent />;
@@ -61,11 +62,13 @@ const Dashboard = () => {
       case "fornecedores": return <FornecedoresContent />;
       case "clientes": return <ClientesContent />;
       case "newsletter": return <NewsletterContent />;
+      case "pdv":
       case "pdv-caixa":
       case "pdv-historico": return <PDVContent />;
       case "funcionarios": return <FuncionariosContent />;
       case "cupons": return <CuponsContent />;
       case "relatorios": return <RelatoriosContent />;
+      case "blog":
       case "blog-posts": return <BlogContent defaultTab="posts" />;
       case "blog-categorias": return <BlogContent defaultTab="categorias" />;
       case "meu-linktree": return <LinktreeContent />;
