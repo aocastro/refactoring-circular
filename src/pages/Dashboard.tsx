@@ -11,6 +11,8 @@ import ConsignacaoContent from "@/components/dashboard/ConsignacaoContent";
 import FinanceiroContent from "@/components/dashboard/FinanceiroContent";
 import CatalogoContent from "@/components/dashboard/CatalogoContent";
 import InventarioContent from "@/components/dashboard/InventarioContent";
+import ClientesContent from "@/components/dashboard/ClientesContent";
+import CuponsContent from "@/components/dashboard/CuponsContent";
 import NotificationsDropdown from "@/components/dashboard/NotificationsDropdown";
 import { useTheme } from "@/hooks/use-theme";
 
