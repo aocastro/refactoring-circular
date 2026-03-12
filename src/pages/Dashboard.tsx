@@ -46,12 +46,14 @@ const Dashboard = () => {
     switch (activeSection) {
       case "dashboard": return <DashboardContent />;
       case "minha-conta": return <MyAccountContent user={user} />;
+      case "configuracoes":
       case "config-geral": return <ConfiguracoesContent defaultTab="geral" />;
       case "config-pagamento": return <ConfiguracoesContent defaultTab="pagamento" />;
       case "config-entrega": return <ConfiguracoesContent defaultTab="entrega" />;
       case "venda-catalogo": return <CatalogoContent />;
       case "venda-produtos":
       case "venda-pedidos": return <VendaContent />;
+      case "servicos":
       case "servicos-agendamentos": return <ServicosContent defaultTab="agendamentos" />;
       case "servicos-lista": return <ServicosContent defaultTab="lista" />;
       case "inventario": return <InventarioContent />;
