@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { BookOpen, Tag, Plus, Eye, Edit, Trash2 } from "lucide-react";
+import PaginationControls, { usePagination } from "@/components/shared/PaginationControls";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -81,6 +82,10 @@ const BlogContent = ({ defaultTab = "posts" }: Props) => {
 
   // Categoria form
   const [cNome, setCNome] = useState("");
+
+  // Pagination
+  const [postsPage, setPostsPage] = useState(1);
+  const postsPerPage = 5;
 
   const resetPostForm = () => { setPTitulo(""); setPCategoria(""); setPConteudo(""); setPStatus("rascunho"); setEditingPost(null); setErrors({}); };
   const resetCatForm = () => { setCNome(""); setEditingCat(null); setErrors({}); };
@@ -167,39 +172,47 @@ const BlogContent = ({ defaultTab = "posts" }: Props) => {
           <div className="flex justify-end">
             <Button size="sm" onClick={() => { resetPostForm(); setPostDialog(true); }}><Plus className="h-4 w-4 mr-2" />Novo Post</Button>
           </div>
-          <div className="rounded-xl border border-border bg-card overflow-hidden">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border bg-secondary/30">
-                  <th className="text-left py-3 px-4 text-muted-foreground font-medium">Título</th>
-                  <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden sm:table-cell">Categoria</th>
-                  <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden md:table-cell">Data</th>
-                  <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden sm:table-cell">Views</th>
-                  <th className="text-left py-3 px-4 text-muted-foreground font-medium">Status</th>
-                  <th className="text-right py-3 px-4 text-muted-foreground font-medium">Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {postsList.map((p) => (
-                  <tr key={p.id} className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors">
-                    <td className="py-3 px-4 text-foreground font-medium">{p.titulo}</td>
-                    <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">{p.categoria}</td>
-                    <td className="py-3 px-4 text-muted-foreground hidden md:table-cell">{p.data}</td>
-                    <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">
-                      <span className="flex items-center gap-1"><Eye className="h-3 w-3" />{p.views}</span>
-                    </td>
-                    <td className="py-3 px-4"><Badge variant="outline" className={statusColors[p.status]}>{p.status}</Badge></td>
-                    <td className="py-3 px-4 text-right">
-                      <div className="flex justify-end gap-1">
-                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEditPost(p)}><Edit className="h-3.5 w-3.5" /></Button>
-                        <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => deletePost(p.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          {(() => {
+            const { paginatedItems, totalPages, safePage, totalItems } = usePagination(postsList, postsPerPage, postsPage);
+            return (
+              <>
+                <div className="rounded-xl border border-border bg-card overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-border bg-secondary/30">
+                        <th className="text-left py-3 px-4 text-muted-foreground font-medium">Título</th>
+                        <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden sm:table-cell">Categoria</th>
+                        <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden md:table-cell">Data</th>
+                        <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden sm:table-cell">Views</th>
+                        <th className="text-left py-3 px-4 text-muted-foreground font-medium">Status</th>
+                        <th className="text-right py-3 px-4 text-muted-foreground font-medium">Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {paginatedItems.map((p) => (
+                        <tr key={p.id} className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors">
+                          <td className="py-3 px-4 text-foreground font-medium">{p.titulo}</td>
+                          <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">{p.categoria}</td>
+                          <td className="py-3 px-4 text-muted-foreground hidden md:table-cell">{p.data}</td>
+                          <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">
+                            <span className="flex items-center gap-1"><Eye className="h-3 w-3" />{p.views}</span>
+                          </td>
+                          <td className="py-3 px-4"><Badge variant="outline" className={statusColors[p.status]}>{p.status}</Badge></td>
+                          <td className="py-3 px-4 text-right">
+                            <div className="flex justify-end gap-1">
+                              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEditPost(p)}><Edit className="h-3.5 w-3.5" /></Button>
+                              <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => deletePost(p.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <PaginationControls currentPage={safePage} totalPages={totalPages} totalItems={totalItems} itemsPerPage={postsPerPage} onPageChange={setPostsPage} />
+              </>
+            );
+          })()}
         </TabsContent>
 
         <TabsContent value="categorias" className="mt-6 space-y-4">

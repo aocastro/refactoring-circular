@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { z } from "zod";
+import PaginationControls, { usePagination } from "@/components/shared/PaginationControls";
 
 interface Fornecedor {
   id: number;
@@ -51,6 +52,10 @@ const FornecedoresContent = () => {
   const filtered = fornecedores.filter((f) =>
     f.nome.toLowerCase().includes(search.toLowerCase()) || f.categoria.toLowerCase().includes(search.toLowerCase())
   );
+
+  const [page, setPage] = useState(1);
+  const perPage = 6;
+  const { paginatedItems, totalPages, safePage, totalItems } = usePagination(filtered, perPage, page);
 
   const resetForm = () => { setNome(""); setCategoria(""); setContato(""); setEmail(""); setCidade(""); setEditing(null); setErrors({}); };
 
@@ -105,7 +110,7 @@ const FornecedoresContent = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filtered.map((f, i) => (
+        {paginatedItems.map((f, i) => (
           <motion.div key={f.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
             className="rounded-xl border border-border bg-card p-5 space-y-3">
             <div className="flex items-center justify-between">
@@ -132,6 +137,8 @@ const FornecedoresContent = () => {
           </motion.div>
         ))}
       </div>
+
+      <PaginationControls currentPage={safePage} totalPages={totalPages} totalItems={totalItems} itemsPerPage={perPage} onPageChange={setPage} />
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="bg-card border-border">
