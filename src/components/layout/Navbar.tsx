@@ -16,21 +16,21 @@ const Navbar = () => {
   ];
 
   return (
-    <header className="fixed top-0 inset-x-0 z-50 glass">
+    <header className="fixed top-0 inset-x-0 z-50 glass" role="banner">
       <div className="container max-w-6xl mx-auto px-4 flex items-center justify-between h-16">
-        <Link to="/" className="flex items-center gap-2">
+        <Link to="/" className="flex items-center gap-2" aria-label="Ir para a página inicial da Circular u-Shar">
           <img src={logo} alt="Circular u-Shar" className="w-8 h-8 object-contain" />
           <span className="font-display font-bold text-lg text-foreground">
             Circular <span className="text-accent text-sm">u-Shar</span>
           </span>
         </Link>
 
-        {/* Desktop */}
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="hidden md:flex items-center gap-6" aria-label="Navegação principal">
           {links.map((link) => (
             <Link
               key={link.href}
               to={link.href}
+              aria-current={location.pathname === link.href ? "page" : undefined}
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               {link.label}
@@ -43,6 +43,7 @@ const Navbar = () => {
             onClick={toggleTheme}
             className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
             title={theme === "dark" ? "Modo claro" : "Modo escuro"}
+            aria-label={theme === "dark" ? "Ativar modo claro" : "Ativar modo escuro"}
           >
             {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
@@ -54,27 +55,33 @@ const Navbar = () => {
           </Button>
         </div>
 
-        {/* Mobile toggle */}
         <div className="md:hidden flex items-center gap-2">
           <button
             onClick={toggleTheme}
             className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
+            aria-label={theme === "dark" ? "Ativar modo claro" : "Ativar modo escuro"}
           >
             {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
-          <button className="text-foreground" onClick={() => setMobileOpen(!mobileOpen)}>
+          <button
+            className="text-foreground"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            aria-expanded={mobileOpen}
+            aria-controls="mobile-menu"
+            aria-label={mobileOpen ? "Fechar menu" : "Abrir menu"}
+          >
             {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden glass border-t border-border px-4 py-4 space-y-3">
+        <div id="mobile-menu" className="md:hidden glass border-t border-border px-4 py-4 space-y-3" aria-label="Menu móvel">
           {links.map((link) => (
             <Link
               key={link.href}
               to={link.href}
+              aria-current={location.pathname === link.href ? "page" : undefined}
               className="block text-sm text-muted-foreground hover:text-foreground"
               onClick={() => setMobileOpen(false)}
             >
