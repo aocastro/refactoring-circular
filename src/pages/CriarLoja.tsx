@@ -32,9 +32,9 @@ interface StoreData {
 
 type FieldErrors = Partial<Record<string, string>>;
 
-const FieldError = ({ message }: { message?: string }) =>
+const FieldError = ({ id, message }: { id: string; message?: string }) =>
   message ? (
-    <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="text-xs text-destructive mt-1">
+    <motion.p id={id} initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="mt-1 text-xs text-destructive">
       {message}
     </motion.p>
   ) : null;
@@ -67,7 +67,7 @@ const CriarLoja = () => {
     if (field === "number") value = value.replace(/\D/g, "").replace(/(\d{4})/g, "$1 ").trim().slice(0, 19);
     if (field === "expiry") {
       value = value.replace(/\D/g, "");
-      if (value.length >= 2) value = value.slice(0, 2) + "/" + value.slice(2, 4);
+      if (value.length >= 2) value = `${value.slice(0, 2)}/${value.slice(2, 4)}`;
     }
     if (field === "cvv") value = value.replace(/\D/g, "").slice(0, 3);
     setCardData((prev) => ({ ...prev, [field]: value }));
@@ -75,7 +75,6 @@ const CriarLoja = () => {
 
   const markTouched = (field: string) => setTouched((p) => ({ ...p, [field]: true }));
 
-  // Validation
   const getStoreErrors = (): FieldErrors => {
     const errors: FieldErrors = {};
     if (storeData.nome.length === 0) errors.nome = "Nome da loja é obrigatório";
@@ -107,8 +106,7 @@ const CriarLoja = () => {
   const storeErrors = getStoreErrors();
   const cardErrors = getCardErrors();
 
-  const showError = (field: string, errors: FieldErrors) =>
-    (touched[field] || triedAdvance) ? errors[field] : undefined;
+  const showError = (field: string, errors: FieldErrors) => (touched[field] || triedAdvance ? errors[field] : undefined);
 
   const canAdvance = () => {
     if (step === 0) return Object.keys(storeErrors).length === 0;
@@ -135,69 +133,88 @@ const CriarLoja = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <section className="pt-28 pb-16">
-        <div className="container max-w-2xl mx-auto px-4">
-          {/* Stepper */}
-          <div className="flex items-center justify-center gap-2 mb-10">
-            {steps.map((s, i) => (
-              <div key={s.label} className="flex items-center gap-2">
-                <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                  i <= step ? "bg-primary/10 text-primary" : "bg-secondary text-muted-foreground"
-                }`}>
-                  <s.icon className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">{s.label}</span>
-                </div>
-                {i < steps.length - 1 && <div className={`w-8 h-0.5 rounded ${i < step ? "bg-primary" : "bg-border"}`} />}
+      <main id="main-content" tabIndex={-1} className="pt-28 pb-16">
+        <section aria-labelledby="criar-loja-heading">
+          <div className="container mx-auto max-w-2xl px-4">
+            <header className="mb-10 space-y-4 text-center">
+              <h1 id="criar-loja-heading" className="font-display text-3xl font-bold text-foreground">Criar minha loja</h1>
+              <p className="text-sm text-muted-foreground">Siga as etapas abaixo para configurar sua loja com acessibilidade e navegação guiada.</p>
+            </header>
+
+            <ol className="mb-10 flex items-center justify-center gap-2" aria-label="Etapas de criação da loja">
+              {steps.map((s, i) => (
+                <li key={s.label} className="flex items-center gap-2">
+                  <div
+                    className={`flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+                      i <= step ? "bg-primary/10 text-primary" : "bg-secondary text-muted-foreground"
+                    }`}
+                    aria-current={i === step ? "step" : undefined}
+                  >
+                    <s.icon className="h-3.5 w-3.5" aria-hidden="true" />
+                    <span className="hidden sm:inline">{s.label}</span>
+                  </div>
+                  {i < steps.length - 1 && <div className={`h-0.5 w-8 rounded ${i < step ? "bg-primary" : "bg-border"}`} aria-hidden="true" />}
+                </li>
+              ))}
+            </ol>
+
+            <p className="sr-only" aria-live="polite">Etapa atual: {steps[step].label}</p>
+
+            <section className="mb-6 flex items-center justify-between rounded-xl border border-border bg-card p-3 text-sm" aria-label="Resumo do plano selecionado">
+              <div>
+                <span className="text-muted-foreground">Plano:</span>{" "}
+                <span className="font-semibold text-foreground">{plan.name}</span>
+                <span className="ml-2 text-muted-foreground">({billingParam})</span>
               </div>
-            ))}
-          </div>
+              <span className="font-bold text-foreground">
+                {plan.price === 0 ? "Grátis" : `R$ ${price.toFixed(2).replace(".", ",")}${billingParam === "anual" ? "/ano" : "/mês"}`}
+              </span>
+            </section>
 
-          {/* Plan summary strip */}
-          <div className="mb-6 p-3 rounded-xl border border-border bg-card flex items-center justify-between text-sm">
-            <div>
-              <span className="text-muted-foreground">Plano:</span>{" "}
-              <span className="font-semibold text-foreground">{plan.name}</span>
-              <span className="text-muted-foreground ml-2">({billingParam})</span>
-            </div>
-            <span className="font-bold text-foreground">
-              {plan.price === 0 ? "Grátis" : `R$ ${price.toFixed(2).replace(".", ",")}${billingParam === "anual" ? "/ano" : "/mês"}`}
-            </span>
-          </div>
+            <AnimatePresence mode="wait">
+              {step === 0 && (
+                <motion.section key="step0" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-5" aria-labelledby="store-data-heading">
+                  <form className="space-y-4 rounded-xl border border-border bg-card p-6" aria-describedby="store-data-help">
+                    <h2 id="store-data-heading" className="font-display text-lg font-bold text-foreground">Dados da sua loja</h2>
+                    <p id="store-data-help" className="text-sm text-muted-foreground">Preencha os campos obrigatórios para continuar para a próxima etapa.</p>
 
-          <AnimatePresence mode="wait">
-            {step === 0 && (
-              <motion.div key="step0" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-5">
-                <div className="p-6 rounded-xl border border-border bg-card space-y-4">
-                  <h2 className="text-lg font-bold font-display text-foreground">Dados da sua loja</h2>
-                  <div className="space-y-3">
                     <div>
-                      <Label>Nome da Loja *</Label>
+                      <Label htmlFor="store-name">Nome da Loja *</Label>
                       <Input
+                        id="store-name"
                         placeholder="Minha Loja Circular"
                         value={storeData.nome}
                         onChange={(e) => handleStoreChange("nome", e.target.value)}
                         onBlur={() => markTouched("nome")}
                         className={showError("nome", storeErrors) ? "border-destructive" : ""}
                         maxLength={60}
+                        aria-invalid={Boolean(showError("nome", storeErrors))}
+                        aria-describedby={showError("nome", storeErrors) ? "store-name-error" : undefined}
                       />
-                      <FieldError message={showError("nome", storeErrors)} />
+                      <FieldError id="store-name-error" message={showError("nome", storeErrors)} />
                     </div>
+
                     <div>
-                      <Label>URL da Loja</Label>
-                      <div className={`flex items-center gap-0 rounded-md border overflow-hidden ${showError("slug", storeErrors) ? "border-destructive" : "border-border"}`}>
-                        <span className="px-3 py-2 bg-secondary text-muted-foreground text-sm border-r border-border whitespace-nowrap">circular.store/</span>
+                      <Label htmlFor="store-slug">URL da Loja</Label>
+                      <div className={`flex items-center overflow-hidden rounded-md border ${showError("slug", storeErrors) ? "border-destructive" : "border-border"}`}>
+                        <span className="whitespace-nowrap border-r border-border bg-secondary px-3 py-2 text-sm text-muted-foreground">circular.store/</span>
                         <Input
-                          className="border-0 rounded-none"
+                          id="store-slug"
+                          className="rounded-none border-0"
                           value={storeData.slug}
                           onChange={(e) => setStoreData((p) => ({ ...p, slug: e.target.value }))}
                           onBlur={() => markTouched("slug")}
+                          aria-invalid={Boolean(showError("slug", storeErrors))}
+                          aria-describedby={showError("slug", storeErrors) ? "store-slug-error" : undefined}
                         />
                       </div>
-                      <FieldError message={showError("slug", storeErrors)} />
+                      <FieldError id="store-slug-error" message={showError("slug", storeErrors)} />
                     </div>
+
                     <div>
-                      <Label>E-mail *</Label>
+                      <Label htmlFor="store-email">E-mail *</Label>
                       <Input
+                        id="store-email"
                         type="email"
                         placeholder="contato@minhaloja.com"
                         value={storeData.email}
@@ -205,158 +222,190 @@ const CriarLoja = () => {
                         onBlur={() => markTouched("email")}
                         className={showError("email", storeErrors) ? "border-destructive" : ""}
                         maxLength={255}
+                        autoComplete="email"
+                        aria-invalid={Boolean(showError("email", storeErrors))}
+                        aria-describedby={showError("email", storeErrors) ? "store-email-error" : undefined}
                       />
-                      <FieldError message={showError("email", storeErrors)} />
+                      <FieldError id="store-email-error" message={showError("email", storeErrors)} />
                     </div>
+
                     <div>
-                      <Label>Telefone</Label>
-                      <Input placeholder="(11) 99999-9999" value={storeData.telefone} onChange={(e) => handleStoreChange("telefone", e.target.value)} />
+                      <Label htmlFor="store-phone">Telefone</Label>
+                      <Input
+                        id="store-phone"
+                        placeholder="(11) 99999-9999"
+                        value={storeData.telefone}
+                        onChange={(e) => handleStoreChange("telefone", e.target.value)}
+                        autoComplete="tel"
+                      />
                     </div>
+                  </form>
+                </motion.section>
+              )}
+
+              {step === 1 && (
+                <motion.section key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-5" aria-labelledby="payment-heading">
+                  <div className="space-y-4 rounded-xl border border-border bg-card p-6">
+                    <h2 id="payment-heading" className="font-display text-lg font-bold text-foreground">
+                      {plan.price === 0 ? "Confirme seu plano gratuito" : "Dados de Pagamento"}
+                    </h2>
+
+                    {plan.price === 0 ? (
+                      <p className="text-sm text-muted-foreground">
+                        O plano Starter é gratuito. Clique em confirmar para criar sua loja agora mesmo.
+                      </p>
+                    ) : (
+                      <fieldset className="space-y-3" aria-describedby="payment-help">
+                        <legend className="sr-only">Informações do cartão</legend>
+                        <p id="payment-help" className="text-sm text-muted-foreground">Digite os dados do cartão para concluir a criação da loja.</p>
+
+                        <div>
+                          <Label htmlFor="card-number">Número do Cartão</Label>
+                          <Input
+                            id="card-number"
+                            placeholder="0000 0000 0000 0000"
+                            value={cardData.number}
+                            onChange={(e) => handleCardChange("number", e.target.value)}
+                            onBlur={() => markTouched("number")}
+                            className={showError("number", cardErrors) ? "border-destructive" : ""}
+                            inputMode="numeric"
+                            autoComplete="cc-number"
+                            aria-invalid={Boolean(showError("number", cardErrors))}
+                            aria-describedby={showError("number", cardErrors) ? "card-number-error" : undefined}
+                          />
+                          <FieldError id="card-number-error" message={showError("number", cardErrors)} />
+                        </div>
+
+                        <div>
+                          <Label htmlFor="card-name">Nome no Cartão</Label>
+                          <Input
+                            id="card-name"
+                            placeholder="MARIA SILVA"
+                            value={cardData.name}
+                            onChange={(e) => handleCardChange("name", e.target.value.toUpperCase())}
+                            onBlur={() => markTouched("name")}
+                            className={showError("name", cardErrors) ? "border-destructive" : ""}
+                            autoComplete="cc-name"
+                            aria-invalid={Boolean(showError("name", cardErrors))}
+                            aria-describedby={showError("name", cardErrors) ? "card-name-error" : undefined}
+                          />
+                          <FieldError id="card-name-error" message={showError("name", cardErrors)} />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <Label htmlFor="card-expiry">Validade</Label>
+                            <Input
+                              id="card-expiry"
+                              placeholder="MM/AA"
+                              value={cardData.expiry}
+                              onChange={(e) => handleCardChange("expiry", e.target.value)}
+                              onBlur={() => markTouched("expiry")}
+                              className={showError("expiry", cardErrors) ? "border-destructive" : ""}
+                              inputMode="numeric"
+                              autoComplete="cc-exp"
+                              aria-invalid={Boolean(showError("expiry", cardErrors))}
+                              aria-describedby={showError("expiry", cardErrors) ? "card-expiry-error" : undefined}
+                            />
+                            <FieldError id="card-expiry-error" message={showError("expiry", cardErrors)} />
+                          </div>
+                          <div>
+                            <Label htmlFor="card-cvv">CVV</Label>
+                            <Input
+                              id="card-cvv"
+                              placeholder="123"
+                              value={cardData.cvv}
+                              onChange={(e) => handleCardChange("cvv", e.target.value)}
+                              onBlur={() => markTouched("cvv")}
+                              className={showError("cvv", cardErrors) ? "border-destructive" : ""}
+                              inputMode="numeric"
+                              autoComplete="cc-csc"
+                              aria-invalid={Boolean(showError("cvv", cardErrors))}
+                              aria-describedby={showError("cvv", cardErrors) ? "card-cvv-error" : undefined}
+                            />
+                            <FieldError id="card-cvv-error" message={showError("cvv", cardErrors)} />
+                          </div>
+                        </div>
+
+                        <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
+                          <CreditCard className="h-3.5 w-3.5" aria-hidden="true" />
+                          <span>Pagamento seguro processado via Stripe (simulado)</span>
+                        </div>
+                      </fieldset>
+                    )}
                   </div>
-                </div>
-              </motion.div>
-            )}
+                </motion.section>
+              )}
 
-            {step === 1 && (
-              <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-5">
-                <div className="p-6 rounded-xl border border-border bg-card space-y-4">
-                  <h2 className="text-lg font-bold font-display text-foreground">
-                    {plan.price === 0 ? "Confirme seu plano gratuito" : "Dados de Pagamento"}
-                  </h2>
-
-                  {plan.price === 0 ? (
-                    <p className="text-muted-foreground text-sm">
-                      O plano Starter é gratuito. Clique em "Confirmar" para criar sua loja agora mesmo!
+              {step === 2 && (
+                <motion.section key="step2" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="space-y-5" aria-labelledby="success-heading">
+                  <div className="space-y-4 rounded-xl border border-primary/30 bg-primary/5 p-8 text-center">
+                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+                      <CheckCircle2 className="h-8 w-8 text-primary" aria-hidden="true" />
+                    </div>
+                    <h2 id="success-heading" className="font-display text-2xl font-bold text-foreground">Loja criada com sucesso! 🎉</h2>
+                    <p className="mx-auto max-w-md text-muted-foreground" role="status">
+                      Sua loja <strong className="text-foreground">{storeData.nome || "Minha Loja"}</strong> está pronta!
+                      Acesse o painel administrativo para configurar seus produtos e começar a vender.
                     </p>
+
+                    <div className="mx-auto max-w-sm space-y-2 rounded-lg border border-border bg-card p-4 text-left">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Plano</span>
+                        <span className="font-medium text-foreground">{plan.name}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Cobrança</span>
+                        <span className="font-medium text-foreground">{billingParam === "anual" ? "Anual" : "Mensal"}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Valor</span>
+                        <span className="font-bold text-foreground">{plan.price === 0 ? "Grátis" : `R$ ${price.toFixed(2).replace(".", ",")}`}</span>
+                      </div>
+                      <div className="flex justify-between gap-4 text-sm">
+                        <span className="text-muted-foreground">URL</span>
+                        <span className="break-all font-medium text-accent">circular.store/{storeData.slug || "minha-loja"}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col justify-center gap-3 pt-4 sm:flex-row">
+                      <Button onClick={() => navigate("/dashboard")} className="bg-gradient-primary">
+                        Acessar Painel
+                        <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
+                      </Button>
+                      <Button variant="outline" onClick={() => window.open(`/loja/${storeData.slug || "minha-loja"}`, "_blank")}>
+                        Ver minha loja
+                      </Button>
+                    </div>
+                  </div>
+                </motion.section>
+              )}
+            </AnimatePresence>
+
+            {step < 2 && (
+              <nav className="mt-6 flex justify-between" aria-label="Navegação entre etapas">
+                <Button variant="outline" onClick={() => (step === 0 ? navigate("/planos") : setStep((s) => s - 1))}>
+                  <ArrowLeft className="mr-2 h-4 w-4" aria-hidden="true" />
+                  Voltar
+                </Button>
+                <Button onClick={handleNext} disabled={processing} aria-busy={processing}>
+                  {processing ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
+                      Processando...
+                    </>
                   ) : (
-                    <div className="space-y-3">
-                      <div>
-                        <Label>Número do Cartão</Label>
-                        <Input
-                          placeholder="0000 0000 0000 0000"
-                          value={cardData.number}
-                          onChange={(e) => handleCardChange("number", e.target.value)}
-                          onBlur={() => markTouched("number")}
-                          className={showError("number", cardErrors) ? "border-destructive" : ""}
-                        />
-                        <FieldError message={showError("number", cardErrors)} />
-                      </div>
-                      <div>
-                        <Label>Nome no Cartão</Label>
-                        <Input
-                          placeholder="MARIA SILVA"
-                          value={cardData.name}
-                          onChange={(e) => handleCardChange("name", e.target.value.toUpperCase())}
-                          onBlur={() => markTouched("name")}
-                          className={showError("name", cardErrors) ? "border-destructive" : ""}
-                        />
-                        <FieldError message={showError("name", cardErrors)} />
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <Label>Validade</Label>
-                          <Input
-                            placeholder="MM/AA"
-                            value={cardData.expiry}
-                            onChange={(e) => handleCardChange("expiry", e.target.value)}
-                            onBlur={() => markTouched("expiry")}
-                            className={showError("expiry", cardErrors) ? "border-destructive" : ""}
-                          />
-                          <FieldError message={showError("expiry", cardErrors)} />
-                        </div>
-                        <div>
-                          <Label>CVV</Label>
-                          <Input
-                            placeholder="123"
-                            value={cardData.cvv}
-                            onChange={(e) => handleCardChange("cvv", e.target.value)}
-                            onBlur={() => markTouched("cvv")}
-                            className={showError("cvv", cardErrors) ? "border-destructive" : ""}
-                          />
-                          <FieldError message={showError("cvv", cardErrors)} />
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground mt-2">
-                        <CreditCard className="h-3.5 w-3.5" />
-                        <span>Pagamento seguro processado via Stripe (simulado)</span>
-                      </div>
-                    </div>
+                    <>
+                      {step === 1 ? (plan.price === 0 ? "Confirmar" : "Pagar e Criar Loja") : "Próximo"}
+                      <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
+                    </>
                   )}
-                </div>
-              </motion.div>
+                </Button>
+              </nav>
             )}
-
-            {step === 2 && (
-              <motion.div key="step2" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="space-y-5">
-                <div className="p-8 rounded-xl border border-primary/30 bg-primary/5 text-center space-y-4">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-                    <CheckCircle2 className="h-8 w-8 text-primary" />
-                  </div>
-                  <h2 className="text-2xl font-bold font-display text-foreground">Loja criada com sucesso! 🎉</h2>
-                  <p className="text-muted-foreground max-w-md mx-auto">
-                    Sua loja <strong className="text-foreground">{storeData.nome || "Minha Loja"}</strong> está pronta! 
-                    Acesse o painel administrativo para configurar seus produtos e começar a vender.
-                  </p>
-
-                  <div className="p-4 rounded-lg border border-border bg-card text-left space-y-2 max-w-sm mx-auto">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Plano</span>
-                      <span className="font-medium text-foreground">{plan.name}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Cobrança</span>
-                      <span className="font-medium text-foreground">{billingParam === "anual" ? "Anual" : "Mensal"}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Valor</span>
-                      <span className="font-bold text-foreground">
-                        {plan.price === 0 ? "Grátis" : `R$ ${price.toFixed(2).replace(".", ",")}`}
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">URL</span>
-                      <span className="font-medium text-accent">circular.store/{storeData.slug || "minha-loja"}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
-                    <Button onClick={() => navigate("/dashboard")} className="bg-gradient-primary">
-                      Acessar Painel
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                    <Button variant="outline" onClick={() => window.open(`/loja/${storeData.slug || "minha-loja"}`, "_blank")}>
-                      Ver minha loja
-                    </Button>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Navigation */}
-          {step < 2 && (
-            <div className="flex justify-between mt-6">
-              <Button variant="outline" onClick={() => step === 0 ? navigate("/planos") : setStep((s) => s - 1)}>
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Voltar
-              </Button>
-              <Button onClick={handleNext} disabled={processing}>
-                {processing ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Processando...
-                  </>
-                ) : (
-                  <>
-                    {step === 1 ? (plan.price === 0 ? "Confirmar" : "Pagar e Criar Loja") : "Próximo"}
-                    <ArrowRight className="h-4 w-4 ml-2" />
-                  </>
-                )}
-              </Button>
-            </div>
-          )}
-        </div>
-      </section>
+          </div>
+        </section>
+      </main>
       <Footer />
     </div>
   );
