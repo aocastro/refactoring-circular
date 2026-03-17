@@ -28,64 +28,76 @@ const LojasContent = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <header className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="text-2xl font-bold font-display text-foreground">Lojas</h1>
-          <p className="text-muted-foreground text-sm">Gerencie suas unidades e canais de venda</p>
+          <h2 className="font-display text-2xl font-bold text-foreground">Lojas</h2>
+          <p className="text-sm text-muted-foreground">Gerencie suas unidades e canais de venda com landmarks e ações acessíveis.</p>
         </div>
-        <Button size="sm"><Plus className="h-4 w-4 mr-2" />Nova Loja</Button>
-      </div>
+        <Button size="sm"><Plus className="mr-2 h-4 w-4" />Nova Loja</Button>
+      </header>
 
-      <FilterToolbar
-        search={search}
-        onSearchChange={setSearch}
-        searchPlaceholder="Buscar loja..."
-        filters={[
-          { key: "status", label: "Status", options: statusOptions, value: filterStatus, onChange: setFilterStatus },
-          { key: "tipo", label: "Tipo", options: tipoOptions, value: filterTipo, onChange: setFilterTipo },
-        ]}
-      />
+      <section aria-labelledby="stores-filter-heading" aria-describedby="stores-filter-description" className="space-y-4">
+        <div className="sr-only">
+          <h3 id="stores-filter-heading">Filtros de lojas</h3>
+          <p id="stores-filter-description">Busque por lojas e filtre por status e tipo.</p>
+        </div>
+        <FilterToolbar
+          search={search}
+          onSearchChange={setSearch}
+          searchPlaceholder="Buscar loja..."
+          filters={[
+            { key: "status", label: "Status", options: statusOptions, value: filterStatus, onChange: setFilterStatus },
+            { key: "tipo", label: "Tipo", options: tipoOptions, value: filterTipo, onChange: setFilterTipo },
+          ]}
+        />
+      </section>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {filtered.map((loja, i) => (
-          <motion.div key={loja.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-            className="rounded-xl border border-border bg-card p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <Building2 className="h-6 w-6 text-primary" />
+      <section aria-labelledby="stores-list-heading" aria-describedby="stores-list-description" className="space-y-4">
+        <div>
+          <h3 id="stores-list-heading" className="text-sm font-semibold text-foreground">Unidades cadastradas</h3>
+          <p id="stores-list-description" className="text-sm text-muted-foreground">Lista de lojas físicas e online com métricas resumidas e ações rápidas.</p>
+        </div>
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          {filtered.map((loja, i) => (
+            <motion.article key={loja.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+              className="space-y-4 rounded-xl border border-border bg-card p-6" aria-labelledby={`store-card-${loja.id}`}>
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-secondary text-foreground">
+                    <Building2 className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h4 id={`store-card-${loja.id}`} className="font-semibold text-foreground">{loja.nome}</h4>
+                    <p className="flex items-center gap-1 text-xs text-muted-foreground"><MapPin className="h-3 w-3" />{loja.endereco}</p>
+                  </div>
+                </div>
+                <Badge variant="default">{loja.status}</Badge>
+              </div>
+              <dl className="flex gap-6 text-sm">
+                <div>
+                  <dt className="text-xs text-muted-foreground">Vendas (mês)</dt>
+                  <dd className="font-bold text-foreground">{loja.vendas}</dd>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground">{loja.nome}</h3>
-                  <p className="text-xs text-muted-foreground flex items-center gap-1"><MapPin className="h-3 w-3" />{loja.endereco}</p>
+                  <dt className="text-xs text-muted-foreground">Receita (mês)</dt>
+                  <dd className="font-bold text-foreground">{loja.receita}</dd>
                 </div>
+                <div>
+                  <dt className="text-xs text-muted-foreground">Tipo</dt>
+                  <dd className="font-bold text-foreground">{loja.tipo}</dd>
+                </div>
+              </dl>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" className="border-border"><Settings className="mr-1 h-3.5 w-3.5" />Configurar</Button>
+                <Button variant="outline" size="sm" className="border-border"><ExternalLink className="mr-1 h-3.5 w-3.5" />Visitar</Button>
               </div>
-              <Badge variant="default">{loja.status}</Badge>
-            </div>
-            <div className="flex gap-6 text-sm">
-              <div>
-                <p className="text-muted-foreground text-xs">Vendas (mês)</p>
-                <p className="font-bold text-foreground">{loja.vendas}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground text-xs">Receita (mês)</p>
-                <p className="font-bold text-foreground">{loja.receita}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground text-xs">Tipo</p>
-                <p className="font-bold text-foreground">{loja.tipo}</p>
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="border-border"><Settings className="h-3.5 w-3.5 mr-1" />Configurar</Button>
-              <Button variant="outline" size="sm" className="border-border"><ExternalLink className="h-3.5 w-3.5 mr-1" />Visitar</Button>
-            </div>
-          </motion.div>
-        ))}
-        {filtered.length === 0 && (
-          <div className="col-span-full text-center py-8 text-muted-foreground">Nenhuma loja encontrada.</div>
-        )}
-      </div>
+            </motion.article>
+          ))}
+          {filtered.length === 0 && (
+            <div className="col-span-full py-8 text-center text-muted-foreground">Nenhuma loja encontrada.</div>
+          )}
+        </div>
+      </section>
     </div>
   );
 };
