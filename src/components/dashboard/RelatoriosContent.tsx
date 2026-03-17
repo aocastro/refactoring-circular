@@ -75,15 +75,15 @@ const RelatoriosContent = ({ defaultTab = "vendas" }: Props) => {
   );
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <section className="space-y-6" aria-labelledby="relatorios-section-title" aria-describedby="relatorios-section-description">
+      <header className="flex items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold font-display text-foreground">Relatórios</h1>
-          <p className="text-muted-foreground text-sm">Vendas, financeiro e impacto ESG</p>
+          <h2 id="relatorios-section-title" className="text-2xl font-bold font-display text-foreground">Relatórios</h2>
+          <p id="relatorios-section-description" className="text-muted-foreground text-sm">Painéis de vendas, fluxo financeiro e impacto ESG com abas acessíveis, filtros e exportação por teclado.</p>
         </div>
         <div className="flex gap-2">
           <Select value={period} onValueChange={setPeriod}>
-            <SelectTrigger className="w-[140px] bg-secondary border-border">
+            <SelectTrigger className="w-[140px] bg-secondary border-border" aria-label="Selecionar período do relatório">
               <Calendar className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
               <SelectValue />
             </SelectTrigger>
@@ -103,7 +103,7 @@ const RelatoriosContent = ({ defaultTab = "vendas" }: Props) => {
             <Download className="h-4 w-4 mr-2" />Exportar
           </Button>
         </div>
-      </div>
+      </header>
 
       <Tabs defaultValue={defaultTab} className="w-full">
         <TabsList className="bg-secondary border border-border">

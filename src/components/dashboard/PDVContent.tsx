@@ -91,16 +91,16 @@ const PDVContent = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <section className="space-y-6" aria-labelledby="pdv-section-title" aria-describedby="pdv-section-description">
+      <header className="flex items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold font-display text-foreground">PDV</h1>
-          <p className="text-muted-foreground text-sm">Gerencie seus pontos de venda</p>
+          <h2 id="pdv-section-title" className="text-2xl font-bold font-display text-foreground">PDV</h2>
+          <p id="pdv-section-description" className="text-muted-foreground text-sm">Gerencie caixas, abertura e fechamento de operação e acesso ao ponto de venda com controles acessíveis.</p>
         </div>
         <Button size="sm" className="bg-gradient-primary text-primary-foreground" onClick={() => setShowAddDialog(true)}>
           <Plus className="h-4 w-4 mr-2" />Novo Caixa
         </Button>
-      </div>
+      </header>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {kpis.map((kpi, i) => <KpiCard key={kpi.label} {...kpi} delay={i * 0.05} />)}
