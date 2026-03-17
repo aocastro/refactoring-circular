@@ -102,11 +102,11 @@ const InventarioContent = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <section className="space-y-6" aria-labelledby="inventario-section-title" aria-describedby="inventario-section-description">
+      <header className="flex items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold font-display text-foreground">Inventário</h1>
-          <p className="text-muted-foreground text-sm">Controle de estoque e contagem de peças</p>
+          <h2 id="inventario-section-title" className="text-2xl font-bold font-display text-foreground">Inventário</h2>
+          <p id="inventario-section-description" className="text-muted-foreground text-sm">Controle de estoque, filtros de busca e alertas de contagem com estrutura semântica e navegação por teclado.</p>
         </div>
         <div className="flex gap-2">
           <Button
@@ -137,7 +137,7 @@ const InventarioContent = () => {
             Nova Contagem
           </Button>
         </div>
-      </div>
+      </header>
 
       {/* KPIs */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
