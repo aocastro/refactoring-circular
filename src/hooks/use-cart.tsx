@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
+import { createContext, forwardRef, useContext, useEffect, useState, type ReactNode } from "react";
 
 export interface CartItem {
   id: number;
@@ -25,12 +25,14 @@ const CartContext = createContext<CartContextType | null>(null);
 
 const CART_KEY = "cart_items";
 
-export function CartProvider({ children }: { children: ReactNode }) {
+export const CartProvider = forwardRef<unknown, { children: ReactNode }>(({ children }, _ref) => {
   const [items, setItems] = useState<CartItem[]>(() => {
     try {
       const stored = localStorage.getItem(CART_KEY);
       return stored ? JSON.parse(stored) : [];
-    } catch { return []; }
+    } catch {
+      return [];
+    }
   });
   const [isOpen, setIsOpen] = useState(false);
 
@@ -42,7 +44,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems((prev) => {
       const existing = prev.find((i) => i.id === item.id && i.size === item.size);
       if (existing) {
-        return prev.map((i) => i.id === item.id && i.size === item.size ? { ...i, quantity: i.quantity + quantity } : i);
+        return prev.map((i) => (i.id === item.id && i.size === item.size ? { ...i, quantity: i.quantity + quantity } : i));
       }
       return [...prev, { ...item, quantity }];
     });
@@ -52,7 +54,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const removeItem = (id: number) => setItems((prev) => prev.filter((i) => i.id !== id));
   const updateQuantity = (id: number, quantity: number) => {
     if (quantity <= 0) return removeItem(id);
-    setItems((prev) => prev.map((i) => i.id === id ? { ...i, quantity } : i));
+    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, quantity } : i)));
   };
   const clearCart = () => setItems([]);
 
@@ -64,7 +66,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
       {children}
     </CartContext.Provider>
   );
-}
+});
+
+CartProvider.displayName = "CartProvider";
 
 export function useCart() {
   const ctx = useContext(CartContext);

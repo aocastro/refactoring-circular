@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, forwardRef, useContext, useEffect, useState, type ReactNode } from "react";
 
 type Theme = "dark" | "light";
 
@@ -9,10 +9,10 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType>({ theme: "dark", toggleTheme: () => {} });
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
+export const ThemeProvider = forwardRef<unknown, { children: ReactNode }>(({ children }, _ref) => {
   const [theme, setTheme] = useState<Theme>(() => {
     const stored = localStorage.getItem("theme");
-    return (stored === "light" || stored === "dark") ? stored : "dark";
+    return stored === "light" || stored === "dark" ? stored : "dark";
   });
 
   useEffect(() => {
@@ -23,11 +23,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
 
-  return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  );
-}
+  return <ThemeContext.Provider value={{ theme, toggleTheme }}>{children}</ThemeContext.Provider>;
+});
+
+ThemeProvider.displayName = "ThemeProvider";
 
 export const useTheme = () => useContext(ThemeContext);
