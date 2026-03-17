@@ -30,88 +30,98 @@ const ConfiguracoesContent = ({ defaultTab = "geral" }: Props) => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold font-display text-foreground">Configurações</h1>
-        <p className="text-muted-foreground text-sm">Gerencie as configurações da sua loja</p>
-      </div>
+      <header>
+        <h2 className="font-display text-2xl font-bold text-foreground">Configurações</h2>
+        <p className="text-sm text-muted-foreground">Gerencie as configurações da sua loja com navegação por abas, formulários semânticos e descrições acessíveis.</p>
+      </header>
 
-      <Tabs defaultValue={defaultTab} className="w-full">
-        <TabsList className="bg-secondary border border-border">
+      <Tabs defaultValue={defaultTab} className="w-full" aria-label="Seções de configurações da loja">
+        <TabsList className="border border-border bg-secondary">
           <TabsTrigger value="geral" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-            <Settings className="h-4 w-4 mr-2" />Geral
+            <Settings className="mr-2 h-4 w-4" />Geral
           </TabsTrigger>
           <TabsTrigger value="pagamento" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-            <CreditCard className="h-4 w-4 mr-2" />Pagamento
+            <CreditCard className="mr-2 h-4 w-4" />Pagamento
           </TabsTrigger>
           <TabsTrigger value="entrega" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-            <Truck className="h-4 w-4 mr-2" />Entrega
+            <Truck className="mr-2 h-4 w-4" />Entrega
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="geral" className="mt-6">
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl border border-border bg-card p-6 space-y-5">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-5 rounded-xl border border-border bg-card p-6" aria-labelledby="config-general-heading" aria-describedby="config-general-description">
+            <div>
+              <h3 id="config-general-heading" className="font-semibold text-foreground">Dados gerais da loja</h3>
+              <p id="config-general-description" className="text-sm text-muted-foreground">Atualize nome, e-mail, telefone e moeda principal da operação.</p>
+            </div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label>Nome da Loja</Label>
-                <Input value={storeName} onChange={(e) => setStoreName(e.target.value)} className="bg-secondary border-border" />
+                <Label htmlFor="config-store-name">Nome da Loja</Label>
+                <Input id="config-store-name" value={storeName} onChange={(e) => setStoreName(e.target.value)} className="border-border bg-secondary" />
               </div>
               <div className="space-y-2">
-                <Label>E-mail</Label>
-                <Input value={storeEmail} onChange={(e) => setStoreEmail(e.target.value)} className="bg-secondary border-border" />
+                <Label htmlFor="config-store-email">E-mail</Label>
+                <Input id="config-store-email" value={storeEmail} onChange={(e) => setStoreEmail(e.target.value)} className="border-border bg-secondary" />
               </div>
               <div className="space-y-2">
-                <Label>Telefone</Label>
-                <Input value={storePhone} onChange={(e) => setStorePhone(e.target.value)} className="bg-secondary border-border" />
+                <Label htmlFor="config-store-phone">Telefone</Label>
+                <Input id="config-store-phone" value={storePhone} onChange={(e) => setStorePhone(e.target.value)} className="border-border bg-secondary" />
               </div>
               <div className="space-y-2">
-                <Label>Moeda</Label>
-                <Input value={currency} onChange={(e) => setCurrency(e.target.value)} className="bg-secondary border-border" />
+                <Label htmlFor="config-store-currency">Moeda</Label>
+                <Input id="config-store-currency" value={currency} onChange={(e) => setCurrency(e.target.value)} className="border-border bg-secondary" />
               </div>
             </div>
-            <Button onClick={handleSave}><Save className="h-4 w-4 mr-2" />Salvar</Button>
-          </motion.div>
+            <Button onClick={handleSave}><Save className="mr-2 h-4 w-4" />Salvar</Button>
+          </motion.section>
         </TabsContent>
 
         <TabsContent value="pagamento" className="mt-6">
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl border border-border bg-card p-6 space-y-5">
-            <h3 className="font-semibold text-foreground">Métodos de Pagamento</h3>
+          <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-5 rounded-xl border border-border bg-card p-6" aria-labelledby="config-payment-heading" aria-describedby="config-payment-description">
+            <div>
+              <h3 id="config-payment-heading" className="font-semibold text-foreground">Métodos de pagamento</h3>
+              <p id="config-payment-description" className="text-sm text-muted-foreground">Ative ou desative as formas de pagamento disponíveis para seus clientes.</p>
+            </div>
             {[
               { label: "PIX", enabled: pixEnabled, toggle: setPixEnabled },
               { label: "Cartão de Crédito", enabled: creditEnabled, toggle: setCreditEnabled },
               { label: "Cartão de Débito", enabled: debitEnabled, toggle: setDebitEnabled },
               { label: "Boleto Bancário", enabled: boletoEnabled, toggle: setBoletoEnabled },
             ].map((m) => (
-              <div key={m.label} className="flex items-center justify-between py-3 border-b border-border last:border-0">
+              <div key={m.label} className="flex items-center justify-between border-b border-border py-3 last:border-0">
                 <div>
                   <p className="text-sm font-medium text-foreground">{m.label}</p>
                   <p className="text-xs text-muted-foreground">{m.enabled ? "Ativado" : "Desativado"}</p>
                 </div>
-                <Switch checked={m.enabled} onCheckedChange={m.toggle} />
+                <Switch checked={m.enabled} onCheckedChange={m.toggle} aria-label={`Alternar método ${m.label}`} />
               </div>
             ))}
-            <Button onClick={handleSave}><Save className="h-4 w-4 mr-2" />Salvar</Button>
-          </motion.div>
+            <Button onClick={handleSave}><Save className="mr-2 h-4 w-4" />Salvar</Button>
+          </motion.section>
         </TabsContent>
 
         <TabsContent value="entrega" className="mt-6">
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl border border-border bg-card p-6 space-y-5">
-            <div className="space-y-2">
-              <Label>Frete grátis a partir de (R$)</Label>
-              <Input value={freeShippingMin} onChange={(e) => setFreeShippingMin(e.target.value)} className="bg-secondary border-border w-40" />
+          <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-5 rounded-xl border border-border bg-card p-6" aria-labelledby="config-delivery-heading" aria-describedby="config-delivery-description">
+            <div>
+              <h3 id="config-delivery-heading" className="font-semibold text-foreground">Métodos de entrega</h3>
+              <p id="config-delivery-description" className="text-sm text-muted-foreground">Defina regras de frete grátis e habilite modalidades de entrega.</p>
             </div>
-            <h3 className="font-semibold text-foreground">Métodos de Entrega</h3>
+            <div className="space-y-2">
+              <Label htmlFor="config-free-shipping">Frete grátis a partir de (R$)</Label>
+              <Input id="config-free-shipping" value={freeShippingMin} onChange={(e) => setFreeShippingMin(e.target.value)} className="w-40 border-border bg-secondary" />
+            </div>
             {[
               { label: "SEDEX", enabled: sedexEnabled, toggle: setSedexEnabled },
               { label: "PAC", enabled: pacEnabled, toggle: setPacEnabled },
               { label: "Retirada na Loja", enabled: localPickup, toggle: setLocalPickup },
             ].map((m) => (
-              <div key={m.label} className="flex items-center justify-between py-3 border-b border-border last:border-0">
+              <div key={m.label} className="flex items-center justify-between border-b border-border py-3 last:border-0">
                 <p className="text-sm font-medium text-foreground">{m.label}</p>
-                <Switch checked={m.enabled} onCheckedChange={m.toggle} />
+                <Switch checked={m.enabled} onCheckedChange={m.toggle} aria-label={`Alternar entrega ${m.label}`} />
               </div>
             ))}
-            <Button onClick={handleSave}><Save className="h-4 w-4 mr-2" />Salvar</Button>
-          </motion.div>
+            <Button onClick={handleSave}><Save className="mr-2 h-4 w-4" />Salvar</Button>
+          </motion.section>
         </TabsContent>
       </Tabs>
     </div>
