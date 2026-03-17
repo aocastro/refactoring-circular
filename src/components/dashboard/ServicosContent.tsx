@@ -142,81 +142,93 @@ const ServicosContent = ({ defaultTab = "agendamentos" }: Props) => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold font-display text-foreground">Serviços</h1>
-        <p className="text-muted-foreground text-sm">Agendamentos e lista de serviços</p>
-      </div>
+      <header>
+        <h2 className="font-display text-2xl font-bold text-foreground">Serviços</h2>
+        <p className="text-sm text-muted-foreground">Gerencie agendamentos e serviços com tabs acessíveis, tabelas semânticas e ações por teclado.</p>
+      </header>
 
-      <Tabs defaultValue={defaultTab} className="w-full">
-        <TabsList className="bg-secondary border border-border">
+      <Tabs defaultValue={defaultTab} className="w-full" aria-label="Seções de serviços">
+        <TabsList className="border border-border bg-secondary">
           <TabsTrigger value="agendamentos" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-            <Calendar className="h-4 w-4 mr-2" />Agendamentos
+            <Calendar className="mr-2 h-4 w-4" />Agendamentos
           </TabsTrigger>
           <TabsTrigger value="lista" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-            <Scissors className="h-4 w-4 mr-2" />Lista de Serviços
+            <Scissors className="mr-2 h-4 w-4" />Lista de Serviços
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="agendamentos" className="mt-6 space-y-4">
-          <div className="flex justify-end">
-            <Button size="sm" onClick={() => { resetAgendForm(); setAgendDialog(true); }}><Plus className="h-4 w-4 mr-2" />Novo Agendamento</Button>
-          </div>
-          <div className="rounded-xl border border-border bg-card overflow-hidden">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border bg-secondary/30">
-                  <th className="text-left py-3 px-4 text-muted-foreground font-medium">Cliente</th>
-                  <th className="text-left py-3 px-4 text-muted-foreground font-medium">Serviço</th>
-                  <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden sm:table-cell">Data</th>
-                  <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden sm:table-cell">Hora</th>
-                  <th className="text-left py-3 px-4 text-muted-foreground font-medium">Status</th>
-                  <th className="text-right py-3 px-4 text-muted-foreground font-medium">Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {agendamentos.map((a) => (
-                  <tr key={a.id} className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors">
-                    <td className="py-3 px-4 text-foreground font-medium">{a.cliente}</td>
-                    <td className="py-3 px-4 text-foreground">{a.servico}</td>
-                    <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">{a.data}</td>
-                    <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">{a.hora}</td>
-                    <td className="py-3 px-4"><Badge variant="outline" className={statusColors[a.status]}>{a.status}</Badge></td>
-                    <td className="py-3 px-4 text-right">
-                      <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => deleteAgendamento(a.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
-                    </td>
+          <section aria-labelledby="services-bookings-heading" aria-describedby="services-bookings-description" className="space-y-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 id="services-bookings-heading" className="text-sm font-semibold text-foreground">Agendamentos</h3>
+                <p id="services-bookings-description" className="text-sm text-muted-foreground">Lista de atendimentos com status, horário e ação rápida de remoção.</p>
+              </div>
+              <Button size="sm" onClick={() => { resetAgendForm(); setAgendDialog(true); }}><Plus className="mr-2 h-4 w-4" />Novo Agendamento</Button>
+            </div>
+            <div className="overflow-hidden rounded-xl border border-border bg-card">
+              <table className="w-full text-sm">
+                <caption className="sr-only">Tabela de agendamentos de serviços.</caption>
+                <thead>
+                  <tr className="border-b border-border bg-secondary/30">
+                    <th className="px-4 py-3 text-left font-medium text-muted-foreground">Cliente</th>
+                    <th className="px-4 py-3 text-left font-medium text-muted-foreground">Serviço</th>
+                    <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground sm:table-cell">Data</th>
+                    <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground sm:table-cell">Hora</th>
+                    <th className="px-4 py-3 text-left font-medium text-muted-foreground">Status</th>
+                    <th className="px-4 py-3 text-right font-medium text-muted-foreground">Ações</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {agendamentos.map((a) => (
+                    <tr key={a.id} className="border-b border-border/50 transition-colors last:border-0 hover:bg-secondary/20 focus-within:bg-secondary/20">
+                      <td className="px-4 py-3 font-medium text-foreground">{a.cliente}</td>
+                      <td className="px-4 py-3 text-foreground">{a.servico}</td>
+                      <td className="hidden px-4 py-3 text-muted-foreground sm:table-cell">{a.data}</td>
+                      <td className="hidden px-4 py-3 text-muted-foreground sm:table-cell">{a.hora}</td>
+                      <td className="px-4 py-3"><Badge variant="outline" className={statusColors[a.status]}>{a.status}</Badge></td>
+                      <td className="px-4 py-3 text-right">
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" aria-label={`Excluir agendamento de ${a.cliente}`} onClick={() => deleteAgendamento(a.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
         </TabsContent>
 
         <TabsContent value="lista" className="mt-6 space-y-4">
-          <div className="flex justify-end">
-            <Button size="sm" onClick={() => { resetServicoForm(); setServicoDialog(true); }}><Plus className="h-4 w-4 mr-2" />Novo Serviço</Button>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {servicosList.map((s) => (
-              <motion.div key={s.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                className="rounded-xl border border-border bg-card p-5 space-y-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-foreground">{s.nome}</h3>
-                  <div className="flex items-center gap-1">
-                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEditServico(s)}><Edit className="h-3.5 w-3.5" /></Button>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => deleteServico(s.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
+          <section aria-labelledby="services-list-heading" aria-describedby="services-list-description" className="space-y-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 id="services-list-heading" className="text-sm font-semibold text-foreground">Lista de serviços</h3>
+                <p id="services-list-description" className="text-sm text-muted-foreground">Visualize duração, preço, status e ações de edição para cada serviço.</p>
+              </div>
+              <Button size="sm" onClick={() => { resetServicoForm(); setServicoDialog(true); }}><Plus className="mr-2 h-4 w-4" />Novo Serviço</Button>
+            </div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {servicosList.map((s) => (
+                <motion.article key={s.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3 rounded-xl border border-border bg-card p-5" aria-labelledby={`service-card-${s.id}`}>
+                  <div className="flex items-center justify-between">
+                    <h4 id={`service-card-${s.id}`} className="font-semibold text-foreground">{s.nome}</h4>
+                    <div className="flex items-center gap-1">
+                      <Button variant="ghost" size="icon" className="h-7 w-7" aria-label={`Editar serviço ${s.nome}`} onClick={() => openEditServico(s)}><Edit className="h-3.5 w-3.5" /></Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" aria-label={`Excluir serviço ${s.nome}`} onClick={() => deleteServico(s.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
+                    </div>
                   </div>
-                </div>
-                <div className="flex gap-4 text-sm text-muted-foreground">
-                  <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" />{s.duracao}</span>
-                  <span className="flex items-center gap-1"><DollarSign className="h-3.5 w-3.5" />{s.preco}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Switch checked={s.ativo} onCheckedChange={(v) => setServicosList((prev) => prev.map((x) => x.id === s.id ? { ...x, ativo: v } : x))} />
-                  <span className="text-xs text-muted-foreground">{s.ativo ? "Ativo" : "Inativo"}</span>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+                  <dl className="flex gap-4 text-sm text-muted-foreground">
+                    <div><dt className="sr-only">Duração</dt><dd className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" />{s.duracao}</dd></div>
+                    <div><dt className="sr-only">Preço</dt><dd className="flex items-center gap-1"><DollarSign className="h-3.5 w-3.5" />{s.preco}</dd></div>
+                  </dl>
+                  <div className="flex items-center gap-2">
+                    <Switch checked={s.ativo} onCheckedChange={(v) => setServicosList((prev) => prev.map((x) => x.id === s.id ? { ...x, ativo: v } : x))} aria-label={`Alternar status do serviço ${s.nome}`} />
+                    <span className="text-xs text-muted-foreground">{s.ativo ? "Ativo" : "Inativo"}</span>
+                  </div>
+                </motion.article>
+              ))}
+            </div>
+          </section>
         </TabsContent>
       </Tabs>
 

@@ -1,31 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sun, Moon } from "lucide-react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
-import DashboardContent from "@/components/dashboard/DashboardContent";
-import MyAccountContent from "@/components/dashboard/MyAccountContent";
-import VendaContent from "@/components/dashboard/VendaContent";
-import ConsignacaoContent from "@/components/dashboard/ConsignacaoContent";
-import CatalogoContent from "@/components/dashboard/CatalogoContent";
-import SmartLockContent from "@/components/dashboard/SmartLockContent";
-import PedidosContent from "@/components/dashboard/PedidosContent";
-import SubestoquesContent from "@/components/dashboard/SubestoquesContent";
-import SacolinhasContent from "@/components/dashboard/SacolinhasContent";
-import InventarioContent from "@/components/dashboard/InventarioContent";
-import ClientesContent from "@/components/dashboard/ClientesContent";
-import CuponsContent from "@/components/dashboard/CuponsContent";
-import PDVContent from "@/components/dashboard/PDVContent";
-import RelatoriosContent from "@/components/dashboard/RelatoriosContent";
-import ConfiguracoesContent from "@/components/dashboard/ConfiguracoesContent";
-import ServicosContent from "@/components/dashboard/ServicosContent";
-import FornecedoresContent from "@/components/dashboard/FornecedoresContent";
-import NewsletterContent from "@/components/dashboard/NewsletterContent";
-import FuncionariosContent from "@/components/dashboard/FuncionariosContent";
-import BlogContent from "@/components/dashboard/BlogContent";
-import LinktreeContent from "@/components/dashboard/LinktreeContent";
-import LojasContent from "@/components/dashboard/LojasContent";
 import NotificationsDropdown from "@/components/dashboard/NotificationsDropdown";
 import { useTheme } from "@/hooks/use-theme";
 
@@ -33,6 +11,58 @@ type DashboardSectionMeta = {
   label: string;
   content: React.ReactNode;
 };
+
+const DashboardContent = lazy(() => import("@/components/dashboard/DashboardContent"));
+const MyAccountContent = lazy(() => import("@/components/dashboard/MyAccountContent"));
+const VendaContent = lazy(() => import("@/components/dashboard/VendaContent"));
+const ConsignacaoContent = lazy(() => import("@/components/dashboard/ConsignacaoContent"));
+const CatalogoContent = lazy(() => import("@/components/dashboard/CatalogoContent"));
+const SmartLockContent = lazy(() => import("@/components/dashboard/SmartLockContent"));
+const PedidosContent = lazy(() => import("@/components/dashboard/PedidosContent"));
+const SubestoquesContent = lazy(() => import("@/components/dashboard/SubestoquesContent"));
+const SacolinhasContent = lazy(() => import("@/components/dashboard/SacolinhasContent"));
+const InventarioContent = lazy(() => import("@/components/dashboard/InventarioContent"));
+const ClientesContent = lazy(() => import("@/components/dashboard/ClientesContent"));
+const CuponsContent = lazy(() => import("@/components/dashboard/CuponsContent"));
+const PDVContent = lazy(() => import("@/components/dashboard/PDVContent"));
+const RelatoriosContent = lazy(() => import("@/components/dashboard/RelatoriosContent"));
+const ConfiguracoesContent = lazy(() => import("@/components/dashboard/ConfiguracoesContent"));
+const ServicosContent = lazy(() => import("@/components/dashboard/ServicosContent"));
+const FornecedoresContent = lazy(() => import("@/components/dashboard/FornecedoresContent"));
+const NewsletterContent = lazy(() => import("@/components/dashboard/NewsletterContent"));
+const FuncionariosContent = lazy(() => import("@/components/dashboard/FuncionariosContent"));
+const BlogContent = lazy(() => import("@/components/dashboard/BlogContent"));
+const LinktreeContent = lazy(() => import("@/components/dashboard/LinktreeContent"));
+const LojasContent = lazy(() => import("@/components/dashboard/LojasContent"));
+
+const SectionFallback = () => (
+  <div className="rounded-xl border border-border bg-card p-6">
+    <p className="text-sm text-muted-foreground" aria-live="polite">Carregando seção...</p>
+  </div>
+);
+
+const AppHeader = ({ theme, toggleTheme, userName }: { theme: string; toggleTheme: () => void; userName: string }) => (
+  <header className="flex h-14 items-center gap-4 border-b border-border px-4" aria-label="Cabeçalho do dashboard">
+    <SidebarTrigger aria-label="Abrir ou recolher barra lateral" />
+    <div className="flex-1" />
+    <div className="flex items-center gap-2">
+      <button
+        type="button"
+        onClick={toggleTheme}
+        className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+        title={theme === "dark" ? "Modo claro" : "Modo escuro"}
+        aria-label={theme === "dark" ? "Ativar modo claro" : "Ativar modo escuro"}
+      >
+        {theme === "dark" ? <Sun className="h-5 w-5" aria-hidden="true" /> : <Moon className="h-5 w-5" aria-hidden="true" />}
+      </button>
+      <NotificationsDropdown />
+      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-primary text-xs font-bold text-primary-foreground" aria-hidden="true">
+        {userName.charAt(0)}
+      </div>
+      <span className="hidden text-sm text-foreground sm:block">Olá, {userName}</span>
+    </div>
+  </header>
+);
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -53,7 +83,7 @@ const Dashboard = () => {
   const sectionMap = useMemo<Record<string, DashboardSectionMeta>>(
     () => ({
       dashboard: { label: "Dashboard", content: <DashboardContent /> },
-      "minha-conta": { label: "Minha Conta", content: <MyAccountContent user={user!} /> },
+      "minha-conta": { label: "Minha Conta", content: user ? <MyAccountContent user={user} /> : null },
       configuracoes: { label: "Configurações gerais", content: <ConfiguracoesContent defaultTab="geral" /> },
       "config-geral": { label: "Configurações gerais", content: <ConfiguracoesContent defaultTab="geral" /> },
       "config-pagamento": { label: "Configurações de pagamento", content: <ConfiguracoesContent defaultTab="pagamento" /> },
@@ -102,44 +132,16 @@ const Dashboard = () => {
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background">
         <DashboardSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
-
         <div className="flex flex-1 flex-col">
-          <header className="flex h-14 items-center gap-4 border-b border-border px-4" aria-label="Cabeçalho do dashboard">
-            <SidebarTrigger aria-label="Abrir ou recolher barra lateral" />
-            <div className="flex-1" />
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={toggleTheme}
-                className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-                title={theme === "dark" ? "Modo claro" : "Modo escuro"}
-                aria-label={theme === "dark" ? "Ativar modo claro" : "Ativar modo escuro"}
-              >
-                {theme === "dark" ? <Sun className="h-5 w-5" aria-hidden="true" /> : <Moon className="h-5 w-5" aria-hidden="true" />}
-              </button>
-              <NotificationsDropdown />
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-primary text-xs font-bold text-primary-foreground" aria-hidden="true">
-                {user.name.charAt(0)}
-              </div>
-              <span className="hidden text-sm text-foreground sm:block">Olá, {user.name}</span>
-            </div>
-          </header>
-
+          <AppHeader theme={theme} toggleTheme={toggleTheme} userName={user.name} />
           <main id="main-content" className="flex-1 overflow-auto p-4 sm:p-6" tabIndex={-1} aria-live="polite">
             <section aria-labelledby="dashboard-section-heading">
               <h1 ref={sectionHeadingRef} id="dashboard-section-heading" tabIndex={-1} className="mb-4 font-display text-2xl font-bold text-foreground focus:outline-none">
                 {currentSection.label}
               </h1>
-
               <AnimatePresence mode="wait">
-                <motion.div
-                  key={activeSection}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  {currentSection.content}
+                <motion.div key={activeSection} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}>
+                  <Suspense fallback={<SectionFallback />}>{currentSection.content}</Suspense>
                 </motion.div>
               </AnimatePresence>
             </section>
