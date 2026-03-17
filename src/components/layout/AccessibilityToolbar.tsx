@@ -1,5 +1,5 @@
 import { useEffect, useId, useState } from "react";
-import { Contrast, Eye, Menu, RotateCcw, Type, Waves, X } from "lucide-react";
+import { Contrast, Eye, RotateCcw, Type, Waves, X, Accessibility } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAccessibility } from "@/hooks/use-accessibility";
 
@@ -11,12 +11,7 @@ const colorFilterOptions = [
   { value: "tritanopia", label: "Tritanopia" },
 ] as const;
 
-type AccessibilityControlsProps = {
-  colorFilterId: string;
-  onCloseMobile?: () => void;
-};
-
-const AccessibilityControls = ({ colorFilterId, onCloseMobile }: AccessibilityControlsProps) => {
+const AccessibilityControls = ({ colorFilterId }: { colorFilterId: string }) => {
   const {
     fontSize,
     contrastMode,
@@ -56,22 +51,10 @@ const AccessibilityControls = ({ colorFilterId, onCloseMobile }: AccessibilityCo
           <h3 id="a11y-contrast" className="font-medium">Contraste</h3>
         </div>
         <div className="grid grid-cols-2 gap-2">
-          <Button
-            type="button"
-            variant={contrastMode === "default" ? "default" : "outline"}
-            size="sm"
-            aria-pressed={contrastMode === "default"}
-            onClick={() => setContrastMode("default")}
-          >
+          <Button type="button" variant={contrastMode === "default" ? "default" : "outline"} size="sm" aria-pressed={contrastMode === "default"} onClick={() => setContrastMode("default")}>
             Padrão
           </Button>
-          <Button
-            type="button"
-            variant={contrastMode === "high" ? "default" : "outline"}
-            size="sm"
-            aria-pressed={contrastMode === "high"}
-            onClick={() => setContrastMode("high")}
-          >
+          <Button type="button" variant={contrastMode === "high" ? "default" : "outline"} size="sm" aria-pressed={contrastMode === "high"} onClick={() => setContrastMode("high")}>
             Alto
           </Button>
         </div>
@@ -82,14 +65,7 @@ const AccessibilityControls = ({ colorFilterId, onCloseMobile }: AccessibilityCo
           <Waves className="h-4 w-4 text-accent" aria-hidden="true" />
           <h3 id="a11y-motion" className="font-medium">Movimento</h3>
         </div>
-        <Button
-          type="button"
-          variant={reducedMotion ? "default" : "outline"}
-          size="sm"
-          className="w-full"
-          aria-pressed={reducedMotion}
-          onClick={() => setReducedMotion(!reducedMotion)}
-        >
+        <Button type="button" variant={reducedMotion ? "default" : "outline"} size="sm" className="w-full" aria-pressed={reducedMotion} onClick={() => setReducedMotion(!reducedMotion)}>
           {reducedMotion ? "Redução ativada" : "Reduzir animações"}
         </Button>
       </section>
@@ -118,31 +94,22 @@ const AccessibilityControls = ({ colorFilterId, onCloseMobile }: AccessibilityCo
         <RotateCcw className="h-4 w-4" aria-hidden="true" />
         Restaurar padrão
       </Button>
-
-      {onCloseMobile && (
-        <Button type="button" variant="outline" size="sm" className="w-full xl:hidden" onClick={onCloseMobile}>
-          Fechar menu
-        </Button>
-      )}
     </div>
   );
 };
 
 const AccessibilityToolbar = () => {
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const desktopFilterId = useId();
-  const mobileFilterId = useId();
+  const [open, setOpen] = useState(false);
+  const colorFilterId = useId();
 
   useEffect(() => {
+    if (!open) return;
     const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setMobileOpen(false);
-      }
+      if (event.key === "Escape") setOpen(false);
     };
-
     window.addEventListener("keydown", handleEscape);
     return () => window.removeEventListener("keydown", handleEscape);
-  }, []);
+  }, [open]);
 
   return (
     <>
@@ -167,48 +134,37 @@ const AccessibilityToolbar = () => {
         Pular para o conteúdo principal
       </a>
 
-      <aside
-        aria-label="Ferramentas de acessibilidade"
-        className="fixed right-4 top-20 z-50 hidden w-72 rounded-2xl border border-border bg-card/95 p-4 shadow-card backdrop-blur xl:block"
-      >
-        <div className="mb-4 flex items-center gap-2">
-          <Eye className="h-4 w-4 text-accent" aria-hidden="true" />
-          <h2 className="font-display text-sm font-semibold text-foreground">Acessibilidade</h2>
-        </div>
-        <AccessibilityControls colorFilterId={desktopFilterId} />
-      </aside>
-
-      <div className="fixed bottom-4 right-4 z-50 xl:hidden">
+      <div className="fixed bottom-4 right-4 z-50">
         <Button
           type="button"
           size="icon"
           className="h-12 w-12 rounded-full bg-gradient-primary text-primary-foreground shadow-card"
-          aria-label={mobileOpen ? "Fechar menu de acessibilidade" : "Abrir menu de acessibilidade"}
-          aria-expanded={mobileOpen}
-          aria-controls="mobile-accessibility-menu"
-          onClick={() => setMobileOpen((open) => !open)}
+          aria-label={open ? "Fechar menu de acessibilidade" : "Abrir menu de acessibilidade"}
+          aria-expanded={open}
+          aria-controls="a11y-panel"
+          onClick={() => setOpen((v) => !v)}
         >
-          {mobileOpen ? <X className="h-5 w-5" aria-hidden="true" /> : <Menu className="h-5 w-5" aria-hidden="true" />}
+          {open ? <X className="h-5 w-5" aria-hidden="true" /> : <Accessibility className="h-5 w-5" aria-hidden="true" />}
         </Button>
 
-        {mobileOpen && (
+        {open && (
           <div
-            id="mobile-accessibility-menu"
+            id="a11y-panel"
             role="dialog"
-            aria-label="Menu móvel de acessibilidade"
+            aria-label="Menu de acessibilidade"
             aria-modal="false"
             className="absolute bottom-16 right-0 w-[min(22rem,calc(100vw-2rem))] rounded-2xl border border-border bg-card/95 p-4 shadow-card backdrop-blur"
           >
             <div className="mb-4 flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <Eye className="h-4 w-4 text-accent" aria-hidden="true" />
+                <Accessibility className="h-4 w-4 text-accent" aria-hidden="true" />
                 <h2 className="font-display text-sm font-semibold text-foreground">Acessibilidade</h2>
               </div>
-              <Button type="button" variant="ghost" size="icon" aria-label="Fechar menu" onClick={() => setMobileOpen(false)}>
+              <Button type="button" variant="ghost" size="icon" aria-label="Fechar menu" onClick={() => setOpen(false)}>
                 <X className="h-4 w-4" aria-hidden="true" />
               </Button>
             </div>
-            <AccessibilityControls colorFilterId={mobileFilterId} onCloseMobile={() => setMobileOpen(false)} />
+            <AccessibilityControls colorFilterId={colorFilterId} />
           </div>
         )}
       </div>

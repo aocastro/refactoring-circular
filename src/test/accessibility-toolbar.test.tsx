@@ -14,7 +14,7 @@ const renderToolbar = () =>
   );
 
 describe("AccessibilityToolbar", () => {
-  it("renderiza skip link e abre o menu móvel", () => {
+  it("renderiza skip link e abre o menu ao clicar no botão", () => {
     renderToolbar();
 
     expect(screen.getByRole("link", { name: /pular para o conteúdo principal/i })).toBeInTheDocument();
@@ -22,15 +22,18 @@ describe("AccessibilityToolbar", () => {
     const toggle = screen.getByRole("button", { name: /abrir menu de acessibilidade/i });
     fireEvent.click(toggle);
 
-    expect(screen.getByRole("dialog", { name: /menu móvel de acessibilidade/i })).toBeInTheDocument();
-    expect(screen.getAllByRole("button", { name: /restaurar padrão/i }).length).toBeGreaterThan(0);
+    expect(screen.getByRole("dialog", { name: /menu de acessibilidade/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /restaurar padrão/i })).toBeInTheDocument();
   });
 
   it("ajusta o tamanho da fonte pelos controles", () => {
     renderToolbar();
 
-    const increaseButtons = screen.getAllByRole("button", { name: /aumentar fonte/i });
-    fireEvent.click(increaseButtons[0]);
+    const toggle = screen.getByRole("button", { name: /abrir menu de acessibilidade/i });
+    fireEvent.click(toggle);
+
+    const increaseButton = screen.getByRole("button", { name: /aumentar fonte/i });
+    fireEvent.click(increaseButton);
 
     expect(document.documentElement.style.getPropertyValue("--user-font-size")).toBe("17px");
   });

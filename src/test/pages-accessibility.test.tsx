@@ -48,7 +48,7 @@ describe("Acessibilidade das páginas principais", () => {
   it("Login renderiza heading principal e formulário", () => {
     renderRoute(<Login />, "/login");
     expect(screen.getByRole("heading", { level: 1, name: /login/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /entrar/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^entrar$/i })).toBeInTheDocument();
   });
 
   it("Planos renderiza heading principal e tabela comparativa", () => {
