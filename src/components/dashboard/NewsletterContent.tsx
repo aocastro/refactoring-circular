@@ -121,30 +121,35 @@ const NewsletterContent = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <header className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="text-2xl font-bold font-display text-foreground">Newsletter</h1>
-          <p className="text-muted-foreground text-sm">Gerencie assinantes e campanhas</p>
+          <h2 className="font-display text-2xl font-bold text-foreground">Newsletter</h2>
+          <p className="text-sm text-muted-foreground">Gerencie assinantes, campanhas e métricas de entrega com estrutura acessível.</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" className="border-border" onClick={() => {
             exportToCSV(subscribers.map(s => ({ Nome: s.nome, Email: s.email, Data: s.data, Status: s.status })), "newsletter-assinantes");
-          }}><Download className="h-4 w-4 mr-2" />Exportar</Button>
-          <Button size="sm" onClick={handleNewCampaign}><Plus className="h-4 w-4 mr-2" />Nova Campanha</Button>
+          }}><Download className="mr-2 h-4 w-4" />Exportar</Button>
+          <Button size="sm" onClick={handleNewCampaign}><Plus className="mr-2 h-4 w-4" />Nova Campanha</Button>
         </div>
-      </div>
+      </header>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <SparklineKpiCard label="Assinantes Ativos" value={String(totalAssinantes)} change="+18" icon={Users} positive delay={0} sparklineData={[{value:2},{value:2},{value:3},{value:3},{value:3},{value:totalAssinantes}]} sparklineColor="hsl(270,80%,60%)" />
-        <SparklineKpiCard label="Taxa de Abertura" value={`${taxaAbertura}%`} change="+3%" icon={Mail} positive delay={0.05} sparklineData={[{value:48},{value:55},{value:61},{value:55},{value:69},{value:taxaAbertura}]} sparklineColor="hsl(180,100%,50%)" />
-        <SparklineKpiCard label="Taxa de Cliques" value={`${taxaCliques}%`} change="+2%" icon={TrendingUp} positive delay={0.1} sparklineData={[{value:10},{value:14},{value:18},{value:14},{value:23},{value:taxaCliques}]} sparklineColor="hsl(150,80%,45%)" />
-        <SparklineKpiCard label="Campanhas Enviadas" value={String(campanhasEnviadas.length)} change="+2" icon={Send} positive delay={0.15} sparklineData={[{value:1},{value:2},{value:3},{value:4},{value:5},{value:campanhasEnviadas.length}]} sparklineColor="hsl(45,90%,55%)" />
-      </div>
+      <section aria-labelledby="newsletter-kpis-heading" aria-describedby="newsletter-kpis-description" className="space-y-3">
+        <div className="sr-only">
+          <h3 id="newsletter-kpis-heading">Indicadores de newsletter</h3>
+          <p id="newsletter-kpis-description">Resumo do desempenho de assinantes, abertura, cliques e campanhas enviadas.</p>
+        </div>
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <SparklineKpiCard label="Assinantes Ativos" value={String(totalAssinantes)} change="+18" icon={Users} positive delay={0} sparklineData={[{value:2},{value:2},{value:3},{value:3},{value:3},{value:totalAssinantes}]} sparklineColor="hsl(var(--primary))" />
+          <SparklineKpiCard label="Taxa de Abertura" value={`${taxaAbertura}%`} change="+3%" icon={Mail} positive delay={0.05} sparklineData={[{value:48},{value:55},{value:61},{value:55},{value:69},{value:taxaAbertura}]} sparklineColor="hsl(var(--accent))" />
+          <SparklineKpiCard label="Taxa de Cliques" value={`${taxaCliques}%`} change="+2%" icon={TrendingUp} positive delay={0.1} sparklineData={[{value:10},{value:14},{value:18},{value:14},{value:23},{value:taxaCliques}]} sparklineColor="hsl(var(--success))" />
+          <SparklineKpiCard label="Campanhas Enviadas" value={String(campanhasEnviadas.length)} change="+2" icon={Send} positive delay={0.15} sparklineData={[{value:1},{value:2},{value:3},{value:4},{value:5},{value:campanhasEnviadas.length}]} sparklineColor="hsl(var(--warning))" />
+        </div>
+      </section>
 
-      {/* Gráficos de Performance */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="rounded-xl border border-border bg-card p-5 space-y-3">
-          <h3 className="font-semibold text-foreground text-sm">Taxa de Abertura (%)</h3>
+      <section aria-labelledby="newsletter-performance-heading" className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <article className="space-y-3 rounded-xl border border-border bg-card p-5" aria-labelledby="newsletter-open-rate-heading">
+          <h3 id="newsletter-open-rate-heading" className="text-sm font-semibold text-foreground">Taxa de Abertura (%)</h3>
           <ResponsiveContainer width="100%" height={220}>
             <AreaChart data={performanceData}>
               <defs>
@@ -160,9 +165,9 @@ const NewsletterContent = () => {
               <Area type="monotone" dataKey="abertura" stroke={chartColors.primary} fill="url(#gradAbertura)" strokeWidth={2} name="Abertura" />
             </AreaChart>
           </ResponsiveContainer>
-        </div>
-        <div className="rounded-xl border border-border bg-card p-5 space-y-3">
-          <h3 className="font-semibold text-foreground text-sm">Abertura vs Cliques por Campanha</h3>
+        </article>
+        <article className="space-y-3 rounded-xl border border-border bg-card p-5" aria-labelledby="newsletter-comparison-heading">
+          <h3 id="newsletter-comparison-heading" className="text-sm font-semibold text-foreground">Abertura vs Cliques por Campanha</h3>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={performanceData}>
               <CartesianGrid strokeDasharray="3 3" stroke={chartGridStroke} />
@@ -174,12 +179,14 @@ const NewsletterContent = () => {
               <Bar dataKey="cliques" fill={chartColors.accent} name="Cliques" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
-        </div>
-      </div>
+        </article>
+      </section>
 
-      {/* Campanhas */}
-      <div className="space-y-3">
-        <h3 className="font-semibold text-foreground text-sm">Campanhas</h3>
+      <section aria-labelledby="newsletter-campaigns-heading" aria-describedby="newsletter-campaigns-description" className="space-y-3">
+        <div>
+          <h3 id="newsletter-campaigns-heading" className="text-sm font-semibold text-foreground">Campanhas</h3>
+          <p id="newsletter-campaigns-description" className="text-sm text-muted-foreground">Use busca, filtros e ações por teclado para revisar e administrar campanhas.</p>
+        </div>
         <FilterToolbar
           search={campSearch}
           onSearchChange={setCampSearch}
@@ -188,39 +195,40 @@ const NewsletterContent = () => {
             { key: "status", label: "Status", options: statusCampOptions, value: campStatus, onChange: setCampStatus },
           ]}
         />
-        <div className="rounded-xl border border-border bg-card overflow-hidden">
+        <div className="overflow-hidden rounded-xl border border-border bg-card">
           <table className="w-full text-sm">
+            <caption className="sr-only">Lista de campanhas de newsletter.</caption>
             <thead>
               <tr className="border-b border-border bg-secondary/30">
-                <th className="text-left py-3 px-4 text-muted-foreground font-medium">Título</th>
-                <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden sm:table-cell">Enviados</th>
-                <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden sm:table-cell">Abertos</th>
-                <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden md:table-cell">Data</th>
-                <th className="text-left py-3 px-4 text-muted-foreground font-medium">Status</th>
-                <th className="text-left py-3 px-4 text-muted-foreground font-medium w-12"></th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Título</th>
+                <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground sm:table-cell">Enviados</th>
+                <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground sm:table-cell">Abertos</th>
+                <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground md:table-cell">Data</th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Status</th>
+                <th className="w-12 px-4 py-3 text-left font-medium text-muted-foreground">Ações</th>
               </tr>
             </thead>
             <tbody>
               {campPagination.paginatedItems.length === 0 ? (
                 <tr><td colSpan={6} className="py-8 text-center text-muted-foreground">Nenhuma campanha encontrada.</td></tr>
               ) : campPagination.paginatedItems.map((c) => (
-                <tr key={c.id} className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors">
-                  <td className="py-3 px-4 text-foreground font-medium">{c.titulo}</td>
-                  <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">{c.enviados}</td>
-                  <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">{c.abertos}</td>
-                  <td className="py-3 px-4 text-muted-foreground hidden md:table-cell">{c.data}</td>
-                  <td className="py-3 px-4">
+                <tr key={c.id} className="border-b border-border/50 transition-colors last:border-0 hover:bg-secondary/20 focus-within:bg-secondary/20">
+                  <td className="px-4 py-3 font-medium text-foreground">{c.titulo}</td>
+                  <td className="hidden px-4 py-3 text-muted-foreground sm:table-cell">{c.enviados}</td>
+                  <td className="hidden px-4 py-3 text-muted-foreground sm:table-cell">{c.abertos}</td>
+                  <td className="hidden px-4 py-3 text-muted-foreground md:table-cell">{c.data}</td>
+                  <td className="px-4 py-3">
                     <Badge variant={c.status === "enviada" ? "default" : "secondary"}>{c.status}</Badge>
                   </td>
-                  <td className="py-3 px-4">
+                  <td className="px-4 py-3">
                     <div className="flex gap-1">
-                      <Button variant="ghost" size="icon" className="h-7 w-7" title="Preview & Enviar" onClick={() => setPreviewCampaign(c)}>
+                      <Button variant="ghost" size="icon" className="h-7 w-7" title="Preview e enviar" aria-label={`Visualizar campanha ${c.titulo}`} onClick={() => setPreviewCampaign(c)}>
                         <Eye className="h-3.5 w-3.5" />
                       </Button>
-                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleEditCampaign(c)}>
+                      <Button variant="ghost" size="icon" className="h-7 w-7" aria-label={`Editar campanha ${c.titulo}`} onClick={() => handleEditCampaign(c)}>
                         <Pencil className="h-3.5 w-3.5" />
                       </Button>
-                      <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => setDeletingCampaign(c)}>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" aria-label={`Excluir campanha ${c.titulo}`} onClick={() => setDeletingCampaign(c)}>
                         <Trash2 className="h-3.5 w-3.5" />
                       </Button>
                     </div>
@@ -231,7 +239,7 @@ const NewsletterContent = () => {
           </table>
         </div>
         <PaginationControls currentPage={campPagination.safePage} totalPages={campPagination.totalPages} totalItems={campPagination.totalItems} itemsPerPage={perPage} onPageChange={setCampPage} />
-      </div>
+      </section>
 
       {/* Assinantes */}
       <div className="space-y-3">

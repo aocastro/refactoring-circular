@@ -159,90 +159,101 @@ const BlogContent = ({ defaultTab = "posts" }: Props) => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold font-display text-foreground">Blog</h1>
-          <p className="text-muted-foreground text-sm">Gerencie posts e categorias</p>
-        </div>
-      </div>
+      <header>
+        <h2 className="font-display text-2xl font-bold text-foreground">Blog</h2>
+        <p className="text-sm text-muted-foreground">Gerencie posts e categorias com tabs, tabelas e diálogos acessíveis.</p>
+      </header>
 
-      <Tabs defaultValue={defaultTab} className="w-full">
-        <TabsList className="bg-secondary border border-border">
+      <Tabs defaultValue={defaultTab} className="w-full" aria-label="Seções do blog">
+        <TabsList className="border border-border bg-secondary">
           <TabsTrigger value="posts" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-            <BookOpen className="h-4 w-4 mr-2" />Posts
+            <BookOpen className="mr-2 h-4 w-4" />Posts
           </TabsTrigger>
           <TabsTrigger value="categorias" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-            <Tag className="h-4 w-4 mr-2" />Categorias
+            <Tag className="mr-2 h-4 w-4" />Categorias
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="posts" className="mt-6 space-y-4">
-          <div className="flex justify-end">
-            <Button size="sm" onClick={() => { resetPostForm(); setPostDialog(true); }}><Plus className="h-4 w-4 mr-2" />Novo Post</Button>
-          </div>
-          {(() => {
-            const { paginatedItems, totalPages, safePage, totalItems } = usePagination(postsList, postsPerPage, postsPage);
-            return (
-              <>
-                <div className="rounded-xl border border-border bg-card overflow-hidden">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-border bg-secondary/30">
-                        <th className="text-left py-3 px-4 text-muted-foreground font-medium">Título</th>
-                        <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden sm:table-cell">Categoria</th>
-                        <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden md:table-cell">Data</th>
-                        <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden sm:table-cell">Views</th>
-                        <th className="text-left py-3 px-4 text-muted-foreground font-medium">Status</th>
-                        <th className="text-right py-3 px-4 text-muted-foreground font-medium">Ações</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {paginatedItems.map((p) => (
-                        <tr key={p.id} className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors">
-                          <td className="py-3 px-4 text-foreground font-medium">{p.titulo}</td>
-                          <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">{p.categoria}</td>
-                          <td className="py-3 px-4 text-muted-foreground hidden md:table-cell">{p.data}</td>
-                          <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">
-                            <span className="flex items-center gap-1"><Eye className="h-3 w-3" />{p.views}</span>
-                          </td>
-                          <td className="py-3 px-4"><Badge variant="outline" className={statusColors[p.status]}>{p.status}</Badge></td>
-                          <td className="py-3 px-4 text-right">
-                            <div className="flex justify-end gap-1">
-                              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEditPost(p)}><Edit className="h-3.5 w-3.5" /></Button>
-                              <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => deletePost(p.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
-                            </div>
-                          </td>
+        <TabsContent value="posts" className="mt-6 space-y-4" aria-labelledby="radix-:r0:-trigger-posts">
+          <section aria-labelledby="blog-posts-heading" aria-describedby="blog-posts-description" className="space-y-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 id="blog-posts-heading" className="text-sm font-semibold text-foreground">Posts publicados e rascunhos</h3>
+                <p id="blog-posts-description" className="text-sm text-muted-foreground">Navegue pela lista de posts e use ações de editar e remover por teclado.</p>
+              </div>
+              <Button size="sm" onClick={() => { resetPostForm(); setPostDialog(true); }}><Plus className="mr-2 h-4 w-4" />Novo Post</Button>
+            </div>
+            {(() => {
+              const { paginatedItems, totalPages, safePage, totalItems } = usePagination(postsList, postsPerPage, postsPage);
+              return (
+                <>
+                  <div className="overflow-hidden rounded-xl border border-border bg-card">
+                    <table className="w-full text-sm">
+                      <caption className="sr-only">Tabela de posts do blog.</caption>
+                      <thead>
+                        <tr className="border-b border-border bg-secondary/30">
+                          <th className="px-4 py-3 text-left font-medium text-muted-foreground">Título</th>
+                          <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground sm:table-cell">Categoria</th>
+                          <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground md:table-cell">Data</th>
+                          <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground sm:table-cell">Views</th>
+                          <th className="px-4 py-3 text-left font-medium text-muted-foreground">Status</th>
+                          <th className="px-4 py-3 text-right font-medium text-muted-foreground">Ações</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                <PaginationControls currentPage={safePage} totalPages={totalPages} totalItems={totalItems} itemsPerPage={postsPerPage} onPageChange={setPostsPage} />
-              </>
-            );
-          })()}
+                      </thead>
+                      <tbody>
+                        {paginatedItems.map((p) => (
+                          <tr key={p.id} className="border-b border-border/50 transition-colors last:border-0 hover:bg-secondary/20 focus-within:bg-secondary/20">
+                            <td className="px-4 py-3 font-medium text-foreground">{p.titulo}</td>
+                            <td className="hidden px-4 py-3 text-muted-foreground sm:table-cell">{p.categoria}</td>
+                            <td className="hidden px-4 py-3 text-muted-foreground md:table-cell">{p.data}</td>
+                            <td className="hidden px-4 py-3 text-muted-foreground sm:table-cell">
+                              <span className="flex items-center gap-1"><Eye className="h-3 w-3" />{p.views}</span>
+                            </td>
+                            <td className="px-4 py-3"><Badge variant="outline" className={statusColors[p.status]}>{p.status}</Badge></td>
+                            <td className="px-4 py-3 text-right">
+                              <div className="flex justify-end gap-1">
+                                <Button variant="ghost" size="icon" className="h-7 w-7" aria-label={`Editar post ${p.titulo}`} onClick={() => openEditPost(p)}><Edit className="h-3.5 w-3.5" /></Button>
+                                <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" aria-label={`Excluir post ${p.titulo}`} onClick={() => deletePost(p.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <PaginationControls currentPage={safePage} totalPages={totalPages} totalItems={totalItems} itemsPerPage={postsPerPage} onPageChange={setPostsPage} />
+                </>
+              );
+            })()}
+          </section>
         </TabsContent>
 
-        <TabsContent value="categorias" className="mt-6 space-y-4">
-          <div className="flex justify-end">
-            <Button size="sm" onClick={() => { resetCatForm(); setCatDialog(true); }}><Plus className="h-4 w-4 mr-2" />Nova Categoria</Button>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {categoriasList.map((c, i) => (
-              <motion.div key={c.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-                className="rounded-xl border border-border bg-card p-5 flex items-center gap-4">
-                <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${c.cor}20` }}>
-                  <Tag className="h-5 w-5" style={{ color: c.cor }} />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-foreground">{c.nome}</h3>
-                  <p className="text-xs text-muted-foreground">{c.posts} posts</p>
-                </div>
-                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEditCat(c)}><Edit className="h-3.5 w-3.5" /></Button>
-                <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => deleteCat(c.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
-              </motion.div>
-            ))}
-          </div>
+        <TabsContent value="categorias" className="mt-6 space-y-4" aria-labelledby="radix-:r0:-trigger-categorias">
+          <section aria-labelledby="blog-categories-heading" aria-describedby="blog-categories-description" className="space-y-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 id="blog-categories-heading" className="text-sm font-semibold text-foreground">Categorias do blog</h3>
+                <p id="blog-categories-description" className="text-sm text-muted-foreground">Organize as categorias disponíveis para publicação e edição de posts.</p>
+              </div>
+              <Button size="sm" onClick={() => { resetCatForm(); setCatDialog(true); }}><Plus className="mr-2 h-4 w-4" />Nova Categoria</Button>
+            </div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {categoriasList.map((c, i) => (
+                <motion.article key={c.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+                  className="flex items-center gap-4 rounded-xl border border-border bg-card p-5" aria-labelledby={`blog-category-${c.id}`}>
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary text-foreground">
+                    <Tag className="h-5 w-5" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 id={`blog-category-${c.id}`} className="font-semibold text-foreground">{c.nome}</h4>
+                    <p className="text-xs text-muted-foreground">{c.posts} posts</p>
+                  </div>
+                  <Button variant="ghost" size="icon" className="h-7 w-7" aria-label={`Editar categoria ${c.nome}`} onClick={() => openEditCat(c)}><Edit className="h-3.5 w-3.5" /></Button>
+                  <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" aria-label={`Excluir categoria ${c.nome}`} onClick={() => deleteCat(c.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
+                </motion.article>
+              ))}
+            </div>
+          </section>
         </TabsContent>
       </Tabs>
 
