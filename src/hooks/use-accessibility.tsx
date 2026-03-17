@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, forwardRef, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
 type ContrastMode = "default" | "high";
 type ColorFilter = "none" | "achromatopsia" | "protanopia" | "deuteranopia" | "tritanopia";
@@ -22,7 +22,7 @@ const FONT_STEP = 1;
 
 const AccessibilityContext = createContext<AccessibilityContextType | undefined>(undefined);
 
-export function AccessibilityProvider({ children }: { children: ReactNode }) {
+export const AccessibilityProvider = forwardRef<unknown, { children: ReactNode }>(({ children }, _ref) => {
   const [fontSize, setFontSize] = useState<number>(() => {
     const stored = Number(localStorage.getItem("a11y-font-size"));
     return Number.isFinite(stored) && stored >= FONT_MIN && stored <= FONT_MAX ? stored : 16;
@@ -76,7 +76,9 @@ export function AccessibilityProvider({ children }: { children: ReactNode }) {
   );
 
   return <AccessibilityContext.Provider value={value}>{children}</AccessibilityContext.Provider>;
-}
+});
+
+AccessibilityProvider.displayName = "AccessibilityProvider";
 
 export function useAccessibility() {
   const context = useContext(AccessibilityContext);
