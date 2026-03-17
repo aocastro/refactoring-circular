@@ -1,4 +1,4 @@
-import { createContext, forwardRef, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 
 export interface CartItem {
   id: number;
@@ -25,7 +25,7 @@ const CartContext = createContext<CartContextType | null>(null);
 
 const CART_KEY = "cart_items";
 
-export const CartProvider = forwardRef<unknown, { children: ReactNode }>(({ children }, _ref) => {
+export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>(() => {
     try {
       const stored = localStorage.getItem(CART_KEY);
@@ -66,9 +66,7 @@ export const CartProvider = forwardRef<unknown, { children: ReactNode }>(({ chil
       {children}
     </CartContext.Provider>
   );
-});
-
-CartProvider.displayName = "CartProvider";
+};
 
 export function useCart() {
   const ctx = useContext(CartContext);

@@ -1,14 +1,15 @@
+import * as React from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from "@/components/ui/toast";
 
-export function Toaster() {
+export const Toaster = React.forwardRef<HTMLOListElement, React.ComponentPropsWithoutRef<typeof ToastViewport>>((props, ref) => {
   const { toasts } = useToast();
 
   return (
     <ToastProvider>
-      {toasts.map(function ({ id, title, description, action, ...props }) {
+      {toasts.map(function ({ id, title, description, action, ...toastProps }) {
         return (
-          <Toast key={id} {...props}>
+          <Toast key={id} {...toastProps}>
             <div className="grid gap-1">
               {title && <ToastTitle>{title}</ToastTitle>}
               {description && <ToastDescription>{description}</ToastDescription>}
@@ -18,7 +19,9 @@ export function Toaster() {
           </Toast>
         );
       })}
-      <ToastViewport />
+      <ToastViewport ref={ref} {...props} />
     </ToastProvider>
   );
-}
+});
+
+Toaster.displayName = "ToastViewportProvider";

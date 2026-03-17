@@ -68,11 +68,11 @@ const ClientesContent = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <section className="space-y-6" aria-labelledby="clientes-section-title" aria-describedby="clientes-section-description">
+      <header className="flex items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold font-display text-foreground">Clientes</h1>
-          <p className="text-muted-foreground text-sm">Gestão de clientes e histórico de compras</p>
+          <h2 id="clientes-section-title" className="text-2xl font-bold font-display text-foreground">Clientes</h2>
+          <p id="clientes-section-description" className="text-muted-foreground text-sm">Gestão de clientes, busca por cadastro e histórico de compras com navegação acessível por teclado.</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" className="border-border" onClick={() => exportToCSV(clientes.map((c) => ({ Nome: c.name, Email: c.email, Telefone: c.phone, Compras: c.totalPurchases, "Total Gasto": c.totalSpent, Status: c.status })), "clientes")}>
@@ -82,7 +82,7 @@ const ClientesContent = () => {
             <Plus className="h-4 w-4 mr-2" />Novo Cliente
           </Button>
         </div>
-      </div>
+      </header>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {kpis.map((kpi, i) => <KpiCard key={kpi.label} {...kpi} delay={i * 0.05} />)}
@@ -210,7 +210,7 @@ const ClientesContent = () => {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </section>
   );
 };
 
