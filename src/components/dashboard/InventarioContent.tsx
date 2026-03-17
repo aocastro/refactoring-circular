@@ -250,7 +250,7 @@ const InventarioContent = () => {
           </div>
         </div>
       )}
-    </div>
+    </section>
   );
 };
 

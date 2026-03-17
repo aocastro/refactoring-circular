@@ -210,7 +210,7 @@ const ClientesContent = () => {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </section>
   );
 };
 
