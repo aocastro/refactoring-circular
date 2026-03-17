@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
 type ContrastMode = "default" | "high";
 type ColorFilter = "none" | "achromatopsia" | "protanopia" | "deuteranopia" | "tritanopia";
@@ -22,7 +22,7 @@ const FONT_STEP = 1;
 
 const AccessibilityContext = createContext<AccessibilityContextType | undefined>(undefined);
 
-export function AccessibilityProvider({ children }: { children: React.ReactNode }) {
+export function AccessibilityProvider({ children }: { children: ReactNode }) {
   const [fontSize, setFontSize] = useState<number>(() => {
     const stored = Number(localStorage.getItem("a11y-font-size"));
     return Number.isFinite(stored) && stored >= FONT_MIN && stored <= FONT_MAX ? stored : 16;

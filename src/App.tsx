@@ -5,6 +5,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/hooks/use-theme";
 import { CartProvider } from "@/hooks/use-cart";
+import { AccessibilityProvider } from "@/hooks/use-accessibility";
+import AccessibilityToolbar from "@/components/layout/AccessibilityToolbar";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
@@ -22,30 +24,33 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <ThemeProvider>
-    <CartProvider>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/planos" element={<Planos />} />
-            <Route path="/consignante" element={<ConsignanteLogin />} />
-            <Route path="/consignante/painel" element={<ConsignantePainel />} />
-            <Route path="/loja/:slug" element={<Loja />} />
-            <Route path="/loja/:slug/p/:id" element={<ProdutoLoja />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/criar-loja" element={<CriarLoja />} />
-            <Route path="/pdv/:id" element={<PDVPage />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </QueryClientProvider>
-    </CartProvider>
+    <AccessibilityProvider>
+      <CartProvider>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <AccessibilityToolbar />
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/planos" element={<Planos />} />
+                <Route path="/consignante" element={<ConsignanteLogin />} />
+                <Route path="/consignante/painel" element={<ConsignantePainel />} />
+                <Route path="/loja/:slug" element={<Loja />} />
+                <Route path="/loja/:slug/p/:id" element={<ProdutoLoja />} />
+                <Route path="/checkout" element={<Checkout />} />
+                <Route path="/criar-loja" element={<CriarLoja />} />
+                <Route path="/pdv/:id" element={<PDVPage />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </QueryClientProvider>
+      </CartProvider>
+    </AccessibilityProvider>
   </ThemeProvider>
 );
 

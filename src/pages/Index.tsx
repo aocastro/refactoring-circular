@@ -16,17 +16,19 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <HeroSection />
-      <FeaturesSection />
-      <PainPointsSection />
-      <ModulesSection />
-      <SolutionsSection />
-      <StoreShowcaseSection />
-      <GrowthSection />
-      <ESGSection />
-      <TestimonialsSection />
-      <FAQSection />
-      <CTASection />
+      <main id="main-content" tabIndex={-1}>
+        <HeroSection />
+        <FeaturesSection />
+        <PainPointsSection />
+        <ModulesSection />
+        <SolutionsSection />
+        <StoreShowcaseSection />
+        <GrowthSection />
+        <ESGSection />
+        <TestimonialsSection />
+        <FAQSection />
+        <CTASection />
+      </main>
       <Footer />
     </div>
   );
