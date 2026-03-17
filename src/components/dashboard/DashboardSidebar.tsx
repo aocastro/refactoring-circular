@@ -34,7 +34,7 @@ import {
   SidebarFooter,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 
 interface MenuItem {
   id: string;
@@ -82,12 +82,13 @@ export function DashboardSidebar({ activeSection, onSectionChange }: DashboardSi
   const navigate = useNavigate();
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
 
-  const toggleGroup = (id: string) => {
-    setOpenGroups((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
+  const isChildActive = (item: MenuItem) => item.children?.some((c) => c.id === activeSection) ?? false;
 
-  const isChildActive = (item: MenuItem) =>
-    item.children?.some((c) => c.id === activeSection) ?? false;
+  const isGroupOpen = (item: MenuItem) => openGroups[item.id] ?? isChildActive(item);
+
+  const toggleGroup = (id: string) => {
+    setOpenGroups((prev) => ({ ...prev, [id]: !isGroupOpen({ id, title: "", icon: LayoutDashboard, children: [] }) }));
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("user");
@@ -95,102 +96,108 @@ export function DashboardSidebar({ activeSection, onSectionChange }: DashboardSi
   };
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-border">
+    <Sidebar collapsible="icon" className="border-r border-border" aria-label="Barra lateral do dashboard">
       <SidebarContent className="pt-4">
-        <div className="px-4 mb-6">
+        <div className="mb-6 px-4">
           <div className="flex items-center gap-2">
-            <img src={logo} alt="Circular u-Shar" className="w-8 h-8 object-contain shrink-0" />
+            <img src={logo} alt="Circular u-Shar" className="h-8 w-8 shrink-0 object-contain" />
             {!collapsed && (
-              <span className="font-display font-bold text-foreground text-sm">
-                Circular <span className="text-accent text-xs">u-Shar</span>
+              <span className="font-display text-sm font-bold text-foreground">
+                Circular <span className="text-xs text-accent">u-Shar</span>
               </span>
             )}
           </div>
         </div>
 
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {menuItems.map((item) =>
-                item.children ? (
-                  <Collapsible
-                    key={item.id}
-                    open={openGroups[item.id] || isChildActive(item)}
-                    onOpenChange={() => toggleGroup(item.id)}
-                  >
-                    <SidebarMenuItem>
-                      <CollapsibleTrigger asChild>
+        <nav aria-label="Navegação principal do dashboard">
+          <SidebarGroup>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {menuItems.map((item) =>
+                  item.children ? (
+                    <Collapsible key={item.id} open={isGroupOpen(item)}>
+                      <SidebarMenuItem>
                         <SidebarMenuButton
+                          type="button"
                           className="cursor-pointer justify-between"
                           isActive={isChildActive(item)}
+                          onClick={() => toggleGroup(item.id)}
+                          aria-expanded={isGroupOpen(item)}
+                          aria-controls={`dashboard-group-${item.id}`}
                         >
                           <span className="flex items-center gap-2">
-                            <item.icon className="h-4 w-4 shrink-0" />
+                            <item.icon className="h-4 w-4 shrink-0" aria-hidden="true" />
                             {!collapsed && <span>{item.title}</span>}
                           </span>
                           {!collapsed && (
                             <ChevronDown
-                              className={`h-3.5 w-3.5 text-muted-foreground transition-transform ${
-                                openGroups[item.id] || isChildActive(item) ? "rotate-180" : ""
-                              }`}
+                              className={`h-3.5 w-3.5 text-muted-foreground transition-transform ${isGroupOpen(item) ? "rotate-180" : ""}`}
+                              aria-hidden="true"
                             />
                           )}
                         </SidebarMenuButton>
-                      </CollapsibleTrigger>
-                      {!collapsed && (
-                        <CollapsibleContent>
-                          <div className="ml-6 mt-1 space-y-0.5 border-l border-border pl-3">
-                            {item.children.map((child) => (
-                              <button
-                                key={child.id}
-                                onClick={() => onSectionChange(child.id)}
-                                className={`block w-full text-left text-sm py-1.5 px-2 rounded-md transition-colors ${
-                                  activeSection === child.id
-                                    ? "text-primary font-medium bg-primary/10"
-                                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
-                                }`}
-                              >
-                                {child.title}
-                              </button>
-                            ))}
-                          </div>
-                        </CollapsibleContent>
-                      )}
+                        {!collapsed && (
+                          <CollapsibleContent id={`dashboard-group-${item.id}`}>
+                            <div className="ml-6 mt-1 space-y-0.5 border-l border-border pl-3">
+                              {item.children.map((child) => (
+                                <button
+                                  key={child.id}
+                                  type="button"
+                                  onClick={() => onSectionChange(child.id)}
+                                  aria-current={activeSection === child.id ? "page" : undefined}
+                                  className={`block w-full rounded-md px-2 py-1.5 text-left text-sm transition-colors ${
+                                    activeSection === child.id
+                                      ? "bg-primary/10 font-medium text-primary"
+                                      : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
+                                  }`}
+                                >
+                                  {child.title}
+                                </button>
+                              ))}
+                            </div>
+                          </CollapsibleContent>
+                        )}
+                      </SidebarMenuItem>
+                    </Collapsible>
+                  ) : item.externalLink ? (
+                    <SidebarMenuItem key={item.id}>
+                      <SidebarMenuButton
+                        type="button"
+                        onClick={() => window.open(item.externalLink, "_blank")}
+                        className="cursor-pointer"
+                        aria-label={collapsed ? item.title : undefined}
+                      >
+                        <item.icon className="h-4 w-4" aria-hidden="true" />
+                        {!collapsed && <span>{item.title}</span>}
+                      </SidebarMenuButton>
                     </SidebarMenuItem>
-                  </Collapsible>
-                ) : item.externalLink ? (
-                  <SidebarMenuItem key={item.id}>
-                    <SidebarMenuButton
-                      onClick={() => window.open(item.externalLink, "_blank")}
-                      className="cursor-pointer"
-                    >
-                      <item.icon className="h-4 w-4" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ) : (
-                  <SidebarMenuItem key={item.id}>
-                    <SidebarMenuButton
-                      onClick={() => onSectionChange(item.id)}
-                      isActive={activeSection === item.id}
-                      className="cursor-pointer"
-                    >
-                      <item.icon className="h-4 w-4" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                )
-              )}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+                  ) : (
+                    <SidebarMenuItem key={item.id}>
+                      <SidebarMenuButton
+                        type="button"
+                        onClick={() => onSectionChange(item.id)}
+                        isActive={activeSection === item.id}
+                        className="cursor-pointer"
+                        aria-current={activeSection === item.id ? "page" : undefined}
+                        aria-label={collapsed ? item.title : undefined}
+                      >
+                        <item.icon className="h-4 w-4" aria-hidden="true" />
+                        {!collapsed && <span>{item.title}</span>}
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ),
+                )}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </nav>
       </SidebarContent>
 
       <SidebarFooter className="p-4">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton onClick={handleLogout} className="text-destructive cursor-pointer">
-              <LogOut className="h-4 w-4" />
+            <SidebarMenuButton type="button" onClick={handleLogout} className="cursor-pointer text-destructive" aria-label="Sair da conta">
+              <LogOut className="h-4 w-4" aria-hidden="true" />
               {!collapsed && <span>Sair</span>}
             </SidebarMenuButton>
           </SidebarMenuItem>
