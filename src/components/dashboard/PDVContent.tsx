@@ -213,7 +213,7 @@ const PDVContent = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </section>
   );
 };
 

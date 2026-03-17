@@ -369,7 +369,7 @@ const RelatoriosContent = ({ defaultTab = "vendas" }: Props) => {
           </motion.div>
         </TabsContent>
       </Tabs>
-    </div>
+    </section>
   );
 };
 
