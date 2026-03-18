@@ -3,17 +3,16 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Store, CreditCard, CheckCircle2, ArrowLeft, ArrowRight, Loader2,
-  UserPlus, ShoppingBag, LayoutTemplate, Crown, Zap, Rocket, Star, Gem, Eye, X,
+  UserPlus, ShoppingBag, LayoutTemplate, Crown, Zap, Rocket, Star, Gem,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import PlanSelectionStep from "@/components/criar-loja/PlanSelectionStep";
+import TemplateSelectionStep from "@/components/criar-loja/TemplateSelectionStep";
 
 /* ── Plan data ─────────────────────────────────────────── */
 const plansData = [
