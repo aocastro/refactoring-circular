@@ -194,7 +194,7 @@ const FornecedoresContent = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </section>
   );
 };
 
