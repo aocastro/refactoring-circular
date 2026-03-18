@@ -25,12 +25,18 @@ const plansData = [
 ];
 
 /* ── E-commerce templates ──────────────────────────────── */
+import templateMinimalImg from "@/assets/templates/template-minimal.jpg";
+import templateBoldImg from "@/assets/templates/template-bold.jpg";
+import templateClassicImg from "@/assets/templates/template-classic.jpg";
+import templateModernImg from "@/assets/templates/template-modern.jpg";
+import templateColorfulImg from "@/assets/templates/template-colorful.jpg";
+
 const templates = [
-  { id: "minimal", name: "Minimalista", description: "Design limpo com foco no produto, tipografia elegante e muito espaço em branco.", preview: "linear-gradient(135deg, hsl(0 0% 98%), hsl(0 0% 90%))", accent: "hsl(0 0% 20%)" },
-  { id: "bold", name: "Bold & Vibrante", description: "Cores intensas, tipografia impactante e layout ousado para marcas que querem se destacar.", preview: "linear-gradient(135deg, hsl(340 80% 55%), hsl(30 90% 55%))", accent: "hsl(340 80% 55%)" },
-  { id: "classic", name: "Clássico Elegante", description: "Inspirado em revistas de moda, com serifas sofisticadas e paleta neutra premium.", preview: "linear-gradient(135deg, hsl(30 20% 90%), hsl(30 10% 75%))", accent: "hsl(30 30% 40%)" },
-  { id: "modern", name: "Moderno Escuro", description: "Dark mode nativo, linhas geométricas e visual high-tech para uma experiência premium.", preview: "linear-gradient(135deg, hsl(240 10% 15%), hsl(240 10% 25%))", accent: "hsl(270 80% 65%)" },
-  { id: "colorful", name: "Colorido & Divertido", description: "Paleta multicolorida, ilustrações e micro-animações para marcas jovens e criativas.", preview: "linear-gradient(135deg, hsl(180 70% 60%), hsl(270 70% 65%))", accent: "hsl(180 70% 50%)" },
+  { id: "minimal", name: "Minimalista", description: "Design limpo com foco no produto, tipografia elegante e muito espaço em branco.", image: templateMinimalImg },
+  { id: "bold", name: "Bold & Vibrante", description: "Cores intensas, tipografia impactante e layout ousado para marcas que querem se destacar.", image: templateBoldImg },
+  { id: "classic", name: "Clássico Elegante", description: "Inspirado em revistas de moda, com serifas sofisticadas e paleta neutra premium.", image: templateClassicImg },
+  { id: "modern", name: "Moderno Escuro", description: "Dark mode nativo, linhas geométricas e visual high-tech para uma experiência premium.", image: templateModernImg },
+  { id: "colorful", name: "Colorido & Divertido", description: "Paleta multicolorida, ilustrações e micro-animações para marcas jovens e criativas.", image: templateColorfulImg },
 ];
 
 /* ── Steps ─────────────────────────────────────────────── */
