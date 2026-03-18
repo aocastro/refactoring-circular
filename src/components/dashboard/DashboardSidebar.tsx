@@ -53,7 +53,7 @@ const getStoreSlug = (): string => {
 
 const menuItems: MenuItem[] = [
   { id: "dashboard", title: "Dashboard", icon: LayoutDashboard },
-  { id: "minha-loja", title: "Minha Loja", icon: Store, externalLink: `/loja/${getStoreSlug()}` },
+  { id: "minha-loja", title: "Minha Loja", icon: Store },
   { id: "minha-conta", title: "Minha Conta", icon: User },
   { id: "configuracoes", title: "Configurações", icon: Settings },
   { id: "venda", title: "Venda", icon: ShoppingCart, children: [
