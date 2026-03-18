@@ -200,8 +200,32 @@ const CriarLoja = () => {
   };
 
   const finishSetup = () => {
-    // Mock account creation
-    localStorage.setItem("user", JSON.stringify({ name: accountData.nome, email: accountData.email }));
+    // Save user credentials
+    const userData = { name: accountData.nome, email: accountData.email };
+    localStorage.setItem("user", JSON.stringify(userData));
+
+    // Save store config so it persists across sessions
+    const storeConfig = {
+      nome: storeData.nome,
+      slug: storeData.slug || "minha-loja",
+      telefone: storeData.telefone,
+      plan: plan.key,
+      planName: plan.name,
+      ecommerce: wantsEcommerce,
+      template: wantsEcommerce ? selectedTemplate : null,
+      templateName: wantsEcommerce ? templates.find((t) => t.id === selectedTemplate)?.name : null,
+      createdAt: new Date().toISOString(),
+    };
+    localStorage.setItem("storeConfig", JSON.stringify(storeConfig));
+
+    // Save credentials for login (mock auth registry)
+    const registeredUsers = JSON.parse(localStorage.getItem("registeredUsers") || "[]");
+    const exists = registeredUsers.some((u: { email: string }) => u.email === accountData.email);
+    if (!exists) {
+      registeredUsers.push({ name: accountData.nome, email: accountData.email, password: accountData.senha });
+      localStorage.setItem("registeredUsers", JSON.stringify(registeredUsers));
+    }
+
     toast.success("Loja criada com sucesso! 🎉");
   };
 

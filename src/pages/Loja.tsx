@@ -14,7 +14,19 @@ const Loja = () => {
   const [activeCategory, setActiveCategory] = useState("Todos");
   const [bannerIndex, setBannerIndex] = useState(0);
   const { totalItems, setIsOpen } = useCart();
-  const store = mockStore;
+
+  // Load store config from localStorage if slug matches the user's store
+  const savedConfig = (() => {
+    try {
+      const config = JSON.parse(localStorage.getItem("storeConfig") || "{}");
+      if (config.slug === slug) return config;
+    } catch {}
+    return null;
+  })();
+
+  const store = savedConfig
+    ? { ...mockStore, slug: savedConfig.slug, name: savedConfig.nome, description: `Template: ${savedConfig.templateName || "Padrão"}` }
+    : mockStore;
 
   const newArrivals = storeProducts.slice(0, 10);
   const featured = storeProducts.filter((p) => p.highlight);
@@ -110,6 +122,18 @@ const Loja = () => {
           ))}
         </div>
       </header>
+
+      {/* Template indicator for user's own store */}
+      {savedConfig && (
+        <div className="border-b border-border bg-primary/5">
+          <div className="container max-w-6xl mx-auto px-4 py-2 flex items-center justify-between">
+            <p className="text-xs text-muted-foreground">
+              🎨 Template: <span className="font-semibold text-foreground">{savedConfig.templateName || "Padrão"}</span>
+              {" · "}Plano: <span className="font-semibold text-foreground">{savedConfig.planName}</span>
+            </p>
+          </div>
+        </div>
+      )}
 
       <main>
         {/* Banner Carousel */}

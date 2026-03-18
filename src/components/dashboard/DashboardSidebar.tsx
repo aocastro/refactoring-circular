@@ -44,9 +44,16 @@ interface MenuItem {
   externalLink?: string;
 }
 
+const getStoreSlug = (): string => {
+  try {
+    const config = JSON.parse(localStorage.getItem("storeConfig") || "{}");
+    return config.slug || "fashion-store";
+  } catch { return "fashion-store"; }
+};
+
 const menuItems: MenuItem[] = [
   { id: "dashboard", title: "Dashboard", icon: LayoutDashboard },
-  { id: "minha-loja", title: "Minha Loja", icon: Store, externalLink: "/loja/fashion-store" },
+  { id: "minha-loja", title: "Minha Loja", icon: Store, externalLink: `/loja/${getStoreSlug()}` },
   { id: "minha-conta", title: "Minha Conta", icon: User },
   { id: "configuracoes", title: "Configurações", icon: Settings },
   { id: "venda", title: "Venda", icon: ShoppingCart, children: [
