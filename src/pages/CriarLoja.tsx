@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Store, CreditCard, CheckCircle2, ArrowLeft, ArrowRight, Loader2,
-  UserPlus, ShoppingBag, LayoutTemplate, Crown, Zap, Rocket, Star, Gem,
+  UserPlus, ShoppingBag, LayoutTemplate, Crown, Zap, Rocket, Star, Gem, Eye, X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
