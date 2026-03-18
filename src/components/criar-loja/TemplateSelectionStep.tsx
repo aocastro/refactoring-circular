@@ -24,7 +24,7 @@ const TemplateSelectionStep = ({ templates, selectedTemplate, onSelectTemplate }
       <div className="space-y-4 rounded-xl border border-border bg-card p-6">
         <h2 className="font-display text-lg font-bold text-foreground">Escolha o template da sua loja</h2>
         <p className="text-sm text-muted-foreground">Clique em um template para ver a visualização completa. Você pode alterar depois.</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {templates.map((t) => (
             <div key={t.id} className={`group rounded-xl border-2 p-3 text-left transition-all ${selectedTemplate === t.id ? "border-primary ring-1 ring-primary" : "border-border hover:border-muted-foreground/30"}`}>
               <div
