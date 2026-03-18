@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import PlanSelectionStep from "@/components/criar-loja/PlanSelectionStep";
 
 /* ── Plan data ─────────────────────────────────────────── */
 const plansData = [
