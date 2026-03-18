@@ -34,9 +34,9 @@ const VendaContent = () => {
   ];
 
   return (
-    <div className="space-y-6">
+    <section aria-label="Módulo de vendas" className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold font-display text-foreground">Venda</h1>
+        <h2 className="text-2xl font-bold font-display text-foreground">Venda</h2>
         <p className="text-muted-foreground text-sm">Gerencie seus produtos e ponto de venda</p>
       </div>
 
@@ -205,7 +205,7 @@ const VendaContent = () => {
           </div>
         </TabsContent>
       </Tabs>
-    </div>
+    </section>
   );
 };
 

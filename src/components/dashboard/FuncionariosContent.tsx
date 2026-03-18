@@ -80,10 +80,10 @@ const FuncionariosContent = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <section aria-label="Gestão de funcionários" className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold font-display text-foreground">Funcionários</h1>
+          <h2 className="text-2xl font-bold font-display text-foreground">Funcionários</h2>
           <p className="text-muted-foreground text-sm">Gerencie a equipe da sua loja</p>
         </div>
         <Button size="sm" className="bg-gradient-primary text-primary-foreground" onClick={() => setShowAddDialog(true)}>
@@ -150,7 +150,7 @@ const FuncionariosContent = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </section>
   );
 };
 
