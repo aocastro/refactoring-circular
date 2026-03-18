@@ -29,6 +29,9 @@ import templateBoldImg from "@/assets/templates/template-bold.jpg";
 import templateClassicImg from "@/assets/templates/template-classic.jpg";
 import templateModernImg from "@/assets/templates/template-modern.jpg";
 import templateColorfulImg from "@/assets/templates/template-colorful.jpg";
+import templateEcoImg from "@/assets/templates/template-eco.jpg";
+import templateLuxuryImg from "@/assets/templates/template-luxury.jpg";
+import templateTechImg from "@/assets/templates/template-tech.jpg";
 
 const templates = [
   { id: "minimal", name: "Minimalista", description: "Design limpo com foco no produto, tipografia elegante e muito espaço em branco.", image: templateMinimalImg },
@@ -36,6 +39,9 @@ const templates = [
   { id: "classic", name: "Clássico Elegante", description: "Inspirado em revistas de moda, com serifas sofisticadas e paleta neutra premium.", image: templateClassicImg },
   { id: "modern", name: "Moderno Escuro", description: "Dark mode nativo, linhas geométricas e visual high-tech para uma experiência premium.", image: templateModernImg },
   { id: "colorful", name: "Colorido & Divertido", description: "Paleta multicolorida, ilustrações e micro-animações para marcas jovens e criativas.", image: templateColorfulImg },
+  { id: "eco", name: "Eco-Friendly", description: "Tons terrosos, motivos naturais e selos de sustentabilidade para marcas conscientes.", image: templateEcoImg },
+  { id: "luxury", name: "Luxo Dourado", description: "Preto e dourado, tipografia serifada e texturas de mármore para boutiques premium.", image: templateLuxuryImg },
+  { id: "tech", name: "Tech Startup", description: "Azul neon e navy, layout futurista e gradientes modernos para lojas de tecnologia.", image: templateTechImg },
 ];
 
 /* ── Steps ─────────────────────────────────────────────── */
