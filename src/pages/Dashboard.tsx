@@ -34,6 +34,7 @@ const FuncionariosContent = lazy(() => import("@/components/dashboard/Funcionari
 const BlogContent = lazy(() => import("@/components/dashboard/BlogContent"));
 const LinktreeContent = lazy(() => import("@/components/dashboard/LinktreeContent"));
 const LojasContent = lazy(() => import("@/components/dashboard/LojasContent"));
+const MinhaLojaContent = lazy(() => import("@/components/dashboard/MinhaLojaContent"));
 
 const SectionFallback = () => (
   <div className="rounded-xl border border-border bg-card p-6">
@@ -114,6 +115,7 @@ const Dashboard = () => {
       "blog-categorias": { label: "Categorias do blog", content: <BlogContent defaultTab="categorias" /> },
       "meu-linktree": { label: "Meu Linktree", content: <LinktreeContent /> },
       lojas: { label: "Lojas", content: <LojasContent /> },
+      "minha-loja": { label: "Minha Loja", content: <MinhaLojaContent /> },
     }),
     [user],
   );
