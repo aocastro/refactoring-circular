@@ -376,36 +376,11 @@ const CriarLoja = () => {
 
               {/* ── Step 5: Template Selection ─────── */}
               {step === 5 && wantsEcommerce && (
-                <motion.div key="template" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-5">
-                  <div className="space-y-4 rounded-xl border border-border bg-card p-6">
-                    <h2 className="font-display text-lg font-bold text-foreground">Escolha o template da sua loja</h2>
-                    <p className="text-sm text-muted-foreground">Selecione o visual que mais combina com a sua marca. Você pode alterar depois.</p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {templates.map((t) => (
-                        <button key={t.id} type="button" onClick={() => setSelectedTemplate(t.id)}
-                          className={`rounded-xl border-2 p-3 text-left transition-all ${selectedTemplate === t.id ? "border-primary ring-1 ring-primary" : "border-border hover:border-muted-foreground/30"}`}>
-                          <div className="aspect-[4/3] rounded-lg mb-3 relative overflow-hidden" style={{ background: t.preview }}>
-                            <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 p-3">
-                              <div className="w-10 h-1.5 rounded-full" style={{ background: t.accent }} />
-                              <div className="w-16 h-1 rounded-full bg-foreground/10" />
-                              <div className="grid grid-cols-2 gap-1.5 mt-2 w-full max-w-[80px]">
-                                <div className="aspect-square rounded bg-foreground/10" />
-                                <div className="aspect-square rounded bg-foreground/10" />
-                              </div>
-                            </div>
-                            {selectedTemplate === t.id && (
-                              <div className="absolute top-2 right-2 h-5 w-5 rounded-full bg-primary flex items-center justify-center">
-                                <CheckCircle2 className="h-3 w-3 text-primary-foreground" />
-                              </div>
-                            )}
-                          </div>
-                          <h3 className="font-semibold text-foreground text-sm">{t.name}</h3>
-                          <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">{t.description}</p>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </motion.div>
+                <TemplateSelectionStep
+                  templates={templates}
+                  selectedTemplate={selectedTemplate}
+                  onSelectTemplate={setSelectedTemplate}
+                />
               )}
 
               {/* ── Final Step: Success ────────────── */}
