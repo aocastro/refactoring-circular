@@ -8,12 +8,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import PlanSelectionStep from "@/components/criar-loja/PlanSelectionStep";
+import TemplateSelectionStep from "@/components/criar-loja/TemplateSelectionStep";
 
 /* ── Plan data ─────────────────────────────────────────── */
 const plansData = [
@@ -25,12 +24,18 @@ const plansData = [
 ];
 
 /* ── E-commerce templates ──────────────────────────────── */
+import templateMinimalImg from "@/assets/templates/template-minimal.jpg";
+import templateBoldImg from "@/assets/templates/template-bold.jpg";
+import templateClassicImg from "@/assets/templates/template-classic.jpg";
+import templateModernImg from "@/assets/templates/template-modern.jpg";
+import templateColorfulImg from "@/assets/templates/template-colorful.jpg";
+
 const templates = [
-  { id: "minimal", name: "Minimalista", description: "Design limpo com foco no produto, tipografia elegante e muito espaço em branco.", preview: "linear-gradient(135deg, hsl(0 0% 98%), hsl(0 0% 90%))", accent: "hsl(0 0% 20%)" },
-  { id: "bold", name: "Bold & Vibrante", description: "Cores intensas, tipografia impactante e layout ousado para marcas que querem se destacar.", preview: "linear-gradient(135deg, hsl(340 80% 55%), hsl(30 90% 55%))", accent: "hsl(340 80% 55%)" },
-  { id: "classic", name: "Clássico Elegante", description: "Inspirado em revistas de moda, com serifas sofisticadas e paleta neutra premium.", preview: "linear-gradient(135deg, hsl(30 20% 90%), hsl(30 10% 75%))", accent: "hsl(30 30% 40%)" },
-  { id: "modern", name: "Moderno Escuro", description: "Dark mode nativo, linhas geométricas e visual high-tech para uma experiência premium.", preview: "linear-gradient(135deg, hsl(240 10% 15%), hsl(240 10% 25%))", accent: "hsl(270 80% 65%)" },
-  { id: "colorful", name: "Colorido & Divertido", description: "Paleta multicolorida, ilustrações e micro-animações para marcas jovens e criativas.", preview: "linear-gradient(135deg, hsl(180 70% 60%), hsl(270 70% 65%))", accent: "hsl(180 70% 50%)" },
+  { id: "minimal", name: "Minimalista", description: "Design limpo com foco no produto, tipografia elegante e muito espaço em branco.", image: templateMinimalImg },
+  { id: "bold", name: "Bold & Vibrante", description: "Cores intensas, tipografia impactante e layout ousado para marcas que querem se destacar.", image: templateBoldImg },
+  { id: "classic", name: "Clássico Elegante", description: "Inspirado em revistas de moda, com serifas sofisticadas e paleta neutra premium.", image: templateClassicImg },
+  { id: "modern", name: "Moderno Escuro", description: "Dark mode nativo, linhas geométricas e visual high-tech para uma experiência premium.", image: templateModernImg },
+  { id: "colorful", name: "Colorido & Divertido", description: "Paleta multicolorida, ilustrações e micro-animações para marcas jovens e criativas.", image: templateColorfulImg },
 ];
 
 /* ── Steps ─────────────────────────────────────────────── */
@@ -370,36 +375,11 @@ const CriarLoja = () => {
 
               {/* ── Step 5: Template Selection ─────── */}
               {step === 5 && wantsEcommerce && (
-                <motion.div key="template" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-5">
-                  <div className="space-y-4 rounded-xl border border-border bg-card p-6">
-                    <h2 className="font-display text-lg font-bold text-foreground">Escolha o template da sua loja</h2>
-                    <p className="text-sm text-muted-foreground">Selecione o visual que mais combina com a sua marca. Você pode alterar depois.</p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {templates.map((t) => (
-                        <button key={t.id} type="button" onClick={() => setSelectedTemplate(t.id)}
-                          className={`rounded-xl border-2 p-3 text-left transition-all ${selectedTemplate === t.id ? "border-primary ring-1 ring-primary" : "border-border hover:border-muted-foreground/30"}`}>
-                          <div className="aspect-[4/3] rounded-lg mb-3 relative overflow-hidden" style={{ background: t.preview }}>
-                            <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 p-3">
-                              <div className="w-10 h-1.5 rounded-full" style={{ background: t.accent }} />
-                              <div className="w-16 h-1 rounded-full bg-foreground/10" />
-                              <div className="grid grid-cols-2 gap-1.5 mt-2 w-full max-w-[80px]">
-                                <div className="aspect-square rounded bg-foreground/10" />
-                                <div className="aspect-square rounded bg-foreground/10" />
-                              </div>
-                            </div>
-                            {selectedTemplate === t.id && (
-                              <div className="absolute top-2 right-2 h-5 w-5 rounded-full bg-primary flex items-center justify-center">
-                                <CheckCircle2 className="h-3 w-3 text-primary-foreground" />
-                              </div>
-                            )}
-                          </div>
-                          <h3 className="font-semibold text-foreground text-sm">{t.name}</h3>
-                          <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">{t.description}</p>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </motion.div>
+                <TemplateSelectionStep
+                  templates={templates}
+                  selectedTemplate={selectedTemplate}
+                  onSelectTemplate={setSelectedTemplate}
+                />
               )}
 
               {/* ── Final Step: Success ────────────── */}
