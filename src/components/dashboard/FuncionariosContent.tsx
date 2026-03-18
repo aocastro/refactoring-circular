@@ -150,7 +150,7 @@ const FuncionariosContent = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </section>
   );
 };
 

@@ -114,7 +114,7 @@ const LinktreeContent = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </section>
   );
 };
 

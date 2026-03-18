@@ -205,7 +205,7 @@ const VendaContent = () => {
           </div>
         </TabsContent>
       </Tabs>
-    </div>
+    </section>
   );
 };
 
