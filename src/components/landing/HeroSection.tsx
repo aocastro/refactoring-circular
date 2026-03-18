@@ -48,7 +48,7 @@ const HeroSection = () => {
           transition={{ duration: 0.6, delay: 0.3 }}
         >
           <Button asChild size="lg" className="bg-gradient-primary text-primary-foreground px-8 py-6 text-lg rounded-xl glow-primary">
-            <Link to="/planos">
+            <Link to="/criar-loja">
               Criar minha loja
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
