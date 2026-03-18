@@ -26,8 +26,22 @@ const Login = () => {
     setLoading(true);
 
     setTimeout(() => {
+      // Check demo user first
       if (email === MOCK_USER.email && password === MOCK_USER.password) {
         localStorage.setItem("user", JSON.stringify({ name: MOCK_USER.name, email: MOCK_USER.email }));
+        navigate("/dashboard");
+        setLoading(false);
+        return;
+      }
+
+      // Check registered users (from store creation wizard)
+      const registeredUsers = JSON.parse(localStorage.getItem("registeredUsers") || "[]");
+      const matchedUser = registeredUsers.find(
+        (u: { email: string; password: string }) => u.email === email && u.password === password
+      );
+
+      if (matchedUser) {
+        localStorage.setItem("user", JSON.stringify({ name: matchedUser.name, email: matchedUser.email }));
         navigate("/dashboard");
       } else {
         toast({
