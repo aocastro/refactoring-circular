@@ -107,7 +107,7 @@ const FornecedoresContent = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold font-display text-foreground">Fornecedores</h1>
+          <h2 className="text-2xl font-bold font-display text-foreground">Fornecedores</h2>
           <p className="text-muted-foreground text-sm">Gerencie seus fornecedores e parceiros</p>
         </div>
         <div className="flex gap-2">

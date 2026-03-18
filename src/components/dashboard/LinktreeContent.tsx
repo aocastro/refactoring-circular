@@ -61,10 +61,10 @@ const LinktreeContent = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <section aria-label="Gestão de links" className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold font-display text-foreground">Meu Linktree</h1>
+          <h2 className="text-2xl font-bold font-display text-foreground">Meu Linktree</h2>
           <p className="text-muted-foreground text-sm">Gerencie seus links compartilháveis</p>
         </div>
         <Button size="sm" className="bg-gradient-primary text-primary-foreground" onClick={() => setShowAddDialog(true)}>
