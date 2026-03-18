@@ -115,6 +115,7 @@ const Dashboard = () => {
       "blog-categorias": { label: "Categorias do blog", content: <BlogContent defaultTab="categorias" /> },
       "meu-linktree": { label: "Meu Linktree", content: <LinktreeContent /> },
       lojas: { label: "Lojas", content: <LojasContent /> },
+      "minha-loja": { label: "Minha Loja", content: <MinhaLojaContent /> },
     }),
     [user],
   );
