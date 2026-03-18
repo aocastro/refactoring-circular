@@ -236,41 +236,13 @@ const CriarLoja = () => {
             <AnimatePresence mode="wait">
               {/* ── Step 0: Plan Selection ──────────── */}
               {step === 0 && (
-                <motion.div key="plan" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-5">
-                  <div className="rounded-xl border border-border bg-card p-6 space-y-4">
-                    <h2 className="font-display text-lg font-bold text-foreground">Escolha seu plano</h2>
-                    <div className="flex items-center justify-center gap-3 mb-4">
-                      <span className={`text-sm ${billing === "mensal" ? "text-foreground font-medium" : "text-muted-foreground"}`}>Mensal</span>
-                      <Switch checked={billing === "anual"} onCheckedChange={(c) => setBilling(c ? "anual" : "mensal")} />
-                      <span className={`text-sm ${billing === "anual" ? "text-foreground font-medium" : "text-muted-foreground"}`}>Anual <Badge variant="secondary" className="ml-1 text-[10px]">-20%</Badge></span>
-                    </div>
-                    <div className="grid gap-3">
-                      {plansData.map((p) => {
-                        const pPrice = billing === "anual" ? p.annualPrice : p.monthlyPrice;
-                        return (
-                          <button key={p.key} type="button"
-                            className={`flex items-center gap-4 rounded-xl border p-4 text-left transition-all ${selectedPlan === p.key ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-border bg-card hover:bg-secondary/50"}`}
-                            onClick={() => setSelectedPlan(p.key)}>
-                            <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${selectedPlan === p.key ? "bg-primary/10 text-primary" : "bg-secondary text-muted-foreground"}`}>
-                              <p.icon className="h-5 w-5" />
-                            </div>
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2">
-                                <span className="font-semibold text-foreground">{p.name}</span>
-                                {p.highlight && <Badge className="bg-accent text-accent-foreground text-[10px]">Popular</Badge>}
-                              </div>
-                              <span className="text-xs text-muted-foreground">{p.tagline}</span>
-                            </div>
-                            <div className="text-right">
-                              <span className="font-bold text-foreground">{pPrice === 0 ? "Grátis" : `R$ ${pPrice.toFixed(2).replace(".", ",")}`}</span>
-                              {pPrice > 0 && <span className="block text-[10px] text-muted-foreground">{billing === "anual" ? "/ano" : "/mês"}</span>}
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </motion.div>
+                <PlanSelectionStep
+                  plans={plansData}
+                  selectedPlan={selectedPlan}
+                  billing={billing}
+                  onSelectPlan={setSelectedPlan}
+                  onBillingChange={setBilling}
+                />
               )}
 
               {/* ── Step 1: Payment ────────────────── */}
