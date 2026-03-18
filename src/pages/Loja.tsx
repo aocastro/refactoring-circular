@@ -14,7 +14,19 @@ const Loja = () => {
   const [activeCategory, setActiveCategory] = useState("Todos");
   const [bannerIndex, setBannerIndex] = useState(0);
   const { totalItems, setIsOpen } = useCart();
-  const store = mockStore;
+
+  // Load store config from localStorage if slug matches the user's store
+  const savedConfig = (() => {
+    try {
+      const config = JSON.parse(localStorage.getItem("storeConfig") || "{}");
+      if (config.slug === slug) return config;
+    } catch {}
+    return null;
+  })();
+
+  const store = savedConfig
+    ? { ...mockStore, slug: savedConfig.slug, name: savedConfig.nome, description: `Template: ${savedConfig.templateName || "Padrão"}` }
+    : mockStore;
 
   const newArrivals = storeProducts.slice(0, 10);
   const featured = storeProducts.filter((p) => p.highlight);
