@@ -18,7 +18,7 @@ const DashboardContent = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold font-display text-foreground">Dashboard</h1>
+        <h2 className="text-xl font-bold font-display text-foreground">Visão geral</h2>
         <p className="text-muted-foreground text-sm">Bom dia, Maria! Seja bem-vinda ao seu painel.</p>
       </div>
 
