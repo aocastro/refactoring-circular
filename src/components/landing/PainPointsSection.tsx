@@ -37,13 +37,13 @@ const PainPointsSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.08 }}
-              className="p-6 rounded-2xl border border-destructive/20 bg-destructive/5 hover-lift"
+              className="p-6 rounded-2xl border border-destructive/20 bg-destructive/5 hover-lift h-full flex flex-col"
             >
-              <div className="w-10 h-10 rounded-lg bg-destructive/10 flex items-center justify-center mb-4">
+              <div className="w-10 h-10 rounded-lg bg-destructive/10 flex items-center justify-center mb-4 shrink-0">
                 <point.icon className="h-5 w-5 text-destructive" />
               </div>
-              <h3 className="font-semibold font-display text-foreground mb-2">{point.title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{point.description}</p>
+              <h3 className="font-semibold font-display text-foreground mb-2 text-base leading-tight min-h-[2.5rem] flex items-center">{point.title}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed flex-1">{point.description}</p>
             </motion.div>
           ))}
         </div>
