@@ -53,13 +53,13 @@ const SolutionsSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.08 }}
-              className="rounded-2xl border border-border bg-card overflow-hidden hover-lift"
+              className="rounded-2xl border border-border bg-card overflow-hidden hover-lift flex flex-col"
             >
-              <div className="p-5 bg-destructive/5 border-b border-border">
+              <div className="p-5 bg-destructive/5 border-b border-border min-h-[7.5rem] flex flex-col justify-start">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-destructive mb-2 block">Desafio</span>
                 <p className="text-sm text-foreground font-medium leading-relaxed">{item.challenge}</p>
               </div>
-              <div className="p-5 bg-success/5">
+              <div className="p-5 bg-success/5 flex-1 flex flex-col justify-start">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-success mb-2 block">Solução</span>
                 <p className="text-sm text-muted-foreground leading-relaxed">{item.solution}</p>
               </div>
