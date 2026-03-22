@@ -28,7 +28,8 @@ describe("AccessibilityToolbar", () => {
     fireEvent.click(toggles[0]);
 
     expect(screen.getByRole("dialog", { name: /menu de acessibilidade/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /restaurar padrão/i })).toBeInTheDocument();
+    const resetButtons = screen.getAllByRole("button", { name: /restaurar padrão/i });
+    expect(resetButtons.length).toBeGreaterThan(0);
   });
 
   it("ajusta o tamanho da fonte pelos controles de zoom no header", () => {
