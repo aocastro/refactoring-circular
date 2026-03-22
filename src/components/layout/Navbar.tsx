@@ -1,14 +1,18 @@
 import { Link, useLocation } from "react-router-dom";
 import logo from "@/assets/logo.png";
+import accessibilityIcon from "@/assets/accessibility-icon.png";
 import { useState } from "react";
-import { Menu, X, Sun, Moon } from "lucide-react";
+import { Menu, X, Sun, Moon, ZoomIn, ZoomOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/hooks/use-theme";
+import { useAccessibility } from "@/hooks/use-accessibility";
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [a11yOpen, setA11yOpen] = useState(false);
   const location = useLocation();
   const { theme, toggleTheme } = useTheme();
+  const { fontSize, increaseFontSize, decreaseFontSize } = useAccessibility();
 
   const links = [
     { label: "Home", href: "/" },
@@ -38,7 +42,61 @@ const Navbar = () => {
           ))}
         </nav>
 
-        <div className="hidden md:flex items-center gap-3">
+        <div className="hidden md:flex items-center gap-1">
+          {/* Zoom controls */}
+          <button
+            onClick={decreaseFontSize}
+            className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
+            aria-label={`Diminuir fonte (atual: ${fontSize}px)`}
+            title="Diminuir fonte"
+          >
+            <ZoomOut className="h-4 w-4" />
+          </button>
+          <button
+            onClick={increaseFontSize}
+            className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
+            aria-label={`Aumentar fonte (atual: ${fontSize}px)`}
+            title="Aumentar fonte"
+          >
+            <ZoomIn className="h-4 w-4" />
+          </button>
+
+          {/* Accessibility menu */}
+          <div className="relative">
+            <button
+              onClick={() => setA11yOpen((v) => !v)}
+              className="p-1.5 rounded-lg hover:bg-secondary transition-colors"
+              aria-label={a11yOpen ? "Fechar menu de acessibilidade" : "Abrir menu de acessibilidade"}
+              aria-expanded={a11yOpen}
+              aria-controls="a11y-header-panel"
+              title="Acessibilidade"
+            >
+              <img src={accessibilityIcon} alt="" className="h-5 w-5 object-contain" aria-hidden="true" />
+            </button>
+
+            {a11yOpen && (
+              <div
+                id="a11y-header-panel"
+                role="dialog"
+                aria-label="Menu de acessibilidade"
+                aria-modal="false"
+                className="absolute top-full right-0 mt-2 w-[min(22rem,calc(100vw-2rem))] rounded-2xl border border-border bg-card/95 p-4 shadow-card backdrop-blur z-50"
+              >
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <img src={accessibilityIcon} alt="" className="h-5 w-5 object-contain" aria-hidden="true" />
+                    <h2 className="font-display text-sm font-semibold text-foreground">Acessibilidade</h2>
+                  </div>
+                  <Button type="button" variant="ghost" size="icon" aria-label="Fechar menu" onClick={() => setA11yOpen(false)}>
+                    <X className="h-4 w-4" aria-hidden="true" />
+                  </Button>
+                </div>
+                <AccessibilityControlsInline />
+              </div>
+            )}
+          </div>
+
+          {/* Theme toggle */}
           <button
             onClick={toggleTheme}
             className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
@@ -47,6 +105,9 @@ const Navbar = () => {
           >
             {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
+
+          <div className="w-px h-6 bg-border mx-1" />
+
           <Button asChild variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
             <Link to="/login">Login</Link>
           </Button>
@@ -55,7 +116,29 @@ const Navbar = () => {
           </Button>
         </div>
 
-        <div className="md:hidden flex items-center gap-2">
+        {/* Mobile */}
+        <div className="md:hidden flex items-center gap-1">
+          <button
+            onClick={decreaseFontSize}
+            className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
+            aria-label="Diminuir fonte"
+          >
+            <ZoomOut className="h-4 w-4" />
+          </button>
+          <button
+            onClick={increaseFontSize}
+            className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
+            aria-label="Aumentar fonte"
+          >
+            <ZoomIn className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => setA11yOpen((v) => !v)}
+            className="p-1.5 rounded-lg hover:bg-secondary transition-colors"
+            aria-label={a11yOpen ? "Fechar menu de acessibilidade" : "Abrir menu de acessibilidade"}
+          >
+            <img src={accessibilityIcon} alt="" className="h-5 w-5 object-contain" aria-hidden="true" />
+          </button>
           <button
             onClick={toggleTheme}
             className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
@@ -74,6 +157,22 @@ const Navbar = () => {
           </button>
         </div>
       </div>
+
+      {/* Mobile a11y panel */}
+      {a11yOpen && (
+        <div className="md:hidden glass border-t border-border px-4 py-4" aria-label="Menu de acessibilidade">
+          <div className="mb-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <img src={accessibilityIcon} alt="" className="h-5 w-5 object-contain" aria-hidden="true" />
+              <h2 className="font-display text-sm font-semibold text-foreground">Acessibilidade</h2>
+            </div>
+            <Button type="button" variant="ghost" size="icon" aria-label="Fechar" onClick={() => setA11yOpen(false)}>
+              <X className="h-4 w-4" aria-hidden="true" />
+            </Button>
+          </div>
+          <AccessibilityControlsInline />
+        </div>
+      )}
 
       {mobileOpen && (
         <div id="mobile-menu" className="md:hidden glass border-t border-border px-4 py-4 space-y-3" aria-label="Menu móvel">
@@ -99,6 +198,96 @@ const Navbar = () => {
         </div>
       )}
     </header>
+  );
+};
+
+/* Inline accessibility controls reused in both desktop dropdown and mobile panel */
+import { Contrast, Eye, RotateCcw, Type, Waves } from "lucide-react";
+import { useId } from "react";
+
+const colorFilterOptions = [
+  { value: "none", label: "Padrão" },
+  { value: "achromatopsia", label: "Acromatopsia" },
+  { value: "protanopia", label: "Protanopia" },
+  { value: "deuteranopia", label: "Deuteranopia" },
+  { value: "tritanopia", label: "Tritanopia" },
+] as const;
+
+type ColorFilter = "none" | "achromatopsia" | "protanopia" | "deuteranopia" | "tritanopia";
+
+const AccessibilityControlsInline = () => {
+  const {
+    fontSize,
+    contrastMode,
+    reducedMotion,
+    colorFilter,
+    increaseFontSize,
+    decreaseFontSize,
+    resetAccessibility,
+    setContrastMode,
+    setReducedMotion,
+    setColorFilter,
+  } = useAccessibility();
+  const colorFilterId = useId();
+
+  return (
+    <div className="space-y-4 text-sm">
+      <section aria-labelledby="a11y-font-size-hdr">
+        <div className="mb-2 flex items-center gap-2 text-foreground">
+          <Type className="h-4 w-4 text-accent" aria-hidden="true" />
+          <h3 id="a11y-font-size-hdr" className="font-medium">Tamanho da fonte</h3>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button type="button" variant="outline" size="sm" onClick={decreaseFontSize} aria-label="Diminuir fonte">A-</Button>
+          <div className="flex-1 rounded-md border border-border bg-secondary px-3 py-2 text-center text-muted-foreground" aria-live="polite">{fontSize}px</div>
+          <Button type="button" variant="outline" size="sm" onClick={increaseFontSize} aria-label="Aumentar fonte">A+</Button>
+        </div>
+      </section>
+
+      <section aria-labelledby="a11y-contrast-hdr">
+        <div className="mb-2 flex items-center gap-2 text-foreground">
+          <Contrast className="h-4 w-4 text-accent" aria-hidden="true" />
+          <h3 id="a11y-contrast-hdr" className="font-medium">Contraste</h3>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <Button type="button" variant={contrastMode === "default" ? "default" : "outline"} size="sm" aria-pressed={contrastMode === "default"} onClick={() => setContrastMode("default")}>Padrão</Button>
+          <Button type="button" variant={contrastMode === "high" ? "default" : "outline"} size="sm" aria-pressed={contrastMode === "high"} onClick={() => setContrastMode("high")}>Alto</Button>
+        </div>
+      </section>
+
+      <section aria-labelledby="a11y-motion-hdr">
+        <div className="mb-2 flex items-center gap-2 text-foreground">
+          <Waves className="h-4 w-4 text-accent" aria-hidden="true" />
+          <h3 id="a11y-motion-hdr" className="font-medium">Movimento</h3>
+        </div>
+        <Button type="button" variant={reducedMotion ? "default" : "outline"} size="sm" className="w-full" aria-pressed={reducedMotion} onClick={() => setReducedMotion(!reducedMotion)}>
+          {reducedMotion ? "Redução ativada" : "Reduzir animações"}
+        </Button>
+      </section>
+
+      <section aria-labelledby="a11y-colors-hdr">
+        <div className="mb-2 flex items-center gap-2 text-foreground">
+          <Eye className="h-4 w-4 text-accent" aria-hidden="true" />
+          <h3 id="a11y-colors-hdr" className="font-medium">Filtros visuais</h3>
+        </div>
+        <label className="sr-only" htmlFor={colorFilterId}>Filtro de cor</label>
+        <select
+          id={colorFilterId}
+          value={colorFilter}
+          onChange={(e) => setColorFilter(e.target.value as ColorFilter)}
+          className="w-full rounded-md border border-input bg-background px-3 py-2 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          {colorFilterOptions.map((opt) => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
+      </section>
+
+      <Button type="button" variant="ghost" size="sm" className="w-full" onClick={resetAccessibility}>
+        <RotateCcw className="h-4 w-4" aria-hidden="true" />
+        Restaurar padrão
+      </Button>
+    </div>
   );
 };
 
