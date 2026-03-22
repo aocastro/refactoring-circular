@@ -19,23 +19,23 @@ const renderWithProviders = () =>
   );
 
 describe("AccessibilityToolbar", () => {
-  it("renderiza skip link e abre o menu ao clicar no botão", () => {
+  it("renderiza skip link e abre o menu ao clicar no botão de acessibilidade no header", () => {
     renderWithProviders();
 
     expect(screen.getByRole("link", { name: /pular para o conteúdo principal/i })).toBeInTheDocument();
 
-    const toggle = screen.getByRole("button", { name: /abrir menu de acessibilidade/i });
-    fireEvent.click(toggle);
+    const toggles = screen.getAllByRole("button", { name: /abrir menu de acessibilidade/i });
+    fireEvent.click(toggles[0]);
 
     expect(screen.getByRole("dialog", { name: /menu de acessibilidade/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /restaurar padrão/i })).toBeInTheDocument();
   });
 
-  it("ajusta o tamanho da fonte pelos controles de zoom", () => {
+  it("ajusta o tamanho da fonte pelos controles de zoom no header", () => {
     renderWithProviders();
 
-    const increaseButton = screen.getByRole("button", { name: /aumentar fonte/i });
-    fireEvent.click(increaseButton);
+    const increaseButtons = screen.getAllByRole("button", { name: /aumentar fonte/i });
+    fireEvent.click(increaseButtons[0]);
 
     expect(document.documentElement.style.getPropertyValue("--user-font-size")).toBe("17px");
   });
