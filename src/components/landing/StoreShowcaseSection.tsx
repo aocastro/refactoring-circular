@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Store, Smartphone, Zap, CreditCard, Share2, Gauge } from "lucide-react";
 
 const features = [
-  { icon: Store, label: "Lindos templates" },
+  { icon: Store, label: "Templates profissionais" },
   { icon: Smartphone, label: "Design Mobile-first" },
   { icon: Zap, label: "Checkout rápido" },
   { icon: CreditCard, label: "Processamento de pagamentos" },
