@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { templateThemes, type TemplateTheme } from "@/lib/template-themes";
+import StorePageEditor from "./store-editor/StorePageEditor";
 
 import templateMinimalImg from "@/assets/templates/template-minimal.jpg";
 import templateBoldImg from "@/assets/templates/template-bold.jpg";
