@@ -84,7 +84,7 @@ interface DashboardSidebarProps {
 }
 
 export function DashboardSidebar({ activeSection, onSectionChange }: DashboardSidebarProps) {
-  const { state } = useSidebar();
+  const { state, setOpenMobile } = useSidebar();
   const collapsed = state === "collapsed";
   const navigate = useNavigate();
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
@@ -150,7 +150,10 @@ export function DashboardSidebar({ activeSection, onSectionChange }: DashboardSi
                                 <button
                                   key={child.id}
                                   type="button"
-                                  onClick={() => onSectionChange(child.id)}
+                                  onClick={() => {
+                                    onSectionChange(child.id);
+                                    setOpenMobile(false);
+                                  }}
                                   aria-current={activeSection === child.id ? "page" : undefined}
                                   className={`block w-full rounded-md px-2 py-1.5 text-left text-sm transition-colors ${
                                     activeSection === child.id
@@ -182,7 +185,10 @@ export function DashboardSidebar({ activeSection, onSectionChange }: DashboardSi
                     <SidebarMenuItem key={item.id}>
                       <SidebarMenuButton
                         type="button"
-                        onClick={() => onSectionChange(item.id)}
+                        onClick={() => {
+                          onSectionChange(item.id);
+                          setOpenMobile(false);
+                        }}
                         isActive={activeSection === item.id}
                         className="cursor-pointer"
                         aria-current={activeSection === item.id ? "page" : undefined}
