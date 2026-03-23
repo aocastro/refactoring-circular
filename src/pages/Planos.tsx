@@ -10,10 +10,10 @@ type BillingPeriod = "mensal" | "anual";
 
 const plans = [
   { name: "Starter", subtitle: "Para iniciantes em lojas online", monthlyPrice: 0, annualPrice: 0, originalPrice: 19.9, cta: "Quero esse", highlight: false },
-  { name: "Essential", subtitle: "Para quem já ganhou força online", monthlyPrice: 59.9, annualPrice: 718.8, originalPrice: 99.9, cta: "Testar Grátis 30 dias", highlight: false },
-  { name: "Growth", subtitle: "Para quem quer organizar sua loja física", monthlyPrice: 149.9, annualPrice: 1798.8, originalPrice: 299.9, cta: "Testar Grátis 30 dias", highlight: true },
-  { name: "Scale", subtitle: "Para quem quer escalar sua operação", monthlyPrice: 420.9, annualPrice: 5050.8, originalPrice: 699.9, cta: "Quero esse", highlight: false },
-  { name: "Executive", subtitle: "Para quem já fatura +100k /mês", monthlyPrice: 199.9, annualPrice: 2398.8, originalPrice: 2999.9, cta: "Quero esse", highlight: false },
+  { name: "Essential", subtitle: "Para quem já ganhou força online", monthlyPrice: 59.9, annualPrice: 575.0, originalPrice: 99.9, cta: "Testar Grátis 30 dias", highlight: false },
+  { name: "Growth", subtitle: "Para quem quer organizar sua loja física", monthlyPrice: 149.9, annualPrice: 1439.0, originalPrice: 299.9, cta: "Testar Grátis 30 dias", highlight: true },
+  { name: "Scale", subtitle: "Para quem quer escalar sua operação", monthlyPrice: 420.9, annualPrice: 4040.6, originalPrice: 699.9, cta: "Quero esse", highlight: false },
+  { name: "Executive", subtitle: "Para quem já fatura +100k /mês", monthlyPrice: 1999.9, annualPrice: 19199.0, originalPrice: 2999.9, cta: "Quero esse", highlight: false },
 ];
 
 const featureCategories = [
