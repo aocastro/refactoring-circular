@@ -1,4 +1,4 @@
-import { Star, Mail, Phone, ArrowRight } from "lucide-react";
+import { Star, Mail, Phone, ArrowRight, Image, Play, Send } from "lucide-react";
 import type { EditorBlock } from "./types";
 
 interface Props {
