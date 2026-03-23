@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ExternalLink, Palette, LayoutTemplate, Check, Eye, Save } from "lucide-react";
+import { ExternalLink, Palette, LayoutTemplate, Check, Eye, Save, PenTool } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
