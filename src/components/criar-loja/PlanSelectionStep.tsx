@@ -118,6 +118,13 @@ const PlanSelectionStep = ({ plans, selectedPlan, billing, onSelectPlan, onBilli
     <motion.div key="plan" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-5">
       <div className="rounded-xl border border-border bg-card p-6 space-y-4">
         <h2 className="font-display text-lg font-bold text-foreground">Escolha seu plano</h2>
+        
+        <div className="rounded-lg bg-primary/10 p-3 border border-primary/20 flex items-center gap-3">
+          <div className="flex-1 text-xs text-primary font-medium leading-tight">
+            <span className="block font-bold text-sm mb-0.5">🎁 7 Dias Grátis em Todos os Planos</span>
+            Experimente todos os recursos sem compromisso. Não pediremos seu cartão agora!
+          </div>
+        </div>
         <div className="flex items-center justify-center gap-3 mb-4">
           <span className={`text-sm ${billing === "mensal" ? "text-foreground font-medium" : "text-muted-foreground"}`}>Mensal</span>
           <Switch checked={billing === "anual"} onCheckedChange={(c) => onBillingChange(c ? "anual" : "mensal")} />

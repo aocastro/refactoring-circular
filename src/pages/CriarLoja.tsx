@@ -47,7 +47,6 @@ const templates = [
 /* ── Steps ─────────────────────────────────────────────── */
 const stepsMeta = [
   { label: "Plano", icon: ShoppingBag },
-  { label: "Pagamento", icon: CreditCard },
   { label: "Conta", icon: UserPlus },
   { label: "Sua Loja", icon: Store },
   { label: "E-commerce", icon: ShoppingBag },
@@ -69,7 +68,6 @@ const CriarLoja = () => {
   const [step, setStep] = useState(0);
   const [billing, setBilling] = useState<"mensal" | "anual">("mensal");
   const [selectedPlan, setSelectedPlan] = useState("growth");
-  const [cardData, setCardData] = useState({ number: "", name: "", expiry: "", cvv: "" });
   const [accountData, setAccountData] = useState({ nome: "", email: "", senha: "" });
   const [storeData, setStoreData] = useState({ nome: "", slug: "", telefone: "" });
   const [wantsEcommerce, setWantsEcommerce] = useState(true);
@@ -98,17 +96,6 @@ const CriarLoja = () => {
   const actualStep = getActualStep(step);
 
   /* ── Validations ─────────────────────────────── */
-  const getCardErrors = (): FieldErrors => {
-    if (plan.monthlyPrice === 0) return {};
-    const errors: FieldErrors = {};
-    const num = cardData.number.replace(/\s/g, "");
-    if (!num) errors.number = "Número do cartão é obrigatório";
-    else if (num.length < 16) errors.number = "Número deve ter 16 dígitos";
-    if (!cardData.name) errors.name = "Nome no cartão é obrigatório";
-    if (!cardData.expiry || cardData.expiry.length < 5) errors.expiry = "Formato: MM/AA";
-    if (!cardData.cvv || cardData.cvv.length < 3) errors.cvv = "CVV deve ter 3 dígitos";
-    return errors;
-  };
 
   const getAccountErrors = (): FieldErrors => {
     const errors: FieldErrors = {};
@@ -129,23 +116,14 @@ const CriarLoja = () => {
     return errors;
   };
 
-  const cardErrors = getCardErrors();
   const accountErrors = getAccountErrors();
   const storeErrors = getStoreErrors();
 
   const canAdvance = () => {
     if (step === 0) return true; // plan always selected
-    if (step === 1) return Object.keys(cardErrors).length === 0;
-    if (step === 2) return Object.keys(accountErrors).length === 0;
-    if (step === 3) return Object.keys(storeErrors).length === 0;
+    if (step === 1) return Object.keys(accountErrors).length === 0;
+    if (step === 2) return Object.keys(storeErrors).length === 0;
     return true;
-  };
-
-  const handleCardChange = (field: string, value: string) => {
-    if (field === "number") value = value.replace(/\D/g, "").replace(/(\d{4})/g, "$1 ").trim().slice(0, 19);
-    if (field === "expiry") { value = value.replace(/\D/g, ""); if (value.length >= 2) value = `${value.slice(0, 2)}/${value.slice(2, 4)}`; }
-    if (field === "cvv") value = value.replace(/\D/g, "").slice(0, 3);
-    setCardData((p) => ({ ...p, [field]: value }));
   };
 
   const handleStoreChange = (field: string, value: string) => {
@@ -166,33 +144,22 @@ const CriarLoja = () => {
     setTriedAdvance(false);
     setTouched({});
 
-    // Payment processing simulation
-    if (step === 1 && plan.monthlyPrice > 0) {
-      setProcessing(true);
-      await new Promise((r) => setTimeout(r, 2000));
-      setProcessing(false);
-      toast.success("Pagamento processado com sucesso!");
-    }
-
     // E-commerce decision step
-    if (step === 4 && !wantsEcommerce) {
+    if (step === 3 && !wantsEcommerce) {
       // Skip template, go to final
       finishSetup();
-      setStep(wantsEcommerce ? 6 : 5);
+      setStep(wantsEcommerce ? 5 : 4);
       return;
     }
 
     // Template step (last before done)
-    if ((wantsEcommerce && step === 5) || (!wantsEcommerce && step === 4)) {
-      if (wantsEcommerce && step === 5) {
+    if ((wantsEcommerce && step === 4) || (!wantsEcommerce && step === 3)) {
+      if (wantsEcommerce && step === 4) {
         finishSetup();
-        setStep(6);
+        setStep(5);
         return;
       }
     }
-
-    // Final confirmation from e-commerce = no
-    if (!wantsEcommerce && step === 4) return;
 
     setStep((s) => s + 1);
   };
@@ -200,7 +167,7 @@ const CriarLoja = () => {
   const handleBack = () => {
     if (step === 0) { navigate("/"); return; }
     // If we're on the final step and skipped template
-    if (!wantsEcommerce && actualStep === 6) { setStep(4); return; }
+    if (!wantsEcommerce && actualStep === 5) { setStep(3); return; }
     setStep((s) => s - 1);
     setTriedAdvance(false);
   };
@@ -221,6 +188,7 @@ const CriarLoja = () => {
       template: wantsEcommerce ? selectedTemplate : null,
       templateName: wantsEcommerce ? templates.find((t) => t.id === selectedTemplate)?.name : null,
       createdAt: new Date().toISOString(),
+      trialEndsAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
     };
     localStorage.setItem("storeConfig", JSON.stringify(storeConfig));
 
@@ -235,7 +203,7 @@ const CriarLoja = () => {
     toast.success("Loja criada com sucesso! 🎉");
   };
 
-  const isFinalStep = actualStep === 6;
+  const isFinalStep = step === (wantsEcommerce ? 5 : 4);
   const showNavButtons = !isFinalStep;
 
   return (
@@ -280,54 +248,9 @@ const CriarLoja = () => {
                 />
               )}
 
-              {/* ── Step 1: Payment ────────────────── */}
-              {step === 1 && (
-                <motion.div key="payment" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-5">
-                  <div className="flex items-center justify-between rounded-xl border border-border bg-card p-3 text-sm">
-                    <div><span className="text-muted-foreground">Plano:</span> <span className="font-semibold text-foreground">{plan.name}</span></div>
-                    <span className="font-bold text-foreground">{price === 0 ? "Grátis" : `R$ ${price.toFixed(2).replace(".", ",")}`}</span>
-                  </div>
-                  <div className="space-y-4 rounded-xl border border-border bg-card p-6">
-                    <h2 className="font-display text-lg font-bold text-foreground">{plan.monthlyPrice === 0 ? "Confirme seu plano gratuito" : "Dados de Pagamento"}</h2>
-                    {plan.monthlyPrice === 0 ? (
-                      <p className="text-sm text-muted-foreground">O plano Starter é gratuito. Clique em próximo para continuar.</p>
-                    ) : (
-                      <fieldset className="space-y-3">
-                        <legend className="sr-only">Informações do cartão</legend>
-                        <div>
-                          <Label htmlFor="card-number">Número do Cartão</Label>
-                          <Input id="card-number" placeholder="0000 0000 0000 0000" value={cardData.number} onChange={(e) => handleCardChange("number", e.target.value)} onBlur={() => markTouched("number")} className={showErr("number", cardErrors) ? "border-destructive" : ""} inputMode="numeric" autoComplete="cc-number" aria-invalid={Boolean(showErr("number", cardErrors))} aria-describedby={showErr("number", cardErrors) ? "card-number-error" : undefined} />
-                          <FieldError id="card-number-error" message={showErr("number", cardErrors)} />
-                        </div>
-                        <div>
-                          <Label htmlFor="card-name">Nome no Cartão</Label>
-                          <Input id="card-name" placeholder="MARIA SILVA" value={cardData.name} onChange={(e) => handleCardChange("name", e.target.value.toUpperCase())} onBlur={() => markTouched("name")} className={showErr("name", cardErrors) ? "border-destructive" : ""} autoComplete="cc-name" aria-invalid={Boolean(showErr("name", cardErrors))} aria-describedby={showErr("name", cardErrors) ? "card-name-error" : undefined} />
-                          <FieldError id="card-name-error" message={showErr("name", cardErrors)} />
-                        </div>
-                        <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <Label htmlFor="card-expiry">Validade</Label>
-                            <Input id="card-expiry" placeholder="MM/AA" value={cardData.expiry} onChange={(e) => handleCardChange("expiry", e.target.value)} onBlur={() => markTouched("expiry")} className={showErr("expiry", cardErrors) ? "border-destructive" : ""} inputMode="numeric" autoComplete="cc-exp" aria-invalid={Boolean(showErr("expiry", cardErrors))} aria-describedby={showErr("expiry", cardErrors) ? "card-expiry-error" : undefined} />
-                            <FieldError id="card-expiry-error" message={showErr("expiry", cardErrors)} />
-                          </div>
-                          <div>
-                            <Label htmlFor="card-cvv">CVV</Label>
-                            <Input id="card-cvv" placeholder="123" value={cardData.cvv} onChange={(e) => handleCardChange("cvv", e.target.value)} onBlur={() => markTouched("cvv")} className={showErr("cvv", cardErrors) ? "border-destructive" : ""} inputMode="numeric" autoComplete="cc-csc" aria-invalid={Boolean(showErr("cvv", cardErrors))} aria-describedby={showErr("cvv", cardErrors) ? "card-cvv-error" : undefined} />
-                            <FieldError id="card-cvv-error" message={showErr("cvv", cardErrors)} />
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground mt-2">
-                          <CreditCard className="h-3.5 w-3.5" aria-hidden="true" />
-                          <span>Pagamento seguro processado via Stripe (simulado)</span>
-                        </div>
-                      </fieldset>
-                    )}
-                  </div>
-                </motion.div>
-              )}
 
-              {/* ── Step 2: Account Creation ───────── */}
-              {step === 2 && (
+              {/* ── Step 1: Account Creation ───────── */}
+              {step === 1 && (
                 <motion.div key="account" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-5">
                   <div className="space-y-4 rounded-xl border border-border bg-card p-6">
                     <h2 className="font-display text-lg font-bold text-foreground">Crie sua conta</h2>
@@ -351,8 +274,8 @@ const CriarLoja = () => {
                 </motion.div>
               )}
 
-              {/* ── Step 3: Store Data ─────────────── */}
-              {step === 3 && (
+              {/* ── Step 2: Store Data ─────────────── */}
+              {step === 2 && (
                 <motion.div key="store" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-5">
                   <div className="space-y-4 rounded-xl border border-border bg-card p-6">
                     <h2 className="font-display text-lg font-bold text-foreground">Dados da sua loja</h2>
@@ -377,8 +300,8 @@ const CriarLoja = () => {
                 </motion.div>
               )}
 
-              {/* ── Step 4: E-commerce toggle ──────── */}
-              {step === 4 && (
+              {/* ── Step 3: E-commerce toggle ──────── */}
+              {step === 3 && (
                 <motion.div key="ecommerce" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-5">
                   <div className="space-y-6 rounded-xl border border-border bg-card p-6 text-center">
                     <h2 className="font-display text-lg font-bold text-foreground">Sua loja terá e-commerce?</h2>
@@ -403,8 +326,8 @@ const CriarLoja = () => {
                 </motion.div>
               )}
 
-              {/* ── Step 5: Template Selection ─────── */}
-              {step === 5 && wantsEcommerce && (
+              {/* ── Step 4: Template Selection ─────── */}
+              {step === 4 && wantsEcommerce && (
                 <TemplateSelectionStep
                   templates={templates}
                   selectedTemplate={selectedTemplate}

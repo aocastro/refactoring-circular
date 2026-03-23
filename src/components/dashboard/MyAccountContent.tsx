@@ -1,5 +1,6 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { User, Mail, Phone, MapPin, Store } from "lucide-react";
+import { User, Mail, Phone, MapPin, Store, CreditCard, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
@@ -8,6 +9,16 @@ interface MyAccountContentProps {
 }
 
 const MyAccountContent = ({ user }: MyAccountContentProps) => {
+  const [storeConfig, setStoreConfig] = useState<any>(null);
+
+  useEffect(() => {
+    const config = JSON.parse(localStorage.getItem("storeConfig") || "{}");
+    setStoreConfig(config);
+  }, []);
+
+  const isTrial = storeConfig?.trialEndsAt && storeConfig.trialEndsAt > Date.now();
+  const trialDays = isTrial ? Math.ceil((storeConfig.trialEndsAt - Date.now()) / (1000 * 60 * 60 * 24)) : 0;
+
   return (
     <div className="max-w-2xl space-y-6">
       <header>
@@ -28,7 +39,9 @@ const MyAccountContent = ({ user }: MyAccountContentProps) => {
           </div>
           <div>
             <h3 id="account-profile-heading" className="font-semibold text-foreground">{user.name}</h3>
-            <p id="account-profile-description" className="text-sm text-muted-foreground">Plano Growth • Ativo</p>
+            <p id="account-profile-description" className="text-sm text-muted-foreground">
+              Plano {storeConfig?.planName || "Growth"} • {isTrial ? "Trial de 7 dias" : "Ativo"}
+            </p>
           </div>
         </div>
 
@@ -61,7 +74,7 @@ const MyAccountContent = ({ user }: MyAccountContentProps) => {
             <label id="account-store-label" className="mb-1.5 flex text-sm font-medium text-foreground">
               <span className="flex items-center gap-2"><Store className="h-3.5 w-3.5 text-muted-foreground" /> Nome da Loja</span>
             </label>
-            <Input defaultValue="Brechó da Maria" className="border-border bg-secondary" readOnly aria-labelledby="account-store-label" />
+            <Input defaultValue={storeConfig?.nome || "Minha Loja"} className="border-border bg-secondary" readOnly aria-labelledby="account-store-label" />
           </section>
         </div>
 
@@ -83,12 +96,39 @@ const MyAccountContent = ({ user }: MyAccountContentProps) => {
         aria-labelledby="account-plan-heading"
       >
         <h3 id="account-plan-heading" className="mb-4 font-semibold text-foreground">Plano Atual</h3>
-        <div className="flex items-center justify-between rounded-lg border border-border bg-secondary/50 p-4">
+        <div className={`flex items-center justify-between rounded-lg border p-4 ${isTrial ? "border-primary/30 bg-primary/5" : "border-border bg-secondary/50"}`}>
           <div>
-            <p className="font-display font-bold text-foreground">Growth</p>
-            <p className="text-sm text-muted-foreground">R$ 149,90/mês • Próximo pagamento: 15/01/2026</p>
+            <p className="font-display font-bold text-foreground">{storeConfig?.planName || "Growth"}</p>
+            {isTrial ? (
+              <p className="text-sm text-muted-foreground">Período de teste • {trialDays} dia(s) restantes</p>
+            ) : (
+              <p className="text-sm text-muted-foreground">R$ 149,90/mês • Próximo pagamento: 15/01/2026</p>
+            )}
           </div>
-          <span className="rounded-full bg-success/10 px-2 py-1 text-xs font-medium text-success">Ativo</span>
+          <span className={`rounded-full px-2 py-1 text-xs font-medium ${isTrial ? "bg-primary/20 text-primary" : "bg-success/10 text-success"}`}>
+            {isTrial ? "Em Teste" : "Ativo"}
+          </span>
+        </div>
+      </motion.section>
+
+      <motion.section
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="rounded-xl border border-border bg-card p-6"
+        aria-labelledby="account-payment-heading"
+      >
+        <h3 id="account-payment-heading" className="mb-4 font-semibold text-foreground">Método de Pagamento</h3>
+        <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-border rounded-xl bg-secondary/20">
+          <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center mb-3">
+            <CreditCard className="h-6 w-6 text-muted-foreground" />
+          </div>
+          <p className="text-sm font-medium text-foreground mb-1">Nenhum cartão cadastrado</p>
+          <p className="text-xs text-muted-foreground mb-4 text-center">Adicione um método de pagamento para evitar interrupções após o trial.</p>
+          <Button variant="outline" className="gap-2 rounded-lg border-primary text-primary hover:bg-primary/5">
+            <Plus className="h-4 w-4" />
+            Adicionar Cartão
+          </Button>
         </div>
       </motion.section>
     </div>
