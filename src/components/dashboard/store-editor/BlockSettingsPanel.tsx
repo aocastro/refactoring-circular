@@ -1,4 +1,5 @@
-import { X } from "lucide-react";
+import { X, Upload } from "lucide-react";
+import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,7 +27,12 @@ const BLOCK_LABELS: Record<string, string> = {
   contact: "Contato",
 };
 
+const IMAGE_KEYS = ["imageUrl", "image1", "image2", "image3", "image4"];
+
 const BlockSettingsPanel = ({ block, onUpdate, onClose }: Props) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const activeKeyRef = useRef<string>("");
+
   const updateContent = (key: string, value: string) => {
     onUpdate({ ...block, content: { ...block.content, [key]: value } });
   };
@@ -35,8 +41,36 @@ const BlockSettingsPanel = ({ block, onUpdate, onClose }: Props) => {
     onUpdate({ ...block, styles: { ...block.styles, [key]: value } });
   };
 
+  const handleImageUpload = (key: string) => {
+    activeKeyRef.current = key;
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (reader.result) {
+        updateContent(activeKeyRef.current, reader.result as string);
+      }
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
+
+  const isImageKey = (key: string) => IMAGE_KEYS.includes(key);
+
   return (
     <div className="flex h-full flex-col border-l border-border bg-card">
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleFileChange}
+      />
+
       <div className="flex items-center justify-between border-b border-border p-4">
         <h3 className="text-sm font-semibold text-foreground">
           {BLOCK_LABELS[block.type] || block.type}
@@ -62,7 +96,39 @@ const BlockSettingsPanel = ({ block, onUpdate, onClose }: Props) => {
           {Object.entries(block.content).map(([key, value]) => (
             <div key={key} className="space-y-1">
               <Label className="text-xs capitalize">{key.replace(/([A-Z])/g, " $1")}</Label>
-              {value.length > 60 ? (
+
+              {isImageKey(key) ? (
+                <div className="space-y-2">
+                  {value && (
+                    <div className="relative aspect-video overflow-hidden rounded-md border border-border">
+                      <img src={value} alt="" className="h-full w-full object-cover" />
+                      <button
+                        onClick={() => updateContent(key, "")}
+                        className="absolute right-1 top-1 rounded bg-destructive/80 p-0.5 text-white hover:bg-destructive"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  )}
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 border-border text-xs"
+                      onClick={() => handleImageUpload(key)}
+                    >
+                      <Upload className="mr-1 h-3 w-3" />
+                      Upload
+                    </Button>
+                  </div>
+                  <Input
+                    value={value}
+                    onChange={(e) => updateContent(key, e.target.value)}
+                    placeholder="Ou cole a URL da imagem"
+                    className="border-border bg-secondary text-xs"
+                  />
+                </div>
+              ) : value.length > 60 ? (
                 <textarea
                   value={value}
                   onChange={(e) => updateContent(key, e.target.value)}
