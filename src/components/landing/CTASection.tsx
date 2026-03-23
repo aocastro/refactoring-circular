@@ -21,7 +21,7 @@ const CTASection = () => {
             <span className="text-gradient">negócio circular</span>?
           </h2>
           <p className="text-muted-foreground mb-8 text-lg">
-            Pare de lidar com planilhas. Comece a crescer com a plataforma criada para o comércio circular.
+            Pare de lidar com planilhas. Comece a crescer com a plataforma criada para o negócio circular.
           </p>
           <Button asChild size="lg" className="bg-gradient-primary text-primary-foreground px-8 py-6 text-lg rounded-xl glow-primary">
             <Link to="/planos">
