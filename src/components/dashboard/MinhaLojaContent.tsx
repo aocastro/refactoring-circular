@@ -151,6 +151,9 @@ const MinhaLojaContent = () => {
           <TabsTrigger value="personalizar" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
             <Palette className="mr-2 h-4 w-4" />Personalizar
           </TabsTrigger>
+          <TabsTrigger value="editor" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <PenTool className="mr-2 h-4 w-4" />Editor Visual
+          </TabsTrigger>
         </TabsList>
 
         {/* ── Template switcher ── */}
