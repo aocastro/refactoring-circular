@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Sprout, TrendingUp, Building, Crown } from "lucide-react";
+import { Sprout, Mountain, Building, Crown } from "lucide-react";
 
 const stages = [
   {
