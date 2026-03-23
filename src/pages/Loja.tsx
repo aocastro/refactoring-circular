@@ -204,6 +204,17 @@ const Loja = () => {
         </div>
       )}
 
+      {/* Editor Visual Blocks */}
+      {editorBlocks.length > 0 && (
+        <div>
+          {editorBlocks
+            .filter((b) => b.visible)
+            .map((block) => (
+              <StorefrontBlockRenderer key={block.id} block={block} slug={slug || ""} />
+            ))}
+        </div>
+      )}
+
       <main>
         {/* Banner Carousel */}
         {activeCategory === "Todos" && search === "" && (
