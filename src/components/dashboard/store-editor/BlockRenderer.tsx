@@ -1,14 +1,30 @@
-import { Star, Mail, Phone, ArrowRight, Image, Play, Send } from "lucide-react";
+import { Star, Mail, Phone, ArrowRight, Image, Play, Send, ChevronLeft, ChevronRight, Leaf, Recycle, TreePine, Package } from "lucide-react";
 import type { EditorBlock } from "./types";
+import { type TemplateTheme } from "@/lib/template-themes";
 
 interface Props {
   block: EditorBlock;
   isSelected: boolean;
   onContentChange: (key: string, value: string) => void;
+  theme?: TemplateTheme | null;
 }
 
-const BlockRenderer = ({ block, isSelected, onContentChange }: Props) => {
+const formatPrice = (price: number) => `R$ ${price.toFixed(2).replace(".", ",")}`;
+
+const BlockRenderer = ({ block, isSelected, onContentChange, theme }: Props) => {
   const { styles, content } = block;
+
+  const t = theme ?? {
+    cssVars: {},
+    rootClass: "",
+    headerClass: "bg-card/95 border-border",
+    pillActiveClass: "bg-primary text-primary-foreground",
+    pillClass: "bg-secondary text-muted-foreground hover:text-foreground",
+    cardClass: "border-border bg-card rounded-xl hover:shadow-elevated",
+    headingClass: "",
+    bannerClass: "rounded-2xl",
+    footerClass: "border-border",
+  };
 
   const editableProps = (key: string) => ({
     contentEditable: true,
@@ -18,25 +34,34 @@ const BlockRenderer = ({ block, isSelected, onContentChange }: Props) => {
   });
 
   switch (block.type) {
-    case "hero-banner":
+    case "banner-carousel":
       return (
-        <div
-          style={{ backgroundColor: styles.backgroundColor, color: styles.textColor, padding: styles.padding, fontFamily: styles.fontFamily }}
-          className="relative flex min-h-[220px] flex-col items-center justify-center gap-3 text-center"
-        >
-          <h2 {...editableProps("title")} className={`${editableProps("title").className} text-2xl font-bold md:text-3xl`}>
-            {content.title}
-          </h2>
-          <p {...editableProps("subtitle")} className={`${editableProps("subtitle").className} max-w-lg text-sm opacity-90 md:text-base`}>
-            {content.subtitle}
-          </p>
-          <button
-            className="mt-2 rounded-lg px-5 py-2 text-sm font-semibold transition-transform hover:scale-105"
-            style={{ backgroundColor: styles.accentColor, color: styles.backgroundColor }}
-          >
-            <span {...editableProps("buttonText")}>{content.buttonText}</span>
-            <ArrowRight className="ml-2 inline h-4 w-4" />
-          </button>
+        <div style={{ backgroundColor: styles.backgroundColor, padding: styles.padding }}>
+          <div className="mx-auto max-w-6xl">
+            <h3 {...editableProps("title")} className={`${editableProps("title").className} mb-4 text-xl font-bold opacity-50 text-center`}>
+              {content.title}
+            </h3>
+            <div className={`relative overflow-hidden aspect-[3/1] border flex items-center justify-center ${t.bannerClass}`}
+              style={theme ? { borderColor: "var(--store-border)", backgroundColor: "var(--store-card)" } : undefined}
+            >
+              <div className="text-center opacity-40">
+                <Image className="h-12 w-12 mx-auto mb-2" />
+                <p>Simulação de Banners</p>
+              </div>
+              <button
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center pointer-events-none"
+                style={theme ? { backgroundColor: "var(--store-bg)", color: "var(--store-text)" } : undefined}
+              >
+                <ChevronLeft className="h-4 w-4" opacity="0.5" />
+              </button>
+              <button
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center pointer-events-none"
+                style={theme ? { backgroundColor: "var(--store-bg)", color: "var(--store-text)" } : undefined}
+              >
+                <ChevronRight className="h-4 w-4" opacity="0.5" />
+              </button>
+            </div>
+          </div>
         </div>
       );
 
@@ -132,25 +157,65 @@ const BlockRenderer = ({ block, isSelected, onContentChange }: Props) => {
         </div>
       );
 
-    case "products":
+    case "product-grid":
       return (
-        <div style={{ backgroundColor: styles.backgroundColor, color: styles.textColor, padding: styles.padding, fontFamily: styles.fontFamily }}>
-          <h3 {...editableProps("title")} className={`${editableProps("title").className} mb-1 text-xl font-bold`}>
-            {content.title}
-          </h3>
-          <p {...editableProps("subtitle")} className={`${editableProps("subtitle").className} mb-4 text-sm opacity-70`}>
-            {content.subtitle}
-          </p>
-          <div className="grid grid-cols-3 gap-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="overflow-hidden rounded-lg border" style={{ borderColor: styles.accentColor + "33" }}>
-                <div className="aspect-square bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600" />
-                <div className="p-2">
-                  <p className="text-xs font-medium">Produto {i}</p>
-                  <p className="text-xs font-bold" style={{ color: styles.accentColor }}>R$ {(49.9 * i).toFixed(2)}</p>
+        <div style={{ backgroundColor: styles.backgroundColor, color: styles.textColor, padding: styles.padding }}>
+          <div className="mx-auto max-w-6xl">
+            <h2 {...editableProps("title")}
+              className={`${editableProps("title").className} mb-4 text-xl font-bold ${t.headingClass}`}
+              style={{ fontFamily: styles.fontFamily }}
+            >
+              {content.title}
+            </h2>
+            <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-3 pointer-events-none">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className={`overflow-hidden border ${t.cardClass}`} style={{ borderColor: styles.accentColor + "33" }}>
+                  <div className="aspect-square flex justify-center items-center bg-gray-100" style={theme ? { backgroundColor: "var(--store-card)" } : undefined}>
+                    <p className="opacity-20 text-4xl">👟</p>
+                  </div>
+                  <div className="p-3">
+                    <p className="text-xs font-medium opacity-60">Produto {i}</p>
+                    <p className="text-sm font-bold mt-1" style={theme ? { fontFamily: "var(--store-font-display)", color: "var(--store-text)" } : undefined}>
+                      {formatPrice(49.9 * i)}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+
+    case "esg-impact":
+      return (
+        <div style={{ backgroundColor: styles.backgroundColor, color: styles.textColor, padding: styles.padding }}>
+          <div className="mx-auto max-w-6xl pointer-events-none">
+            <h2 {...editableProps("title")}
+              className={`${editableProps("title").className} mb-4 text-xl font-bold ${t.headingClass}`}
+              style={{ fontFamily: styles.fontFamily }}
+            >
+              {content.title}
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              {[
+                { icon: Leaf, value: "76 kg", label: "CO₂ Evitado" },
+                { icon: Recycle, value: "120 kg", label: "Resíduos Evitados" },
+                { icon: TreePine, value: "45 kg", label: "Recursos Não Extraídos" },
+                { icon: Package, value: "102", label: "Produtos Disponibilizados" },
+              ].map((item) => (
+                <div
+                  key={item.label}
+                  className="p-4 rounded-xl border text-center"
+                  style={theme ? { borderColor: "var(--store-border)", backgroundColor: "var(--store-card)" } : undefined}
+                >
+                  <item.icon className="h-6 w-6 mx-auto mb-2" style={theme ? { color: "var(--store-accent)" } : undefined} />
+                  <p className="text-lg font-bold" style={theme ? { fontFamily: "var(--store-font-display)", color: "var(--store-text)" } : undefined}>
+                    {item.value}
+                  </p>
+                  <p className="text-xs opacity-60 text-[var(--store-text)]">{item.label}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       );

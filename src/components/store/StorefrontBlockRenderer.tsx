@@ -14,26 +14,6 @@ const StorefrontBlockRenderer = ({ block, slug }: Props) => {
   const { styles, content } = block;
 
   switch (block.type) {
-    case "hero-banner":
-      return (
-        <section
-          style={{ backgroundColor: styles.backgroundColor, color: styles.textColor, padding: styles.padding, fontFamily: styles.fontFamily }}
-          className="relative flex min-h-[280px] flex-col items-center justify-center gap-4 text-center"
-        >
-          {content.imageUrl && (
-            <img src={content.imageUrl} alt="" className="absolute inset-0 h-full w-full object-cover opacity-30" />
-          )}
-          <h1 className="relative z-10 text-3xl font-bold md:text-5xl">{content.title}</h1>
-          <p className="relative z-10 max-w-xl text-base opacity-90 md:text-lg">{content.subtitle}</p>
-          <button
-            className="relative z-10 mt-2 rounded-lg px-6 py-3 text-sm font-semibold transition-transform hover:scale-105"
-            style={{ backgroundColor: styles.accentColor, color: styles.backgroundColor }}
-          >
-            {content.buttonText}
-            <ArrowRight className="ml-2 inline h-4 w-4" />
-          </button>
-        </section>
-      );
 
     case "about":
       return (
@@ -120,33 +100,7 @@ const StorefrontBlockRenderer = ({ block, slug }: Props) => {
         </section>
       );
 
-    case "products":
-      return (
-        <section style={{ backgroundColor: styles.backgroundColor, color: styles.textColor, padding: styles.padding, fontFamily: styles.fontFamily }}>
-          <div className="mx-auto max-w-5xl">
-            <h2 className="mb-1 text-2xl font-bold">{content.title}</h2>
-            <p className="mb-4 text-sm opacity-70">{content.subtitle}</p>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-              {storeProducts.slice(0, 4).map((p) => (
-                <Link
-                  key={p.id}
-                  to={`/loja/${slug}/p/${p.id}`}
-                  className="overflow-hidden rounded-xl border transition-all hover:shadow-lg"
-                  style={{ borderColor: styles.accentColor + "33" }}
-                >
-                  <div className="aspect-square flex items-center justify-center text-4xl bg-gradient-to-br from-gray-100 to-gray-200">
-                    {p.image}
-                  </div>
-                  <div className="p-3">
-                    <p className="text-sm font-medium line-clamp-1">{p.name}</p>
-                    <p className="text-sm font-bold" style={{ color: styles.accentColor }}>{formatPrice(p.price)}</p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-      );
+
 
     case "testimonials":
       return (

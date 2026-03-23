@@ -330,7 +330,7 @@ const MinhaLojaContent = () => {
             <p className="mb-4 text-sm text-muted-foreground">
               Arraste seções para reordenar, clique nos textos para editar inline e use o painel lateral para personalizar cores, fontes e espaçamentos.
             </p>
-            <StorePageEditor />
+            <StorePageEditor templateId={storeConfig.template} />
           </motion.section>
         </TabsContent>
       </Tabs>

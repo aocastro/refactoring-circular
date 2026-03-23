@@ -9,6 +9,7 @@ import CartDrawer from "@/components/store/CartDrawer";
 import StorefrontBlockRenderer from "@/components/store/StorefrontBlockRenderer";
 import { getTemplateTheme, type TemplateTheme } from "@/lib/template-themes";
 import type { EditorBlock } from "@/components/dashboard/store-editor/types";
+import { buildDefaultBlocksFromTheme } from "@/components/dashboard/store-editor/StorePageEditor";
 
 const Loja = () => {
   const { slug } = useParams();
@@ -26,16 +27,19 @@ const Loja = () => {
     return null;
   })();
 
+  const theme: TemplateTheme | null = getTemplateTheme(savedConfig?.template);
+
   // Load editor layout blocks
   const editorBlocks: EditorBlock[] = (() => {
     try {
-      const raw = localStorage.getItem("storeLayout");
-      if (raw && savedConfig) return JSON.parse(raw);
+      const raw = localStorage.getItem(savedConfig?.template ? `storeLayout_${savedConfig.template}` : "storeLayout");
+      if (raw && savedConfig) {
+        const parsed = JSON.parse(raw);
+        if (parsed.length > 0) return parsed;
+      }
     } catch {}
-    return [];
+    return buildDefaultBlocksFromTheme(theme);
   })();
-
-  const theme: TemplateTheme | null = getTemplateTheme(savedConfig?.template);
 
   // Load Google Font for the active theme
   useEffect(() => {
@@ -204,130 +208,121 @@ const Loja = () => {
         </div>
       )}
 
-      {/* Editor Visual Blocks */}
-      {editorBlocks.length > 0 && (
-        <div>
-          {editorBlocks
-            .filter((b) => b.visible)
-            .map((block) => (
-              <StorefrontBlockRenderer key={block.id} block={block} slug={slug || ""} />
-            ))}
-        </div>
-      )}
-
       <main>
-        {/* Banner Carousel */}
+        {/* Render Dynamic Editor Blocks */}
         {activeCategory === "Todos" && search === "" && (
-          <>
-            <section className="relative w-full overflow-hidden" style={theme ? { backgroundColor: "var(--store-bg)" } : undefined}>
-              <div className="container max-w-6xl mx-auto px-4 py-4">
-                <div className={`relative overflow-hidden aspect-[3/1] border ${t.bannerClass}`}
-                  style={theme ? { borderColor: "var(--store-border)", backgroundColor: "var(--store-card)" } : undefined}
-                >
-                  {store.banners.map((banner, i) => (
-                    <motion.img
-                      key={i}
-                      src={banner}
-                      alt={`Banner ${i + 1}`}
-                      className="absolute inset-0 w-full h-full object-cover"
-                      initial={false}
-                      animate={{ opacity: i === bannerIndex ? 1 : 0 }}
-                      transition={{ duration: 0.5 }}
-                    />
-                  ))}
-                  <button
-                    onClick={prevBanner}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center transition-colors"
-                    style={theme ? { backgroundColor: "var(--store-bg)", color: "var(--store-text)" } : undefined}
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={nextBanner}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center transition-colors"
-                    style={theme ? { backgroundColor: "var(--store-bg)", color: "var(--store-text)" } : undefined}
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </button>
-                  <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
-                    {store.banners.map((_, i) => (
-                      <button
-                        key={i}
-                        onClick={() => setBannerIndex(i)}
-                        className="w-2 h-2 rounded-full transition-colors"
-                        style={theme ? {
-                          backgroundColor: i === bannerIndex ? "var(--store-accent)" : "var(--store-muted)",
-                        } : undefined}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </section>
+          <div className="space-y-0">
+            {editorBlocks.filter(b => b.visible).map((block) => {
+              
+              if (block.type === "banner-carousel") {
+                return (
+                  <section key={block.id} className="relative w-full overflow-hidden" style={theme ? { backgroundColor: "var(--store-bg)" } : { backgroundColor: block.styles.backgroundColor }}>
+                    <div className="container max-w-6xl mx-auto px-4 py-4">
+                      <div className={`relative overflow-hidden aspect-[3/1] border ${t.bannerClass}`}
+                        style={theme ? { borderColor: "var(--store-border)", backgroundColor: "var(--store-card)" } : undefined}
+                      >
+                        {store.banners.map((banner, i) => (
+                          <motion.img
+                            key={i}
+                            src={banner}
+                            alt={`Banner ${i + 1}`}
+                            className="absolute inset-0 w-full h-full object-cover"
+                            initial={false}
+                            animate={{ opacity: i === bannerIndex ? 1 : 0 }}
+                            transition={{ duration: 0.5 }}
+                          />
+                        ))}
+                        <button
+                          onClick={prevBanner}
+                          className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center transition-colors shadow-sm"
+                          style={theme ? { backgroundColor: "var(--store-bg)", color: "var(--store-text)" } : undefined}
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={nextBanner}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center transition-colors shadow-sm"
+                          style={theme ? { backgroundColor: "var(--store-bg)", color: "var(--store-text)" } : undefined}
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </button>
+                        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+                          {store.banners.map((_, i) => (
+                            <button
+                              key={i}
+                              onClick={() => setBannerIndex(i)}
+                              className="w-2 h-2 rounded-full transition-colors"
+                              style={theme ? {
+                                backgroundColor: i === bannerIndex ? "var(--store-accent)" : "var(--store-muted)",
+                              } : undefined}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+                );
+              }
 
-            {/* New Arrivals */}
-            <section className="container max-w-6xl mx-auto px-4 py-8">
-              <h2 className={`text-xl font-bold mb-4 ${t.headingClass}`}
-                style={theme ? { fontFamily: "var(--store-font-display)" } : undefined}
-              >
-                Lançamentos
-              </h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-                {newArrivals.map((p) => (
-                  <ProductCard key={p.id} product={p} />
-                ))}
-              </div>
-            </section>
+              if (block.type === "product-grid") {
+                const productsList = block.content.listType === "featured" ? featured : newArrivals;
+                return (
+                  <section key={block.id} className="container max-w-6xl mx-auto px-4 py-8" style={{ backgroundColor: block.styles.backgroundColor }}>
+                    <h2 className={`text-xl font-bold mb-4 ${t.headingClass}`}
+                      style={theme ? { fontFamily: "var(--store-font-display)" } : { fontFamily: block.styles.fontFamily }}
+                    >
+                      {block.content.title}
+                    </h2>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                      {productsList.map((p) => (
+                        <ProductCard key={p.id} product={p} />
+                      ))}
+                    </div>
+                  </section>
+                );
+              }
 
-            {/* Featured */}
-            <section className="container max-w-6xl mx-auto px-4 py-8">
-              <h2 className={`text-xl font-bold mb-4 ${t.headingClass}`}
-                style={theme ? { fontFamily: "var(--store-font-display)" } : undefined}
-              >
-                Produtos em Destaque
-              </h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-                {featured.map((p) => (
-                  <ProductCard key={p.id} product={p} />
-                ))}
-              </div>
-            </section>
+              if (block.type === "esg-impact") {
+                return (
+                  <section key={block.id} className="container max-w-6xl mx-auto px-4 py-8" style={{ backgroundColor: block.styles.backgroundColor }}>
+                    <h2 className={`text-xl font-bold mb-4 ${t.headingClass}`}
+                      style={theme ? { fontFamily: "var(--store-font-display)" } : { fontFamily: block.styles.fontFamily }}
+                    >
+                      {block.content.title}
+                    </h2>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                      {[
+                        { icon: Leaf, value: "76 kg", label: "CO₂ Evitado" },
+                        { icon: Recycle, value: "120 kg", label: "Resíduos Evitados" },
+                        { icon: TreePine, value: "45 kg", label: "Recursos Não Extraídos" },
+                        { icon: Package, value: "102", label: "Produtos Disponibilizados" },
+                      ].map((item) => (
+                        <motion.div
+                          key={item.label}
+                          initial={{ opacity: 0, y: 10 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true }}
+                          className="p-4 rounded-xl border text-center"
+                          style={theme ? {
+                            borderColor: "var(--store-border)",
+                            backgroundColor: "var(--store-card)",
+                          } : undefined}
+                        >
+                          <item.icon className="h-6 w-6 mx-auto mb-2" style={theme ? { color: "var(--store-accent)" } : undefined} />
+                          <p className="text-lg font-bold" style={theme ? { fontFamily: "var(--store-font-display)" } : undefined}>
+                            {item.value}
+                          </p>
+                          <p className="text-xs opacity-60 text-[var(--store-text)]">{item.label}</p>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </section>
+                );
+              }
 
-            {/* ESG Impact */}
-            <section className="container max-w-6xl mx-auto px-4 py-8">
-              <h2 className={`text-xl font-bold mb-4 ${t.headingClass}`}
-                style={theme ? { fontFamily: "var(--store-font-display)" } : undefined}
-              >
-                Nosso Impacto
-              </h2>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                {[
-                  { icon: Leaf, value: "76 kg", label: "CO₂ Evitado" },
-                  { icon: Recycle, value: "120 kg", label: "Resíduos Evitados" },
-                  { icon: TreePine, value: "45 kg", label: "Recursos Não Extraídos" },
-                  { icon: Package, value: "102", label: "Produtos Disponibilizados" },
-                ].map((item) => (
-                  <motion.div
-                    key={item.label}
-                    initial={{ opacity: 0, y: 10 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    className="p-4 rounded-xl border text-center"
-                    style={theme ? {
-                      borderColor: "var(--store-border)",
-                      backgroundColor: "var(--store-card)",
-                    } : undefined}
-                  >
-                    <item.icon className="h-6 w-6 mx-auto mb-2" style={theme ? { color: "var(--store-accent)" } : undefined} />
-                    <p className="text-lg font-bold" style={theme ? { fontFamily: "var(--store-font-display)" } : undefined}>
-                      {item.value}
-                    </p>
-                    <p className="text-xs opacity-60">{item.label}</p>
-                  </motion.div>
-                ))}
-              </div>
-            </section>
-          </>
+              return <StorefrontBlockRenderer key={block.id} block={block} slug={slug || ""} />;
+            })}
+          </div>
         )}
 
         {/* Filtered view */}
