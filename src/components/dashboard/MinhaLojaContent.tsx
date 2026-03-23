@@ -323,6 +323,16 @@ const MinhaLojaContent = () => {
             </Button>
           </motion.section>
         </TabsContent>
+
+        {/* ── Visual Editor ── */}
+        <TabsContent value="editor" className="mt-6">
+          <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+            <p className="mb-4 text-sm text-muted-foreground">
+              Arraste seções para reordenar, clique nos textos para editar inline e use o painel lateral para personalizar cores, fontes e espaçamentos.
+            </p>
+            <StorePageEditor />
+          </motion.section>
+        </TabsContent>
       </Tabs>
     </div>
   );
