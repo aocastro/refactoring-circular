@@ -11,6 +11,7 @@ import ESGSection from "@/components/landing/ESGSection";
 import TestimonialsSection from "@/components/landing/TestimonialsSection";
 import FAQSection from "@/components/landing/FAQSection";
 import CTASection from "@/components/landing/CTASection";
+import SectionCTA from "@/components/landing/SectionCTA";
 
 const Index = () => {
   return (
@@ -19,14 +20,23 @@ const Index = () => {
       <main id="main-content" tabIndex={-1}>
         <HeroSection />
         <FeaturesSection />
+        <SectionCTA />
         <PainPointsSection />
+        <SectionCTA />
         <ModulesSection />
+        <SectionCTA />
         <SolutionsSection />
+        <SectionCTA />
         <StoreShowcaseSection />
+        <SectionCTA />
         <GrowthSection />
+        <SectionCTA />
         <ESGSection />
+        <SectionCTA />
         <TestimonialsSection />
+        <SectionCTA />
         <FAQSection />
+        <SectionCTA />
         <CTASection />
       </main>
       <Footer />

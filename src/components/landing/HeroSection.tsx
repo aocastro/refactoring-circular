@@ -49,7 +49,7 @@ const HeroSection = () => {
         >
           <Button asChild size="lg" className="bg-gradient-primary text-primary-foreground px-8 py-6 text-lg rounded-xl glow-primary">
             <Link to="/criar-loja">
-              Criar minha loja
+              Criar a minha loja grátis
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>

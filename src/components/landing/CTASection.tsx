@@ -24,8 +24,8 @@ const CTASection = () => {
             Pare de lidar com planilhas. Comece a crescer com a plataforma criada para o negócio circular.
           </p>
           <Button asChild size="lg" className="bg-gradient-primary text-primary-foreground px-8 py-6 text-lg rounded-xl glow-primary">
-            <Link to="/planos">
-              Criar minha loja agora
+            <Link to="/criar-loja">
+              Criar a minha loja grátis
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>
