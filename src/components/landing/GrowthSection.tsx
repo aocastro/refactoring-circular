@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Sprout, TrendingUp, Building, Crown } from "lucide-react";
+import { Sprout, Mountain, Building, Crown } from "lucide-react";
 
 const stages = [
   {
@@ -9,7 +9,7 @@ const stages = [
     features: ["Inventário básico", "Rastreamento simples de consignados", "Loja única"],
   },
   {
-    icon: TrendingUp,
+    icon: Mountain,
     title: "Crescendo",
     subtitle: "Loja estabelecida com consignantes regulares",
     features: ["Análise avançada", "Acesso da equipe", "Várias opções de pagamento"],
