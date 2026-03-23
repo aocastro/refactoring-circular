@@ -6,7 +6,9 @@ import { Input } from "@/components/ui/input";
 import { mockStore, storeProducts } from "@/data/store";
 import { useCart } from "@/hooks/use-cart";
 import CartDrawer from "@/components/store/CartDrawer";
+import StorefrontBlockRenderer from "@/components/store/StorefrontBlockRenderer";
 import { getTemplateTheme, type TemplateTheme } from "@/lib/template-themes";
+import type { EditorBlock } from "@/components/dashboard/store-editor/types";
 
 const Loja = () => {
   const { slug } = useParams();
