@@ -14,7 +14,11 @@ import KpiCard from "@/components/shared/KpiCard";
 import { dashboardKpis, revenueData, salesByCategory, recentSales } from "@/data/dashboard";
 import { chartTooltipStyle, chartGridStroke, chartAxisStroke, chartAxisFontSize, chartColors } from "@/lib/chart-config";
 
-const DashboardContent = () => {
+interface DashboardContentProps {
+  onSectionChange?: (section: string) => void;
+}
+
+const DashboardContent = ({ onSectionChange }: DashboardContentProps) => {
   return (
     <div className="space-y-6">
       <div>
@@ -25,7 +29,12 @@ const DashboardContent = () => {
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {dashboardKpis.map((kpi, i) => (
-          <KpiCard key={kpi.label} {...kpi} delay={i * 0.05} />
+          <KpiCard
+            key={kpi.label}
+            {...kpi}
+            delay={i * 0.05}
+            onClick={kpi.target ? () => onSectionChange?.(kpi.target!) : undefined}
+          />
         ))}
       </div>
 

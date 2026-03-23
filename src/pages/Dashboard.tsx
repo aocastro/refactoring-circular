@@ -83,7 +83,7 @@ const Dashboard = () => {
 
   const sectionMap = useMemo<Record<string, DashboardSectionMeta>>(
     () => ({
-      dashboard: { label: "Dashboard", content: <DashboardContent /> },
+      dashboard: { label: "Dashboard", content: <DashboardContent onSectionChange={setActiveSection} /> },
       "minha-conta": { label: "Minha Conta", content: user ? <MyAccountContent user={user} /> : null },
       configuracoes: { label: "Configurações gerais", content: <ConfiguracoesContent defaultTab="geral" /> },
       "config-geral": { label: "Configurações gerais", content: <ConfiguracoesContent defaultTab="geral" /> },

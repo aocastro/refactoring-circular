@@ -7,6 +7,8 @@ export interface KpiItem {
   change?: string;
   icon: LucideIcon;
   positive?: boolean;
+  period?: string;
+  target?: string;
 }
 
 // ─── Products ────────────────────────────────────

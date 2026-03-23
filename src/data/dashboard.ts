@@ -9,12 +9,12 @@ import {
 import type { KpiItem, MonthlyValue, CategoryValue, RecentSale } from "@/types";
 
 export const dashboardKpis: KpiItem[] = [
-  { label: "Receita do Mês", value: "R$ 12.450", change: "+12%", icon: DollarSign, positive: true },
-  { label: "Vendas", value: "87", change: "+8%", icon: ShoppingBag, positive: true },
-  { label: "Ticket Médio", value: "R$ 143", change: "+3%", icon: TrendingUp, positive: true },
-  { label: "Consignantes Ativos", value: "23", change: "+2", icon: Users, positive: true },
-  { label: "CO₂ Evitado", value: "361 kg", change: "+15%", icon: Leaf, positive: true },
-  { label: "Água Economizada", value: "234.900 L", change: "+12%", icon: Droplets, positive: true },
+  { label: "Receita do Mês", value: "R$ 12.450", change: "+12%", icon: DollarSign, positive: true, period: "Mensal", target: "relatorios" },
+  { label: "Vendas", value: "87", change: "+8%", icon: ShoppingBag, positive: true, period: "Mensal", target: "venda-pedidos" },
+  { label: "Ticket Médio", value: "R$ 143", change: "+3%", icon: TrendingUp, positive: true, period: "Mensal", target: "relatorios" },
+  { label: "Consignantes Ativos", value: "23", change: "+2", icon: Users, positive: true, period: "Atual", target: "consignantes" },
+  { label: "CO₂ Evitado", value: "361 kg", change: "+15%", icon: Leaf, positive: true, period: "Desde o início", target: "relatorios" },
+  { label: "Água Economizada", value: "234.900 L", change: "+12%", icon: Droplets, positive: true, period: "Desde o início", target: "relatorios" },
 ];
 
 export const revenueData: MonthlyValue[] = [
