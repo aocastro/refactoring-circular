@@ -12,6 +12,7 @@ import TestimonialsSection from "@/components/landing/TestimonialsSection";
 import FAQSection from "@/components/landing/FAQSection";
 import CTASection from "@/components/landing/CTASection";
 import SectionCTA from "@/components/landing/SectionCTA";
+import WhatsAppFloat from "@/components/layout/WhatsAppFloat";
 
 const Index = () => {
   return (
@@ -39,6 +40,7 @@ const Index = () => {
         <SectionCTA />
         <CTASection />
       </main>
+      <WhatsAppFloat />
       <Footer />
     </div>
   );

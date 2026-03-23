@@ -5,6 +5,7 @@ import { Check, X, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import WhatsAppFloat from "@/components/layout/WhatsAppFloat";
 
 type BillingPeriod = "mensal" | "anual";
 
@@ -296,6 +297,7 @@ const Planos = () => {
         </section>
       </main>
 
+      <WhatsAppFloat />
       <Footer />
     </div>
   );
