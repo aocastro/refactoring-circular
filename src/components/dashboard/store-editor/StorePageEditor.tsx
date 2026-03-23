@@ -11,7 +11,9 @@ import { DEFAULT_BLOCKS } from "./types";
 const BLOCK_LABELS: Record<string, string> = {
   "hero-banner": "Banner Principal",
   text: "Texto",
-  "image-gallery": "Galeria",
+  "image-gallery": "Galeria de Imagens",
+  video: "Vídeo",
+  newsletter: "Newsletter",
   products: "Produtos",
   testimonials: "Depoimentos",
   cta: "Chamada para Ação",
