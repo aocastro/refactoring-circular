@@ -22,8 +22,11 @@ const BLOCK_LABELS: Record<string, string> = {
 const ADDABLE_BLOCKS: { type: EditorBlock["type"]; label: string }[] = [
   { type: "text", label: "Texto" },
   { type: "about", label: "Sobre Nós" },
+  { type: "image-gallery", label: "Galeria de Imagens" },
+  { type: "video", label: "Vídeo" },
   { type: "products", label: "Produtos" },
   { type: "testimonials", label: "Depoimentos" },
+  { type: "newsletter", label: "Newsletter" },
   { type: "cta", label: "Chamada para Ação" },
   { type: "contact", label: "Contato" },
 ];

@@ -52,6 +52,86 @@ const BlockRenderer = ({ block, isSelected, onContentChange }: Props) => {
         </div>
       );
 
+    case "image-gallery":
+      return (
+        <div style={{ backgroundColor: styles.backgroundColor, color: styles.textColor, padding: styles.padding, fontFamily: styles.fontFamily }}>
+          <h3 {...editableProps("title")} className={`${editableProps("title").className} mb-4 text-xl font-bold`}>
+            {content.title}
+          </h3>
+          <div className="grid grid-cols-2 gap-2">
+            {["image1", "image2", "image3", "image4"].map((key) => (
+              <div key={key} className="group/img relative aspect-[4/3] overflow-hidden rounded-lg border" style={{ borderColor: styles.accentColor + "33" }}>
+                {content[key] ? (
+                  <img src={content[key]} alt={key} className="h-full w-full object-cover" />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600">
+                    <Image className="h-8 w-8 opacity-40" />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+
+    case "video":
+      return (
+        <div style={{ backgroundColor: styles.backgroundColor, color: styles.textColor, padding: styles.padding, fontFamily: styles.fontFamily }}>
+          <h3 {...editableProps("title")} className={`${editableProps("title").className} mb-2 text-xl font-bold`}>
+            {content.title}
+          </h3>
+          <p {...editableProps("description")} className={`${editableProps("description").className} mb-4 text-sm opacity-80`}>
+            {content.description}
+          </p>
+          <div className="aspect-video overflow-hidden rounded-lg border" style={{ borderColor: styles.accentColor + "33" }}>
+            {content.videoUrl ? (
+              <iframe
+                src={content.videoUrl}
+                title="Video"
+                className="h-full w-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
+                <Play className="h-12 w-12 opacity-40 text-white" />
+              </div>
+            )}
+          </div>
+        </div>
+      );
+
+    case "newsletter":
+      return (
+        <div
+          style={{ backgroundColor: styles.backgroundColor, color: styles.textColor, padding: styles.padding, fontFamily: styles.fontFamily }}
+          className="flex flex-col items-center gap-3 text-center"
+        >
+          <Send className="h-8 w-8" style={{ color: styles.accentColor }} />
+          <h3 {...editableProps("title")} className={`${editableProps("title").className} text-xl font-bold`}>
+            {content.title}
+          </h3>
+          <p {...editableProps("subtitle")} className={`${editableProps("subtitle").className} max-w-md text-sm opacity-90`}>
+            {content.subtitle}
+          </p>
+          <div className="mt-1 flex w-full max-w-sm gap-2">
+            <input
+              type="email"
+              placeholder={content.placeholder || "Seu e-mail"}
+              className="flex-1 rounded-lg border px-4 py-2 text-sm"
+              style={{ borderColor: styles.accentColor + "66", backgroundColor: styles.backgroundColor, color: styles.textColor }}
+              readOnly
+            />
+            <button
+              className="rounded-lg px-4 py-2 text-sm font-semibold"
+              style={{ backgroundColor: styles.accentColor, color: styles.backgroundColor }}
+            >
+              {content.buttonText || "Inscrever"}
+            </button>
+          </div>
+        </div>
+      );
+
     case "products":
       return (
         <div style={{ backgroundColor: styles.backgroundColor, color: styles.textColor, padding: styles.padding, fontFamily: styles.fontFamily }}>

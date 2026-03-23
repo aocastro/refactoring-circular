@@ -1,6 +1,6 @@
 export interface EditorBlock {
   id: string;
-  type: "hero-banner" | "text" | "image-gallery" | "products" | "testimonials" | "cta" | "about" | "contact";
+  type: "hero-banner" | "text" | "image-gallery" | "video" | "newsletter" | "products" | "testimonials" | "cta" | "about" | "contact";
   visible: boolean;
   content: Record<string, string>;
   styles: {
@@ -70,6 +70,25 @@ export const DEFAULT_BLOCKS: EditorBlock[] = [
     },
   },
   {
+    id: "gallery",
+    type: "image-gallery",
+    visible: true,
+    content: {
+      title: "Galeria",
+      image1: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=300&fit=crop",
+      image2: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=400&h=300&fit=crop",
+      image3: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=300&fit=crop",
+      image4: "https://images.unsplash.com/photo-1607082349566-187342175e2f?w=400&h=300&fit=crop",
+    },
+    styles: {
+      backgroundColor: "#f9fafb",
+      textColor: "#1a1a1a",
+      accentColor: "#8b5cf6",
+      fontFamily: "'Inter', sans-serif",
+      padding: "2rem 1.5rem",
+    },
+  },
+  {
     id: "products",
     type: "products",
     visible: true,
@@ -86,6 +105,23 @@ export const DEFAULT_BLOCKS: EditorBlock[] = [
     },
   },
   {
+    id: "video",
+    type: "video",
+    visible: true,
+    content: {
+      title: "Conheça Nossa História",
+      videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+      description: "Assista ao vídeo e descubra como a moda circular pode transformar o mundo.",
+    },
+    styles: {
+      backgroundColor: "#1a1a1a",
+      textColor: "#ffffff",
+      accentColor: "#8b5cf6",
+      fontFamily: "'Space Grotesk', sans-serif",
+      padding: "2rem 1.5rem",
+    },
+  },
+  {
     id: "testimonials",
     type: "testimonials",
     visible: true,
@@ -97,6 +133,24 @@ export const DEFAULT_BLOCKS: EditorBlock[] = [
       textColor: "#1a1a1a",
       accentColor: "#8b5cf6",
       fontFamily: "'Inter', sans-serif",
+      padding: "2rem 1.5rem",
+    },
+  },
+  {
+    id: "newsletter",
+    type: "newsletter",
+    visible: true,
+    content: {
+      title: "Fique por dentro!",
+      subtitle: "Receba novidades e ofertas exclusivas direto no seu e-mail.",
+      buttonText: "Inscrever-se",
+      placeholder: "Seu melhor e-mail",
+    },
+    styles: {
+      backgroundColor: "#7c3aed",
+      textColor: "#ffffff",
+      accentColor: "#c4b5fd",
+      fontFamily: "'Space Grotesk', sans-serif",
       padding: "2rem 1.5rem",
     },
   },
