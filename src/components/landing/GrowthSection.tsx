@@ -9,7 +9,7 @@ const stages = [
     features: ["Inventário básico", "Rastreamento simples de consignados", "Loja única"],
   },
   {
-    icon: TrendingUp,
+    icon: Mountain,
     title: "Crescendo",
     subtitle: "Loja estabelecida com consignantes regulares",
     features: ["Análise avançada", "Acesso da equipe", "Várias opções de pagamento"],
