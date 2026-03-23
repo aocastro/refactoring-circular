@@ -11,10 +11,11 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
+  Cell,
 } from "recharts";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import KpiCard from "@/components/shared/KpiCard";
-import { dashboardKpisByPeriod, revenueData, salesByCategory, recentSales, type DashboardPeriod } from "@/data/dashboard";
+import { dashboardKpisByPeriod, revenueData, salesByCategory, recentSales, abcData, type DashboardPeriod } from "@/data/dashboard";
 import { chartTooltipStyle, chartGridStroke, chartAxisStroke, chartAxisFontSize, chartColors } from "@/lib/chart-config";
 
 interface DashboardContentProps {
@@ -132,6 +133,55 @@ const DashboardContent = ({ onSectionChange }: DashboardContentProps) => {
               <Bar dataKey="value" fill={chartColors.accent} radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 p-6 rounded-xl border border-border bg-card">
+          <h3 className="text-sm font-semibold text-foreground mb-4">Curva ABC por Subcategoria (Análise de Receita)</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={abcData} layout="vertical" margin={{ left: 20, right: 20 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke={chartGridStroke} horizontal={false} />
+              <XAxis type="number" stroke={chartAxisStroke} fontSize={chartAxisFontSize} unit="%" hide />
+              <YAxis dataKey="subcategory" type="category" stroke={chartAxisStroke} fontSize={chartAxisFontSize} width={100} axisLine={false} tickLine={false} />
+              <Tooltip 
+                contentStyle={chartTooltipStyle} 
+                formatter={(value: number) => [`${value}% da Receita`, "Participação"]}
+              />
+              <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={20}>
+                {abcData.map((entry, index) => (
+                  <Cell 
+                    key={`cell-${index}`} 
+                    fill={entry.category === 'A' ? chartColors.primary : entry.category === 'B' ? chartColors.accent : '#94a3b8'} 
+                  />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+          <div className="mt-4 flex gap-4 justify-center text-[10px] sm:text-xs">
+            <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm" style={{ backgroundColor: chartColors.primary }} /> <span>Classe A (Principais)</span></div>
+            <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm" style={{ backgroundColor: chartColors.accent }} /> <span>Classe B (Intermediários)</span></div>
+            <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#94a3b8' }} /> <span>Classe C (Cauda Longa)</span></div>
+          </div>
+        </div>
+
+        <div className="p-6 rounded-xl border border-border bg-card">
+          <h3 className="text-sm font-semibold text-foreground mb-4">Destaques da Curva</h3>
+          <div className="space-y-4">
+            <div className="p-3 rounded-lg bg-primary/5 border border-primary/10">
+              <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-1">Top Subcategoria</p>
+              <p className="text-lg font-bold text-foreground">{abcData[0].subcategory}</p>
+              <p className="text-xs text-success font-medium">Responsável por {abcData[0].value}% da sua receita total.</p>
+            </div>
+            <div className="space-y-2">
+              <p className="text-xs text-muted-foreground font-medium">Otimização Sugerida:</p>
+              <ul className="text-xs text-foreground space-y-1.5 list-disc pl-4">
+                <li>Aumentar estoque de <strong>{abcData[0].subcategory}</strong> e {abcData[1].subcategory}.</li>
+                <li>Fazer liquidação de itens na Classe C para liberar espaço.</li>
+                <li>Reavaliar margens de produtos na Classe B.</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
 

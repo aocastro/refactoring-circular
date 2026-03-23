@@ -8,6 +8,7 @@ export interface Cliente {
   lastPurchase: string;
   since: string;
   status: "Ativo" | "Inativo";
+  birthDate?: string;
 }
 
 export interface PurchaseHistory {
@@ -20,14 +21,14 @@ export interface PurchaseHistory {
 }
 
 export const mockClientes: Cliente[] = [
-  { id: 1, name: "Ana Oliveira", email: "ana@email.com", phone: "(11) 99123-4567", totalPurchases: 8, totalSpent: 2450, lastPurchase: "10/03/2026", since: "Jan/2025", status: "Ativo" },
-  { id: 2, name: "Carlos Silva", email: "carlos@email.com", phone: "(11) 98765-4321", totalPurchases: 3, totalSpent: 890, lastPurchase: "05/03/2026", since: "Mar/2025", status: "Ativo" },
-  { id: 3, name: "Beatriz Santos", email: "bia@email.com", phone: "(21) 99876-5432", totalPurchases: 12, totalSpent: 4200, lastPurchase: "11/03/2026", since: "Out/2024", status: "Ativo" },
-  { id: 4, name: "Daniel Costa", email: "daniel@email.com", phone: "(11) 97654-3210", totalPurchases: 1, totalSpent: 320, lastPurchase: "15/01/2026", since: "Jan/2026", status: "Inativo" },
-  { id: 5, name: "Fernanda Lima", email: "fer@email.com", phone: "(31) 99234-5678", totalPurchases: 6, totalSpent: 1800, lastPurchase: "08/03/2026", since: "Jun/2025", status: "Ativo" },
-  { id: 6, name: "Gustavo Mendes", email: "gustavo@email.com", phone: "(21) 98345-6789", totalPurchases: 4, totalSpent: 1100, lastPurchase: "01/03/2026", since: "Ago/2025", status: "Ativo" },
-  { id: 7, name: "Helena Rocha", email: "helena@email.com", phone: "(11) 99456-7890", totalPurchases: 2, totalSpent: 560, lastPurchase: "20/12/2025", since: "Nov/2025", status: "Inativo" },
-  { id: 8, name: "Igor Pereira", email: "igor@email.com", phone: "(41) 98567-8901", totalPurchases: 15, totalSpent: 5600, lastPurchase: "12/03/2026", since: "Jul/2024", status: "Ativo" },
+  { id: 1, name: "Ana Oliveira LF", email: "ana@email.com", phone: "(11) 99123-4567", totalPurchases: 8, totalSpent: 2450, lastPurchase: "10/03/2026", since: "Jan/2025", status: "Ativo", birthDate: "15/05/1990" },
+  { id: 2, name: "Carlos Silva PTA", email: "carlos@email.com", phone: "(11) 98765-4321", totalPurchases: 3, totalSpent: 890, lastPurchase: "05/03/2026", since: "Mar/2025", status: "Ativo", birthDate: "20/03/1985" },
+  { id: 3, name: "Beatriz Santos LF", email: "bia@email.com", phone: "(21) 99876-5432", totalPurchases: 12, totalSpent: 4200, lastPurchase: "11/03/2026", since: "Out/2024", status: "Ativo", birthDate: "10/08/1992" },
+  { id: 4, name: "Daniel Costa FEIRA", email: "daniel@email.com", phone: "(11) 97654-3210", totalPurchases: 1, totalSpent: 320, lastPurchase: "15/01/2026", since: "Jan/2026", status: "Inativo", birthDate: "05/03/1988" },
+  { id: 5, name: "Fernanda Lima LF", email: "fer@email.com", phone: "(31) 99234-5678", totalPurchases: 6, totalSpent: 1800, lastPurchase: "08/03/2026", since: "Jun/2025", status: "Ativo", birthDate: "12/12/1995" },
+  { id: 6, name: "Gustavo Mendes PTA", email: "gustavo@email.com", phone: "(21) 98345-6789", totalPurchases: 4, totalSpent: 1100, lastPurchase: "01/03/2026", since: "Ago/2025", status: "Ativo", birthDate: "25/07/1982" },
+  { id: 7, name: "Helena Rocha FEIRA", email: "helena@email.com", phone: "(11) 99456-7890", totalPurchases: 2, totalSpent: 560, lastPurchase: "20/12/2025", since: "Nov/2025", status: "Inativo", birthDate: "30/01/1991" },
+  { id: 8, name: "Igor Pereira LF", email: "igor@email.com", phone: "(41) 98567-8901", totalPurchases: 15, totalSpent: 5600, lastPurchase: "12/03/2026", since: "Jul/2024", status: "Ativo", birthDate: "14/03/1987" },
 ];
 
 export const mockPurchaseHistory: PurchaseHistory[] = [

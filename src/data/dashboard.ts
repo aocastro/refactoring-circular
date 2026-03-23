@@ -6,7 +6,7 @@ import {
   Leaf,
   Droplets,
 } from "lucide-react";
-import type { KpiItem, MonthlyValue, CategoryValue, RecentSale } from "@/types";
+import type { KpiItem, MonthlyValue, CategoryValue, RecentSale, ABCValue } from "@/types";
 
 export type DashboardPeriod = "hoje" | "mensal" | "trimestral" | "semestral" | "anual";
 
@@ -75,4 +75,12 @@ export const recentSales: RecentSale[] = [
   { id: 3, item: "Bolsa de Couro Retrô", price: "R$ 210,00", date: "Ontem, 18:45", status: "Pendente" },
   { id: 4, item: "Tênis Vintage Adidas", price: "R$ 120,00", date: "Ontem, 09:20", status: "Pago" },
   { id: 5, item: "Colar Artesanal Boho", price: "R$ 45,00", date: "22/12, 16:00", status: "Pago" },
+];
+
+export const abcData: ABCValue[] = [
+  { subcategory: "Vestidos", value: 45, category: "A" },
+  { subcategory: "Bolsas", value: 35, category: "A" },
+  { subcategory: "Jaquetas", value: 12, category: "B" },
+  { subcategory: "Sapatos", value: 5, category: "C" },
+  { subcategory: "Acessórios", value: 3, category: "C" },
 ];

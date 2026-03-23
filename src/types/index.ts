@@ -57,6 +57,12 @@ export interface CategoryValue {
   value: number;
 }
 
+export interface ABCValue {
+  subcategory: string;
+  value: number;
+  category: "A" | "B" | "C";
+}
+
 // ─── Consignação ─────────────────────────────────
 export type ConsignanteStatus = "Ativo" | "Pago";
 

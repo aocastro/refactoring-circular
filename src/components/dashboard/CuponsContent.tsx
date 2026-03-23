@@ -12,11 +12,14 @@ import { mockCupons } from "@/data/cupons";
 import type { Cupom } from "@/data/cupons";
 import type { KpiItem } from "@/types";
 import { useToast } from "@/hooks/use-toast";
+import { mockClientes } from "@/data/clientes";
 
 const CuponsContent = () => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("Todos");
   const [showCreate, setShowCreate] = useState(false);
+  const [targetType, setTargetType] = useState("todos");
+  const [targetValue, setTargetValue] = useState("");
   const { toast } = useToast();
 
   const filtered = useMemo(() => {
@@ -65,6 +68,39 @@ const CuponsContent = () => {
     navigator.clipboard.writeText(code);
     toast({ title: "Código copiado!", description: code });
   };
+
+  const origins = useMemo(() => {
+    const caps = new Set<string>();
+    mockClientes.forEach(c => {
+      const parts = c.name.split(" ");
+      if (parts.length > 1) caps.add(parts[parts.length - 1]);
+    });
+    return Array.from(caps);
+  }, []);
+
+  const recipientCount = useMemo(() => {
+    if (targetType === "todos") return mockClientes.length;
+    if (targetType === "origin" && targetValue) {
+      return mockClientes.filter(c => c.name.endsWith(targetValue)).length;
+    }
+    if (targetType === "birthday" && targetValue) {
+      // Simplificado: targetValue = mês (1-12)
+      return mockClientes.filter(c => {
+        if (!c.birthDate) return false;
+        const month = parseInt(c.birthDate.split("/")[1]);
+        return month === parseInt(targetValue);
+      }).length;
+    }
+    if (targetType === "inactive" && targetValue) {
+      const months = parseInt(targetValue);
+      return mockClientes.filter(c => {
+        const lastDate = c.lastPurchase === "-" ? new Date(0) : new Date(c.lastPurchase.split("/").reverse().join("-"));
+        const diffMonths = (new Date("2026-03-23").getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24 * 30);
+        return diffMonths >= months;
+      }).length;
+    }
+    return 0;
+  }, [targetType, targetValue]);
 
   return (
     <div className="space-y-6">
@@ -165,8 +201,57 @@ const CuponsContent = () => {
               <div><Label>Compra Mínima (R$)</Label><Input type="number" placeholder="100" className="bg-secondary border-border mt-1" /></div>
               <div><Label>Limite de Usos</Label><Input type="number" placeholder="100" className="bg-secondary border-border mt-1" /></div>
             </div>
-            <Button className="w-full bg-gradient-primary text-primary-foreground" onClick={() => { setShowCreate(false); toast({ title: "Cupom criado!", description: "O cupom foi adicionado com sucesso." }); }}>
-              Criar Cupom
+            <div className="space-y-3 p-3 rounded-lg bg-accent/5 border border-accent/20">
+              <Label className="text-xs font-bold uppercase text-accent">Destinatários (Targeting)</Label>
+              <div className="grid grid-cols-2 gap-2">
+                <Select value={targetType} onValueChange={(v) => { setTargetType(v); setTargetValue(""); }}>
+                  <SelectTrigger className="bg-background border-border h-8 text-xs"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos os Clientes</SelectItem>
+                    <SelectItem value="origin">Por Origem (Feira)</SelectItem>
+                    <SelectItem value="birthday">Aniversariantes</SelectItem>
+                    <SelectItem value="inactive">Inativos</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                {targetType === "origin" && (
+                  <Select value={targetValue} onValueChange={setTargetValue}>
+                    <SelectTrigger className="bg-background border-border h-8 text-xs"><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                    <SelectContent>
+                      {origins.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                )}
+
+                {targetType === "birthday" && (
+                  <Select value={targetValue} onValueChange={setTargetValue}>
+                    <SelectTrigger className="bg-background border-border h-8 text-xs"><SelectValue placeholder="Mês..." /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="3">Março (Este mês)</SelectItem>
+                      <SelectItem value="4">Abril</SelectItem>
+                      <SelectItem value="5">Maio</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+
+                {targetType === "inactive" && (
+                  <Select value={targetValue} onValueChange={setTargetValue}>
+                    <SelectTrigger className="bg-background border-border h-8 text-xs"><SelectValue placeholder="Tempo..." /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="3">+3 meses</SelectItem>
+                      <SelectItem value="6">+6 meses</SelectItem>
+                      <SelectItem value="12">+1 ano</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              </div>
+              <p className="text-[10px] text-muted-foreground italic">
+                {recipientCount > 0 ? `Este cupom será enviado para ${recipientCount} clientes selecionados.` : "Nenhum cliente selecionado."}
+              </p>
+            </div>
+
+            <Button className="w-full bg-gradient-primary text-primary-foreground" onClick={() => { setShowCreate(false); toast({ title: "Cupom criado e enviado!", description: `O cupom foi enviado para ${recipientCount} clientes.` }); }}>
+              Criar e Enviar Cupom
             </Button>
           </div>
         </DialogContent>

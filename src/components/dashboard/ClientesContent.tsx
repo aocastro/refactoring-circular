@@ -17,6 +17,8 @@ const ClientesContent = () => {
   const [clientes, setClientes] = useState<Cliente[]>(initialClientes);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("Todos");
+  const [originFilter, setOriginFilter] = useState("Todas");
+  const [inactivityFilter, setInactivityFilter] = useState("Todos");
   const [selectedCliente, setSelectedCliente] = useState<Cliente | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "", cpf: "" });
@@ -25,9 +27,33 @@ const ClientesContent = () => {
     return clientes.filter((c) => {
       const matchSearch = search === "" || c.name.toLowerCase().includes(search.toLowerCase()) || c.email.toLowerCase().includes(search.toLowerCase());
       const matchStatus = statusFilter === "Todos" || c.status === statusFilter;
-      return matchSearch && matchStatus;
+      
+      // Filtro de Origem (Extraído do final do nome)
+      const nameParts = c.name.split(" ");
+      const origin = nameParts.length > 1 ? nameParts[nameParts.length - 1] : "Sem Origem";
+      const matchOrigin = originFilter === "Todas" || origin === originFilter;
+
+      // Filtro de Inatividade
+      let matchInactivity = true;
+      if (inactivityFilter !== "Todos") {
+        const months = parseInt(inactivityFilter);
+        const lastDate = c.lastPurchase === "-" ? new Date(0) : new Date(c.lastPurchase.split("/").reverse().join("-"));
+        const diffMonths = (new Date("2026-03-23").getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24 * 30);
+        matchInactivity = diffMonths >= months;
+      }
+
+      return matchSearch && matchStatus && matchOrigin && matchInactivity;
     });
-  }, [search, statusFilter, clientes]);
+  }, [search, statusFilter, originFilter, inactivityFilter, clientes]);
+
+  const origins = useMemo(() => {
+    const set = new Set<string>();
+    clientes.forEach(c => {
+      const parts = c.name.split(" ");
+      if (parts.length > 1) set.add(parts[parts.length - 1]);
+    });
+    return ["Todas", ...Array.from(set)];
+  }, [clientes]);
 
   const totalClientes = clientes.length;
   const ativos = clientes.filter((c) => c.status === "Ativo").length;
@@ -94,11 +120,28 @@ const ClientesContent = () => {
           <Input placeholder="Buscar por nome ou email..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10 bg-secondary border-border" />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[140px] bg-secondary border-border"><SelectValue /></SelectTrigger>
+          <SelectTrigger className="w-[130px] bg-secondary border-border"><SelectValue placeholder="Status" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="Todos">Todos</SelectItem>
+            <SelectItem value="Todos">Todos Status</SelectItem>
             <SelectItem value="Ativo">Ativo</SelectItem>
             <SelectItem value="Inativo">Inativo</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select value={originFilter} onValueChange={setOriginFilter}>
+          <SelectTrigger className="w-[130px] bg-secondary border-border"><SelectValue placeholder="Origem" /></SelectTrigger>
+          <SelectContent>
+            {origins.map(o => <SelectItem key={o} value={o}>{o === "Todas" ? "Todas Origens" : o}</SelectItem>)}
+          </SelectContent>
+        </Select>
+
+        <Select value={inactivityFilter} onValueChange={setInactivityFilter}>
+          <SelectTrigger className="w-[160px] bg-secondary border-border"><SelectValue placeholder="Inatividade" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="Todos">Qualquer tempo</SelectItem>
+            <SelectItem value="3">+3 meses sem comprar</SelectItem>
+            <SelectItem value="6">+6 meses sem comprar</SelectItem>
+            <SelectItem value="12">+1 ano sem comprar</SelectItem>
           </SelectContent>
         </Select>
       </div>

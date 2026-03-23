@@ -23,28 +23,29 @@ interface InventoryItem {
   minStock: number;
   location: string;
   lastCount: string;
+  registrationDate: string;
   status: "ok" | "low" | "out";
 }
 
 const mockInventory: InventoryItem[] = [
-  { id: 1, name: "Vestido Floral Vintage", sku: "VFV-001", category: "Roupas", stock: 1, minStock: 1, location: "Arara A1", lastCount: "10/03/2026", status: "ok" },
-  { id: 2, name: "Jaqueta Jeans Upcycled", sku: "JJU-002", category: "Roupas", stock: 1, minStock: 1, location: "Arara A2", lastCount: "10/03/2026", status: "ok" },
-  { id: 3, name: "Bolsa de Couro Retrô", sku: "BCR-003", category: "Bolsas", stock: 1, minStock: 1, location: "Prateleira B1", lastCount: "09/03/2026", status: "ok" },
-  { id: 4, name: "Tênis Vintage Adidas", sku: "TVA-004", category: "Calçados", stock: 0, minStock: 1, location: "Prateleira C1", lastCount: "09/03/2026", status: "out" },
-  { id: 5, name: "Colar Artesanal Boho", sku: "CAB-005", category: "Acessórios", stock: 3, minStock: 2, location: "Vitrine D1", lastCount: "10/03/2026", status: "ok" },
-  { id: 6, name: "Camisa Hawaiana 90s", sku: "CH9-006", category: "Roupas", stock: 1, minStock: 1, location: "Arara A3", lastCount: "08/03/2026", status: "ok" },
-  { id: 7, name: "Saia Midi Plissada", sku: "SMP-007", category: "Roupas", stock: 1, minStock: 1, location: "Arara A4", lastCount: "08/03/2026", status: "ok" },
-  { id: 8, name: "Óculos Retrô Ray-Ban", sku: "ORR-008", category: "Acessórios", stock: 1, minStock: 1, location: "Vitrine D2", lastCount: "10/03/2026", status: "ok" },
-  { id: 9, name: "Casaco de Pele Sintética", sku: "CPS-009", category: "Roupas", stock: 0, minStock: 1, location: "Arara B1", lastCount: "07/03/2026", status: "out" },
-  { id: 10, name: "Boné Vintage Nike", sku: "BVN-010", category: "Acessórios", stock: 1, minStock: 2, location: "Prateleira D3", lastCount: "06/03/2026", status: "low" },
-  { id: 11, name: "Calça Cargo Militar", sku: "CCM-011", category: "Roupas", stock: 1, minStock: 2, location: "Arara A5", lastCount: "05/03/2026", status: "low" },
-  { id: 12, name: "Sandália Plataforma", sku: "SP-012", category: "Calçados", stock: 0, minStock: 1, location: "Prateleira C2", lastCount: "04/03/2026", status: "out" },
+  { id: 1, name: "Vestido Floral Vintage", sku: "VFV-001", category: "Roupas", stock: 1, minStock: 1, location: "Arara A1", lastCount: "10/03/2026", registrationDate: "01/01/2026", status: "ok" },
+  { id: 2, name: "Jaqueta Jeans Upcycled", sku: "JJU-002", category: "Roupas", stock: 1, minStock: 1, location: "Arara A2", lastCount: "10/03/2026", registrationDate: "15/01/2026", status: "ok" },
+  { id: 3, name: "Bolsa de Couro Retrô", sku: "BCR-003", category: "Bolsas", stock: 1, minStock: 1, location: "Prateleira B1", lastCount: "09/03/2026", registrationDate: "10/12/2025", status: "ok" },
+  { id: 4, name: "Tênis Vintage Adidas", sku: "TVA-004", category: "Calçados", stock: 0, minStock: 1, location: "Prateleira C1", lastCount: "09/03/2026", registrationDate: "05/11/2025", status: "out" },
+  { id: 5, name: "Colar Artesanal Boho", sku: "CAB-005", category: "Acessórios", stock: 3, minStock: 2, location: "Vitrine D1", lastCount: "10/03/2026", registrationDate: "20/02/2026", status: "ok" },
+  { id: 6, name: "Camisa Hawaiana 90s", sku: "CH9-006", category: "Roupas", stock: 1, minStock: 1, location: "Arara A3", lastCount: "08/03/2026", registrationDate: "10/01/2026", status: "ok" },
+  { id: 7, name: "Saia Midi Plissada", sku: "SMP-007", category: "Roupas", stock: 1, minStock: 1, location: "Arara A4", lastCount: "08/03/2026", registrationDate: "25/12/2025", status: "ok" },
+  { id: 8, name: "Óculos Retrô Ray-Ban", sku: "ORR-008", category: "Acessórios", stock: 1, minStock: 1, location: "Vitrine D2", lastCount: "10/03/2026", registrationDate: "15/02/2026", status: "ok" },
+  { id: 9, name: "Casaco de Pele Sintética", sku: "CPS-009", category: "Roupas", stock: 0, minStock: 1, location: "Arara B1", lastCount: "07/03/2026", registrationDate: "01/11/2025", status: "out" },
+  { id: 10, name: "Boné Vintage Nike", sku: "BVN-010", category: "Acessórios", stock: 1, minStock: 2, location: "Prateleira D3", lastCount: "06/03/2026", registrationDate: "10/10/2025", status: "low" },
+  { id: 11, name: "Calça Cargo Militar", sku: "CCM-011", category: "Roupas", stock: 1, minStock: 2, location: "Arara A5", lastCount: "05/03/2026", registrationDate: "05/09/2025", status: "low" },
+  { id: 12, name: "Sandália Plataforma", sku: "SP-012", category: "Calçados", stock: 0, minStock: 1, location: "Prateleira C2", lastCount: "04/03/2026", registrationDate: "15/08/2025", status: "out" },
 ];
 
 const categories = ["Todos", "Roupas", "Acessórios", "Calçados", "Bolsas"];
-const statusOptions = ["Todos", "Em estoque", "Estoque baixo", "Sem estoque"];
+const statusOptions = ["Todos", "Em estoque", "Estoque baixo", "Sem estoque", "Parado (+30 dias)", "Parado (+60 dias)", "Parado (+90 dias)"];
 
-const statusMap: Record<string, InventoryItem["status"]> = {
+const statusMap: Record<string, InventoryItem["status"] | string> = {
   "Em estoque": "ok",
   "Estoque baixo": "low",
   "Sem estoque": "out",
@@ -62,7 +63,17 @@ const InventarioContent = () => {
         item.name.toLowerCase().includes(search.toLowerCase()) ||
         item.sku.toLowerCase().includes(search.toLowerCase());
       const matchCategory = categoryFilter === "Todos" || item.category === categoryFilter;
-      const matchStatus = statusFilter === "Todos" || item.status === statusMap[statusFilter];
+      
+      let matchStatus = statusFilter === "Todos" || item.status === statusMap[statusFilter];
+      
+      // Lógica de "Itens Parados"
+      if (statusFilter.startsWith("Parado")) {
+        const days = parseInt(statusFilter.split(" ")[1]) || 30;
+        const regDate = new Date(item.registrationDate.split("/").reverse().join("-"));
+        const diffDays = Math.ceil((new Date("2026-03-23").getTime() - regDate.getTime()) / (1000 * 60 * 60 * 24));
+        matchStatus = diffDays >= days && item.stock > 0;
+      }
+
       return matchSearch && matchCategory && matchStatus;
     });
   }, [search, categoryFilter, statusFilter]);
