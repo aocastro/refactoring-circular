@@ -26,6 +26,15 @@ const Loja = () => {
     return null;
   })();
 
+  // Load editor layout blocks
+  const editorBlocks: EditorBlock[] = (() => {
+    try {
+      const raw = localStorage.getItem("storeLayout");
+      if (raw && savedConfig) return JSON.parse(raw);
+    } catch {}
+    return [];
+  })();
+
   const theme: TemplateTheme | null = getTemplateTheme(savedConfig?.template);
 
   // Load Google Font for the active theme
