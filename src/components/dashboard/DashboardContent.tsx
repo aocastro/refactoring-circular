@@ -12,8 +12,9 @@ import {
   BarChart,
   Bar,
 } from "recharts";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import KpiCard from "@/components/shared/KpiCard";
-import { dashboardKpis, revenueData, salesByCategory, recentSales } from "@/data/dashboard";
+import { dashboardKpisByPeriod, revenueData, salesByCategory, recentSales, type DashboardPeriod } from "@/data/dashboard";
 import { chartTooltipStyle, chartGridStroke, chartAxisStroke, chartAxisFontSize, chartColors } from "@/lib/chart-config";
 
 interface DashboardContentProps {
@@ -22,6 +23,7 @@ interface DashboardContentProps {
 
 const DashboardContent = ({ onSectionChange }: DashboardContentProps) => {
   const [trialDays, setTrialDays] = useState<number | null>(null);
+  const [selectedPeriod, setSelectedPeriod] = useState<DashboardPeriod>("hoje");
 
   useEffect(() => {
     const storeConfig = JSON.parse(localStorage.getItem("storeConfig") || "{}");
@@ -64,14 +66,31 @@ const DashboardContent = ({ onSectionChange }: DashboardContentProps) => {
         </motion.div>
       )}
 
-      <div>
-        <h2 className="text-xl font-bold font-display text-foreground">Visão geral</h2>
-        <p className="text-muted-foreground text-sm">Bom dia, Maria! Seja bem-vinda ao seu painel.</p>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 className="text-xl font-bold font-display text-foreground">Visão geral</h2>
+          <p className="text-muted-foreground text-sm">Bom dia, Maria! Seja bem-vinda ao seu painel.</p>
+        </div>
+
+        <Tabs
+          defaultValue="hoje"
+          value={selectedPeriod}
+          onValueChange={(value) => setSelectedPeriod(value as DashboardPeriod)}
+          className="w-full sm:w-auto"
+        >
+          <TabsList className="grid grid-cols-5 w-full sm:w-auto h-9 p-1 bg-muted/50">
+            <TabsTrigger value="hoje" className="text-[10px] sm:text-xs">Hoje</TabsTrigger>
+            <TabsTrigger value="mensal" className="text-[10px] sm:text-xs">Mensal</TabsTrigger>
+            <TabsTrigger value="trimestral" className="text-[10px] sm:text-xs">Trimestral</TabsTrigger>
+            <TabsTrigger value="semestral" className="text-[10px] sm:text-xs">Semestral</TabsTrigger>
+            <TabsTrigger value="anual" className="text-[10px] sm:text-xs">Anual</TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
 
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {dashboardKpis.map((kpi, i) => (
+        {dashboardKpisByPeriod[selectedPeriod].map((kpi, i) => (
           <KpiCard
             key={kpi.label}
             {...kpi}
