@@ -160,7 +160,7 @@ const AdminSuporteContent = () => {
 
             return (
               <React.Fragment key={ticket.id}>
-                <tr>
+                <tr className="border-b border-border/50 last:border-0 hover:bg-muted/30">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <MessageSquare className="h-4 w-4 text-primary shrink-0" />
