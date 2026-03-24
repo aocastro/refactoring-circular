@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import FilterToolbar from "@/components/shared/FilterToolbar";
+import DataTable from "@/components/shared/DataTable";
 import { toast } from "sonner";
 
 type TicketStatus = "aberto" | "em_andamento" | "resolvido";
@@ -77,6 +78,14 @@ const priorityColor: Record<TicketPriority, string> = {
   urgente: "text-destructive",
 };
 
+const columns = [
+  { key: "subject", label: "Ticket" },
+  { key: "store", label: "Loja / Usuário", hideOn: "sm" as const },
+  { key: "priority", label: "Prioridade", hideOn: "md" as const },
+  { key: "status", label: "Status" },
+  { key: "actions", label: "" },
+];
+
 const AdminSuporteContent = () => {
   const [tickets, setTickets] = useState<Ticket[]>(initialTickets);
   const [search, setSearch] = useState("");
@@ -140,46 +149,48 @@ const AdminSuporteContent = () => {
         }]}
       />
 
-      <div className="space-y-3">
-        {filtered.map((ticket, i) => {
-          const cfg = statusConfig[ticket.status];
-          const expanded = expandedId === ticket.id;
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+        <DataTable
+          columns={columns}
+          data={filtered}
+          emptyMessage="Nenhum ticket encontrado."
+          renderRow={(ticket: Ticket) => {
+            const cfg = statusConfig[ticket.status];
+            const expanded = expandedId === ticket.id;
 
-          return (
-            <motion.div key={ticket.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}>
-              <Card className={expanded ? "ring-1 ring-primary/20" : ""}>
-                <CardContent className="p-0">
-                  {/* Header */}
-                  <button
-                    type="button"
-                    onClick={() => setExpandedId(expanded ? null : ticket.id)}
-                    className="flex w-full items-center justify-between gap-3 p-4 text-left"
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="mt-0.5 shrink-0">
-                        <MessageSquare className="h-5 w-5 text-primary" />
-                      </div>
-                      <div className="min-w-0 space-y-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className="text-sm font-semibold text-foreground">#{ticket.id}</span>
-                          <span className="text-sm text-foreground">{ticket.subject}</span>
-                        </div>
-                        <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-                          <span className="flex items-center gap-1"><Store className="h-3 w-3" />{ticket.store}</span>
-                          <span className="flex items-center gap-1"><User className="h-3 w-3" />{ticket.owner}</span>
-                          <span className={`font-medium ${priorityColor[ticket.priority]}`}>{ticket.priority}</span>
-                        </div>
+            return (
+              <React.Fragment key={ticket.id}>
+                <tr>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <MessageSquare className="h-4 w-4 text-primary shrink-0" />
+                      <div className="min-w-0">
+                        <span className="text-xs font-semibold text-muted-foreground mr-2">#{ticket.id}</span>
+                        <span className="text-sm text-foreground">{ticket.subject}</span>
                       </div>
                     </div>
-                    <div className="flex shrink-0 items-center gap-2">
-                      <Badge variant={cfg.variant} className="flex items-center gap-1">{cfg.icon}{cfg.label}</Badge>
-                      {expanded ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+                  </td>
+                  <td className="hidden px-4 py-3 text-sm text-muted-foreground sm:table-cell">
+                    <div className="flex flex-col">
+                      <span className="flex items-center gap-1 text-xs"><Store className="h-3 w-3" />{ticket.store}</span>
+                      <span className="flex items-center gap-1 text-xs"><User className="h-3 w-3" />{ticket.owner}</span>
                     </div>
-                  </button>
-
-                  {/* Expanded content */}
-                  {expanded && (
-                    <div className="border-t border-border px-4 pb-4 pt-3">
+                  </td>
+                  <td className="hidden px-4 py-3 text-sm md:table-cell">
+                    <span className={`font-medium text-xs ${priorityColor[ticket.priority]}`}>{ticket.priority}</span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <Badge variant={cfg.variant} className="flex w-fit items-center gap-1">{cfg.icon}{cfg.label}</Badge>
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <Button variant="ghost" size="sm" onClick={() => setExpandedId(expanded ? null : ticket.id)}>
+                      {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                    </Button>
+                  </td>
+                </tr>
+                {expanded && (
+                  <tr>
+                    <td colSpan={columns.length} className="px-4 pb-4 pt-2 border-b border-border bg-muted/20">
                       <div className="space-y-3">
                         {ticket.messages.map((msg, mi) => (
                           <div key={mi} className={`rounded-lg p-3 text-sm ${msg.role === "admin" ? "ml-6 bg-primary/5 border border-primary/10" : "mr-6 bg-muted"}`}>
@@ -212,17 +223,14 @@ const AdminSuporteContent = () => {
                           </div>
                         </div>
                       )}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </motion.div>
-          );
-        })}
-        {filtered.length === 0 && (
-          <p className="py-8 text-center text-muted-foreground">Nenhum ticket encontrado.</p>
-        )}
-      </div>
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
+            );
+          }}
+        />
+      </motion.div>
     </div>
   );
 };

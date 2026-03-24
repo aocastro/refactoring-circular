@@ -6,6 +6,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import NotificationsDropdown from "@/components/dashboard/NotificationsDropdown";
 import { useTheme } from "@/hooks/use-theme";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 
 type DashboardSectionMeta = {
   label: string;
@@ -42,9 +43,20 @@ const SectionFallback = () => (
   </div>
 );
 
-const AppHeader = ({ theme, toggleTheme, userName }: { theme: string; toggleTheme: () => void; userName: string }) => (
+const AppHeader = ({ theme, toggleTheme, userName, sectionLabel }: { theme: string; toggleTheme: () => void; userName: string, sectionLabel: string }) => (
   <header className="flex h-14 items-center gap-4 border-b border-border px-4" aria-label="Cabeçalho do dashboard">
     <SidebarTrigger aria-label="Abrir ou recolher barra lateral" />
+    <Breadcrumb className="hidden sm:block">
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <span className="text-muted-foreground">Dashboard</span>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbPage>{sectionLabel}</BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </Breadcrumb>
     <div className="flex-1" />
     <div className="flex items-center gap-2">
       <button
@@ -135,7 +147,7 @@ const Dashboard = () => {
       <div className="flex min-h-screen w-full bg-background">
         <DashboardSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
         <div className="flex flex-1 flex-col">
-          <AppHeader theme={theme} toggleTheme={toggleTheme} userName={user.name} />
+          <AppHeader theme={theme} toggleTheme={toggleTheme} userName={user.name} sectionLabel={currentSection.label} />
           <main id="main-content" className="flex-1 overflow-auto p-4 sm:p-6" tabIndex={-1} aria-live="polite">
             <section aria-labelledby="dashboard-section-heading">
               <h1 ref={sectionHeadingRef} id="dashboard-section-heading" tabIndex={-1} className="mb-4 font-display text-2xl font-bold text-foreground focus:outline-none">

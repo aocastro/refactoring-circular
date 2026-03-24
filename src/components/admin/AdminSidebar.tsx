@@ -33,6 +33,7 @@ const menuItems = [
   { id: "esg", title: "Impacto Ambiental", icon: Leaf },
   { id: "blockchain", title: "Blockchain", icon: Link2 },
   { id: "auditoria", title: "Auditoria", icon: FileText },
+  { id: "nps", title: "NPS", icon: MessageSquare },
   { id: "suporte", title: "Suporte", icon: MessageSquare },
 ];
 

@@ -6,7 +6,7 @@ import {
   Leaf,
   Droplets,
 } from "lucide-react";
-import type { KpiItem, MonthlyValue, CategoryValue, RecentSale, ABCValue } from "@/types";
+import type { KpiItem, MonthlyValue, CategoryValue, RecentSale, ABCValue, ABCProductValue } from "@/types";
 
 export type DashboardPeriod = "hoje" | "mensal" | "trimestral" | "semestral" | "anual";
 
@@ -83,4 +83,17 @@ export const abcData: ABCValue[] = [
   { subcategory: "Jaquetas", value: 12, category: "B" },
   { subcategory: "Sapatos", value: 5, category: "C" },
   { subcategory: "Acessórios", value: 3, category: "C" },
+];
+
+export const abcProductsData: ABCProductValue[] = [
+  { product: "Vestido Floral Vintage", value: 25, revenue: 3112, category: "A" },
+  { product: "Bolsa de Couro Retrô", value: 20, revenue: 2490, category: "A" },
+  { product: "Jaqueta Jeans Upcycled", value: 15, revenue: 1867, category: "B" },
+  { product: "Tênis Vintage Adidas", value: 10, revenue: 1245, category: "B" },
+  { product: "Colar Artesanal Boho", value: 8, revenue: 996, category: "C" },
+  { product: "Camisa de Seda 90s", value: 7, revenue: 871, category: "C" },
+  { product: "Calça Levi's 501", value: 5, revenue: 622, category: "C" },
+  { product: "Óculos de Sol Vintage", value: 4, revenue: 498, category: "C" },
+  { product: "Cinto de Couro Western", value: 4, revenue: 498, category: "C" },
+  { product: "Lenço Estampado", value: 2, revenue: 249, category: "C" },
 ];

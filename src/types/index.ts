@@ -63,6 +63,13 @@ export interface ABCValue {
   category: "A" | "B" | "C";
 }
 
+export interface ABCProductValue {
+  product: string;
+  value: number;
+  revenue: number;
+  category: "A" | "B" | "C";
+}
+
 // ─── Consignação ─────────────────────────────────
 export type ConsignanteStatus = "Ativo" | "Pago";
 
