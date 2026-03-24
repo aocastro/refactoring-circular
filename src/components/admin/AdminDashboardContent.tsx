@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Store, Users, DollarSign, TrendingUp, Leaf, ArrowUpRight, ArrowDownRight, TrendingDown, Timer } from "lucide-react";
+import { Store, Users, DollarSign, Leaf, ArrowUpRight, ArrowDownRight, TrendingDown, Timer } from "lucide-react";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, BarChart, Bar, Legend, LineChart, Line,
