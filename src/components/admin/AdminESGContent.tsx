@@ -1,0 +1,61 @@
+import { motion } from "framer-motion";
+import { Leaf, Droplets, Recycle, Store, ArrowUpRight } from "lucide-react";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { adminEsg, adminEsgMonthly } from "@/data/admin";
+
+const kpis = [
+  { label: "CO₂ Evitado", value: `${adminEsg.co2Evitado.toLocaleString("pt-BR")} kg`, icon: Leaf, change: "+18%", color: "text-green-600" },
+  { label: "Água Economizada", value: `${(adminEsg.aguaEconomizada / 1000).toFixed(0)} mil L`, icon: Droplets, change: "+22%", color: "text-blue-500" },
+  { label: "Peças Circuladas", value: adminEsg.pecasCirculadas.toLocaleString("pt-BR"), icon: Recycle, change: "+15%", color: "text-amber-600" },
+  { label: "Lojas com Selo ESG", value: adminEsg.lojasESG.toString(), icon: Store, change: "+12 este mês", color: "text-primary" },
+];
+
+const AdminESGContent = () => (
+  <div className="space-y-6">
+    <header>
+      <h2 className="font-display text-2xl font-bold text-foreground">Impacto Ambiental</h2>
+      <p className="text-sm text-muted-foreground">Métricas de sustentabilidade e economia circular da plataforma</p>
+    </header>
+
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {kpis.map((kpi, i) => (
+        <motion.div key={kpi.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
+          <Card>
+            <CardContent className="flex items-center gap-4 p-5">
+              <div className={`flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 ${kpi.color}`}>
+                <kpi.icon className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">{kpi.label}</p>
+                <p className="text-lg font-bold text-foreground">{kpi.value}</p>
+                <p className="flex items-center gap-0.5 text-xs text-green-600">
+                  <ArrowUpRight className="h-3 w-3" />{kpi.change}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      ))}
+    </div>
+
+    <Card>
+      <CardHeader><CardTitle className="text-base">Evolução Mensal do Impacto</CardTitle></CardHeader>
+      <CardContent>
+        <ResponsiveContainer width="100%" height={320}>
+          <AreaChart data={adminEsgMonthly}>
+            <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+            <XAxis dataKey="month" className="text-xs fill-muted-foreground" />
+            <YAxis className="text-xs fill-muted-foreground" />
+            <Tooltip />
+            <Legend />
+            <Area type="monotone" dataKey="co2" name="CO₂ (kg)" stroke="hsl(142, 76%, 36%)" fill="hsl(142, 76%, 36%, .15)" strokeWidth={2} />
+            <Area type="monotone" dataKey="pecas" name="Peças" stroke="hsl(var(--primary))" fill="hsl(var(--primary) / .15)" strokeWidth={2} />
+          </AreaChart>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
+  </div>
+);
+
+export default AdminESGContent;
