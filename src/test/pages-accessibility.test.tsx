@@ -1,3 +1,4 @@
+import { AccessibilityProvider } from "@/hooks/use-accessibility";
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
@@ -32,10 +33,12 @@ vi.mock("@/components/dashboard/DashboardContent", () => ({ default: () => <sect
 const renderRoute = (ui: React.ReactNode, path = "/") =>
   render(
     <MemoryRouter initialEntries={[path]}>
+      <AccessibilityProvider>
       <Routes>
         <Route path="*" element={ui} />
       </Routes>
-    </MemoryRouter>,
+      </AccessibilityProvider>
+      </MemoryRouter>,
   );
 
 describe("Acessibilidade das páginas principais", () => {

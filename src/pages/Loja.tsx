@@ -23,7 +23,7 @@ const Loja = () => {
     try {
       const config = JSON.parse(localStorage.getItem("storeConfig") || "{}");
       if (config.slug === slug) return config;
-    } catch {}
+    } catch { /* ignore */ }
     return null;
   })();
 
@@ -37,7 +37,7 @@ const Loja = () => {
         const parsed = JSON.parse(raw);
         if (parsed.length > 0) return parsed;
       }
-    } catch {}
+    } catch { /* ignore */ }
     return buildDefaultBlocksFromTheme(theme);
   })();
 

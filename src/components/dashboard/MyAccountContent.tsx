@@ -9,7 +9,7 @@ interface MyAccountContentProps {
 }
 
 const MyAccountContent = ({ user }: MyAccountContentProps) => {
-  const [storeConfig, setStoreConfig] = useState<any>(null);
+  const [storeConfig, setStoreConfig] = useState<Record<string, unknown> | null>(null);
 
   useEffect(() => {
     const config = JSON.parse(localStorage.getItem("storeConfig") || "{}");

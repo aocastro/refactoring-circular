@@ -128,7 +128,7 @@ const StorePageEditor = ({ templateId }: StorePageEditorProps) => {
     try {
       const saved = localStorage.getItem(storageKey);
       if (saved) return JSON.parse(saved);
-    } catch {}
+    } catch { /* ignore */ }
     return buildDefaultBlocksFromTheme(theme);
   });
 
@@ -151,7 +151,7 @@ const StorePageEditor = ({ templateId }: StorePageEditorProps) => {
         setSelectedBlockId(null);
         return;
       }
-    } catch {}
+    } catch { /* ignore */ }
     setBlocks(buildDefaultBlocksFromTheme(theme));
     setSelectedBlockId(null);
   }, [templateId]);

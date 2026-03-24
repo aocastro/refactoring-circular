@@ -62,7 +62,7 @@ const CampaignFormDialog = ({ open, onOpenChange, campaign, onSave }: CampaignFo
     } else {
       form.reset({ titulo: "", assunto: "", conteudo: "", status: "rascunho" });
     }
-  }, [campaign, open]);
+  }, [campaign, open, form]);
 
   const onSubmit = (values: CampaignFormValues) => {
     const today = new Date();

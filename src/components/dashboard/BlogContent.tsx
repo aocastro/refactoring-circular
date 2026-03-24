@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { BookOpen, Tag, Plus, Eye, Edit, Trash2 } from "lucide-react";
-import PaginationControls, { usePagination } from "@/components/shared/PaginationControls";
+import PaginationControls from "@/components/shared/PaginationControls";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -184,7 +184,7 @@ const BlogContent = ({ defaultTab = "posts" }: Props) => {
               <Button size="sm" onClick={() => { resetPostForm(); setPostDialog(true); }}><Plus className="mr-2 h-4 w-4" />Novo Post</Button>
             </div>
             {(() => {
-              const { paginatedItems, totalPages, safePage, totalItems } = usePagination(postsList, postsPerPage, postsPage);
+
               return (
                 <>
                   <div className="overflow-hidden rounded-xl border border-border bg-card">
