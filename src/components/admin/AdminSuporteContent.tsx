@@ -1,69 +1,16 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { MessageSquare, Clock, CheckCircle, AlertCircle, User, Store, ChevronDown, ChevronUp, Send } from "lucide-react";
+import { MessageSquare, Clock, CheckCircle, AlertCircle, User, Store, ChevronDown, ChevronUp, Send, Users, ShieldAlert, BarChart3, TrendingUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import FilterToolbar from "@/components/shared/FilterToolbar";
 import DataTable from "@/components/shared/DataTable";
+import KpiCard from "@/components/shared/KpiCard";
 import { toast } from "sonner";
-
-type TicketStatus = "aberto" | "em_andamento" | "resolvido";
-type TicketPriority = "baixa" | "média" | "alta" | "urgente";
-
-interface Ticket {
-  id: number;
-  subject: string;
-  store: string;
-  owner: string;
-  status: TicketStatus;
-  priority: TicketPriority;
-  createdAt: string;
-  lastUpdate: string;
-  messages: { from: string; role: "lojista" | "admin"; text: string; time: string }[];
-}
-
-const initialTickets: Ticket[] = [
-  {
-    id: 1001, subject: "Problema com integração de pagamento", store: "Fashion Store", owner: "Maria Silva",
-    status: "aberto", priority: "alta", createdAt: "Hoje, 13:40", lastUpdate: "Hoje, 13:40",
-    messages: [
-      { from: "Maria Silva", role: "lojista", text: "Ao tentar processar pagamentos via PIX, o sistema retorna erro 500. Já tentei limpar cache.", time: "13:40" },
-    ],
-  },
-  {
-    id: 1002, subject: "Solicitação de upgrade de plano", store: "Vintage Corner", owner: "João Santos",
-    status: "em_andamento", priority: "média", createdAt: "Ontem, 10:00", lastUpdate: "Hoje, 09:15",
-    messages: [
-      { from: "João Santos", role: "lojista", text: "Gostaria de migrar do Essential para o Growth. Como funciona a cobrança proporcional?", time: "10:00" },
-      { from: "Admin Master", role: "admin", text: "Olá João! A migração é proporcional ao período restante. Vou calcular o valor e enviar a proposta.", time: "09:15" },
-    ],
-  },
-  {
-    id: 1003, subject: "Relatório ESG não carrega", store: "Eco Brechó", owner: "Ana Paula",
-    status: "resolvido", priority: "baixa", createdAt: "22/12, 08:30", lastUpdate: "22/12, 14:00",
-    messages: [
-      { from: "Ana Paula", role: "lojista", text: "A página de relatórios ESG fica em loading infinito.", time: "08:30" },
-      { from: "Admin Master", role: "admin", text: "Identificamos o problema. Era um timeout no cálculo de CO₂. Já foi corrigido.", time: "14:00" },
-    ],
-  },
-  {
-    id: 1004, subject: "Dúvida sobre funcionalidade SmartLock", store: "Reuse & Style", owner: "Carlos Lima",
-    status: "aberto", priority: "média", createdAt: "Hoje, 11:20", lastUpdate: "Hoje, 11:20",
-    messages: [
-      { from: "Carlos Lima", role: "lojista", text: "Como configurar o SmartLock para reservas automáticas com prazo de 48h?", time: "11:20" },
-    ],
-  },
-  {
-    id: 1005, subject: "Erro ao importar produtos em massa", store: "Brechó da Vila", owner: "Roberto Dias",
-    status: "em_andamento", priority: "urgente", createdAt: "Ontem, 16:00", lastUpdate: "Hoje, 08:30",
-    messages: [
-      { from: "Roberto Dias", role: "lojista", text: "Upload de CSV com 500 produtos falha na linha 234. Erro de formato.", time: "16:00" },
-      { from: "Admin Master", role: "admin", text: "Roberto, verificamos que o campo 'preço' na linha 234 tem vírgula ao invés de ponto. Pode corrigir e tentar novamente?", time: "08:30" },
-    ],
-  },
-];
+import { mockTickets, adminSuporteKpis, adminTicketsVolume, adminTicketsByCategory, type Ticket, type TicketStatus, type TicketPriority } from "@/data/suporte";
 
 const statusConfig: Record<TicketStatus, { label: string; variant: "default" | "secondary" | "outline"; icon: React.ReactNode }> = {
   aberto: { label: "Aberto", variant: "default", icon: <AlertCircle className="h-3.5 w-3.5" /> },
@@ -87,7 +34,7 @@ const columns = [
 ];
 
 const AdminSuporteContent = () => {
-  const [tickets, setTickets] = useState<Ticket[]>(initialTickets);
+  const [tickets, setTickets] = useState<Ticket[]>(mockTickets);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("Todos");
   const [expandedId, setExpandedId] = useState<number | null>(null);
@@ -130,13 +77,53 @@ const AdminSuporteContent = () => {
       <header className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h2 className="font-display text-2xl font-bold text-foreground">Suporte / Tickets</h2>
-          <p className="text-sm text-muted-foreground">Gerencie solicitações dos lojistas</p>
+          <p className="text-sm text-muted-foreground">Gerencie solicitações dos lojistas e acompanhe métricas de atendimento</p>
         </div>
         <div className="flex gap-2">
-          <Badge variant="default">{openCount} abertos</Badge>
+          <Badge variant="default">{openCount} abertos agora</Badge>
           <Badge variant="secondary">{inProgressCount} em andamento</Badge>
         </div>
       </header>
+
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <KpiCard label="Novos Hoje" value={adminSuporteKpis.novosHoje} icon={AlertCircle} delay={0.1} />
+        <KpiCard label="Resolvidos Hoje" value={adminSuporteKpis.resolvidosHoje} icon={CheckCircle} delay={0.2} positive={true} />
+        <KpiCard label="Tempo Médio" value={adminSuporteKpis.tempoMedioResposta} icon={Clock} delay={0.3} />
+        <KpiCard label="Satisfação" value={adminSuporteKpis.satisfacao} icon={TrendingUp} delay={0.4} positive={true} />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader><CardTitle className="text-base font-semibold">Volume de Tickets (7 dias)</CardTitle></CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={adminTicketsVolume}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                <XAxis dataKey="day" axisLine={false} tickLine={false} fontSize={12} stroke="hsl(var(--muted-foreground))" />
+                <YAxis axisLine={false} tickLine={false} fontSize={12} stroke="hsl(var(--muted-foreground))" />
+                <RechartsTooltip cursor={{ fill: "hsl(var(--muted))" }} contentStyle={{ borderRadius: "8px", border: "1px solid hsl(var(--border))", background: "hsl(var(--background))" }} />
+                <Bar dataKey="tickets" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader><CardTitle className="text-base font-semibold">Tickets por Categoria</CardTitle></CardHeader>
+          <CardContent className="flex justify-center">
+            <ResponsiveContainer width="100%" height={250}>
+              <PieChart>
+                <Pie data={adminTicketsByCategory} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`} labelLine={false} stroke="hsl(var(--background))" strokeWidth={2}>
+                  {adminTicketsByCategory.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <RechartsTooltip contentStyle={{ borderRadius: "8px", border: "1px solid hsl(var(--border))", background: "hsl(var(--background))" }} />
+              </PieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
 
       <FilterToolbar
         search={search}
@@ -160,7 +147,7 @@ const AdminSuporteContent = () => {
 
             return (
               <React.Fragment key={ticket.id}>
-                <tr>
+              <tr className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <MessageSquare className="h-4 w-4 text-primary shrink-0" />
