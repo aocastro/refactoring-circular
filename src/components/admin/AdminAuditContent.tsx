@@ -4,6 +4,7 @@ import { FileText, Shield, Store, CreditCard, Users, Settings } from "lucide-rea
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import FilterToolbar from "@/components/shared/FilterToolbar";
+import DataTable from "@/components/shared/DataTable";
 
 interface AuditLog {
   id: number;
@@ -45,6 +46,14 @@ const categoryLabel: Record<string, string> = {
   financial: "Financeiro",
 };
 
+const columns = [
+  { key: "action", label: "Ação" },
+  { key: "actor", label: "Autor / Alvo", hideOn: "sm" as const },
+  { key: "details", label: "Detalhes", hideOn: "md" as const },
+  { key: "timestamp", label: "Data/Hora" },
+  { key: "ip", label: "IP", align: "right" as const, hideOn: "lg" as const },
+];
+
 const AdminAuditContent = () => {
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("Todos");
@@ -83,41 +92,40 @@ const AdminAuditContent = () => {
         }]}
       />
 
-      <div className="space-y-3">
-        {filtered.map((log, i) => (
-          <motion.div
-            key={log.id}
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: i * 0.03 }}
-          >
-            <Card>
-              <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-start gap-3">
-                  <div className="mt-0.5 shrink-0">{categoryIcon[log.category]}</div>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+        <DataTable
+          columns={columns}
+          data={filtered}
+          emptyMessage="Nenhum registro encontrado."
+          renderRow={(log: AuditLog) => (
+            <>
+              <td className="px-4 py-3">
+                <div className="flex items-center gap-3">
+                  <div className="shrink-0">{categoryIcon[log.category]}</div>
                   <div className="min-w-0 space-y-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="text-sm font-semibold text-foreground">{log.action}</span>
                       <Badge variant="outline" className="text-[10px]">{categoryLabel[log.category]}</Badge>
                     </div>
-                    <p className="text-xs text-muted-foreground">
-                      <span className="font-medium text-foreground">{log.actor}</span> → {log.target}
-                    </p>
-                    <p className="text-xs text-muted-foreground">{log.details}</p>
                   </div>
                 </div>
-                <div className="shrink-0 text-right">
-                  <p className="text-xs text-muted-foreground">{log.timestamp}</p>
-                  <p className="font-mono text-[10px] text-muted-foreground">{log.ip}</p>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
-        {filtered.length === 0 && (
-          <p className="py-8 text-center text-muted-foreground">Nenhum registro encontrado.</p>
-        )}
-      </div>
+              </td>
+              <td className="hidden px-4 py-3 text-sm text-muted-foreground sm:table-cell">
+                <span className="font-medium text-foreground">{log.actor}</span> → {log.target}
+              </td>
+              <td className="hidden px-4 py-3 text-sm text-muted-foreground md:table-cell">
+                {log.details}
+              </td>
+              <td className="px-4 py-3 text-sm text-muted-foreground">
+                {log.timestamp}
+              </td>
+              <td className="hidden px-4 py-3 text-right font-mono text-[10px] text-muted-foreground lg:table-cell">
+                {log.ip}
+              </td>
+            </>
+          )}
+        />
+      </motion.div>
     </div>
   );
 };

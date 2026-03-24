@@ -15,7 +15,7 @@ import {
 } from "recharts";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import KpiCard from "@/components/shared/KpiCard";
-import { dashboardKpisByPeriod, revenueData, salesByCategory, recentSales, abcData, type DashboardPeriod } from "@/data/dashboard";
+import { dashboardKpisByPeriod, revenueData, salesByCategory, recentSales, abcProductsData, type DashboardPeriod } from "@/data/dashboard";
 import { chartTooltipStyle, chartGridStroke, chartAxisStroke, chartAxisFontSize, chartColors } from "@/lib/chart-config";
 
 interface DashboardContentProps {
@@ -138,18 +138,18 @@ const DashboardContent = ({ onSectionChange }: DashboardContentProps) => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 p-6 rounded-xl border border-border bg-card">
-          <h3 className="text-sm font-semibold text-foreground mb-4">Curva ABC por Subcategoria (Análise de Receita)</h3>
+          <h3 className="text-sm font-semibold text-foreground mb-4">Curva ABC por Produto (Análise de Receita)</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={abcData} layout="vertical" margin={{ left: 20, right: 20 }}>
+            <BarChart data={abcProductsData} layout="vertical" margin={{ left: 20, right: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke={chartGridStroke} horizontal={false} />
               <XAxis type="number" stroke={chartAxisStroke} fontSize={chartAxisFontSize} unit="%" hide />
-              <YAxis dataKey="subcategory" type="category" stroke={chartAxisStroke} fontSize={chartAxisFontSize} width={100} axisLine={false} tickLine={false} />
+              <YAxis dataKey="product" type="category" stroke={chartAxisStroke} fontSize={chartAxisFontSize} width={120} axisLine={false} tickLine={false} />
               <Tooltip 
                 contentStyle={chartTooltipStyle} 
-                formatter={(value: number) => [`${value}% da Receita`, "Participação"]}
+                formatter={(value: number, _name: string, props: { payload: { revenue: number } }) => [`${value}% (R$ ${props.payload.revenue.toLocaleString('pt-BR')})`, "Participação"]}
               />
               <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={20}>
-                {abcData.map((entry, index) => (
+                {abcProductsData.map((entry, index) => (
                   <Cell 
                     key={`cell-${index}`} 
                     fill={entry.category === 'A' ? chartColors.primary : entry.category === 'B' ? chartColors.accent : '#94a3b8'} 
@@ -169,14 +169,14 @@ const DashboardContent = ({ onSectionChange }: DashboardContentProps) => {
           <h3 className="text-sm font-semibold text-foreground mb-4">Destaques da Curva</h3>
           <div className="space-y-4">
             <div className="p-3 rounded-lg bg-primary/5 border border-primary/10">
-              <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-1">Top Subcategoria</p>
-              <p className="text-lg font-bold text-foreground">{abcData[0].subcategory}</p>
-              <p className="text-xs text-success font-medium">Responsável por {abcData[0].value}% da sua receita total.</p>
+              <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-1">Top Produto</p>
+              <p className="text-lg font-bold text-foreground leading-tight">{abcProductsData[0].product}</p>
+              <p className="text-xs text-success font-medium mt-1">Responsável por {abcProductsData[0].value}% da sua receita total.</p>
             </div>
             <div className="space-y-2">
               <p className="text-xs text-muted-foreground font-medium">Otimização Sugerida:</p>
               <ul className="text-xs text-foreground space-y-1.5 list-disc pl-4">
-                <li>Aumentar estoque de <strong>{abcData[0].subcategory}</strong> e {abcData[1].subcategory}.</li>
+                <li>Aumentar estoque de <strong>{abcProductsData[0].product}</strong> e {abcProductsData[1].product}.</li>
                 <li>Fazer liquidação de itens na Classe C para liberar espaço.</li>
                 <li>Reavaliar margens de produtos na Classe B.</li>
               </ul>

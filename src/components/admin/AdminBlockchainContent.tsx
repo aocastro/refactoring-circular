@@ -2,7 +2,8 @@ import { motion } from "framer-motion";
 import { Link2, Hash, Shield, Store, ArrowUpRight, CheckCircle, Clock, XCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { blockchainStats, blockchainTransactions } from "@/data/admin";
+import { blockchainStats, blockchainTransactions, type BlockchainTransaction } from "@/data/admin";
+import DataTable from "@/components/shared/DataTable";
 
 const kpis = [
   { label: "Tokens Emitidos", value: blockchainStats.totalTokens.toLocaleString("pt-BR"), icon: Hash, change: "+342 este mês" },
@@ -18,6 +19,14 @@ const statusConfig: Record<string, { icon: React.ReactNode; variant: "default" |
 };
 
 const typeLabel: Record<string, string> = { mint: "Mint", transfer: "Transferência", verify: "Verificação" };
+
+const columns = [
+  { key: "type", label: "Tipo / Descrição" },
+  { key: "hash", label: "Hash", hideOn: "md" as const },
+  { key: "store", label: "Loja", hideOn: "sm" as const },
+  { key: "timestamp", label: "Data/Hora", hideOn: "sm" as const },
+  { key: "status", label: "Status" },
+];
 
 const AdminBlockchainContent = () => (
   <div className="space-y-6">
@@ -47,35 +56,43 @@ const AdminBlockchainContent = () => (
       ))}
     </div>
 
-    <Card>
-      <CardHeader><CardTitle className="text-base">Transações Recentes</CardTitle></CardHeader>
-      <CardContent>
-        <div className="space-y-3">
-          {blockchainTransactions.map((tx, i) => {
-            const cfg = statusConfig[tx.status];
-            return (
-              <motion.div key={tx.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
-                className="flex flex-col gap-2 rounded-lg border border-border p-4 sm:flex-row sm:items-center sm:justify-between">
-                <div className="min-w-0 flex-1 space-y-1">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+      <DataTable
+        columns={columns}
+        data={blockchainTransactions}
+        emptyMessage="Nenhuma transação encontrada."
+        header={<h3 className="text-base font-semibold text-foreground">Transações Recentes</h3>}
+        renderRow={(tx: BlockchainTransaction) => {
+          const cfg = statusConfig[tx.status];
+          return (
+            <>
+              <td className="px-4 py-3">
+                <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <Badge variant="outline" className="text-xs">{typeLabel[tx.type]}</Badge>
                     <span className="text-sm font-medium text-foreground">{tx.description}</span>
                   </div>
-                  <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
-                    <span>Hash: <code className="font-mono">{tx.hash}</code></span>
-                    <span>Loja: {tx.store}</span>
-                    <span>{tx.timestamp}</span>
-                  </div>
                 </div>
-                <Badge variant={cfg.variant} className="flex items-center gap-1 self-start">
+              </td>
+              <td className="hidden px-4 py-3 text-sm text-muted-foreground md:table-cell">
+                <code className="font-mono">{tx.hash}</code>
+              </td>
+              <td className="hidden px-4 py-3 text-sm text-muted-foreground sm:table-cell">
+                {tx.store}
+              </td>
+              <td className="hidden px-4 py-3 text-sm text-muted-foreground sm:table-cell">
+                {tx.timestamp}
+              </td>
+              <td className="px-4 py-3">
+                <Badge variant={cfg.variant} className="flex w-fit items-center gap-1">
                   {cfg.icon}{tx.status}
                 </Badge>
-              </motion.div>
-            );
-          })}
-        </div>
-      </CardContent>
-    </Card>
+              </td>
+            </>
+          );
+        }}
+      />
+    </motion.div>
   </div>
 );
 

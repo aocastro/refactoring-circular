@@ -168,3 +168,41 @@ export const blockchainTransactions: BlockchainTransaction[] = [
   { id: "TX-004", type: "mint", description: "NFT de rastreabilidade — Coleção Eco", hash: "0x9t0u1v...w2x3y4", timestamp: "Ontem, 10:20", status: "confirmado", store: "Reuse & Style" },
   { id: "TX-005", type: "verify", description: "Selo de sustentabilidade — Lote #45", hash: "0x5z6a7b...c8d9e0", timestamp: "22/12, 14:00", status: "falhou", store: "GreenWear" },
 ];
+
+// ─── NPS ────────────────────────────────────────
+
+export interface NPSResponse {
+  id: number;
+  score: number;
+  comment: string;
+  user: string;
+  store: string;
+  date: string;
+  status: "novo" | "analisado" | "contatado";
+}
+
+export const adminNpsStats = {
+  score: 68,
+  totalResponses: 124,
+  promoters: 75, // 60%
+  passives: 35, // 28%
+  detractors: 14, // 11%
+};
+
+export const adminNpsHistory = [
+  { month: "Jul", score: 55 },
+  { month: "Ago", score: 58 },
+  { month: "Set", score: 62 },
+  { month: "Out", score: 65 },
+  { month: "Nov", score: 67 },
+  { month: "Dez", score: 68 },
+];
+
+export const adminNpsResponses: NPSResponse[] = [
+  { id: 1, score: 10, comment: "Plataforma excelente, o PDV e o SmartLock mudaram meu negócio.", user: "Carlos Lima", store: "Reuse & Style", date: "Hoje, 10:30", status: "novo" },
+  { id: 2, score: 9, comment: "Muito boa, só queria mais relatórios na versão Essential.", user: "João Santos", store: "Vintage Corner", date: "Ontem, 15:20", status: "novo" },
+  { id: 3, score: 6, comment: "Funciona, mas às vezes o sistema fica lento na hora do checkout.", user: "Maria Silva", store: "Fashion Store", date: "Ontem, 11:45", status: "analisado" },
+  { id: 4, score: 3, comment: "Faltam integrações e o suporte demora a responder.", user: "Fernanda Alves", store: "Second Hand SP", date: "22/12, 09:15", status: "contatado" },
+  { id: 5, score: 10, comment: "Gosto muito do relatório de ESG, me ajuda a vender mais.", user: "Ana Paula", store: "Eco Brechó", date: "21/12, 14:00", status: "analisado" },
+  { id: 6, score: 8, comment: "Atende bem, mas tem curva de aprendizado.", user: "Roberto Dias", store: "Brechó da Vila", date: "20/12, 16:30", status: "analisado" },
+];
