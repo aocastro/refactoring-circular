@@ -19,6 +19,24 @@ export const adminMrrHistory = [
   { month: "Dez", value: 48750 },
 ];
 
+// ─── Churn & LTV ────────────────────────────────
+export const adminChurnHistory = [
+  { month: "Jul", churn: 4.8, newStores: 18, cancelled: 9 },
+  { month: "Ago", churn: 4.2, newStores: 22, cancelled: 8 },
+  { month: "Set", churn: 3.9, newStores: 20, cancelled: 7 },
+  { month: "Out", churn: 3.6, newStores: 25, cancelled: 8 },
+  { month: "Nov", churn: 3.5, newStores: 19, cancelled: 6 },
+  { month: "Dez", churn: 3.2, newStores: 14, cancelled: 5 },
+];
+
+export const adminLtvByPlan = [
+  { plan: "Starter", ltv: 588, avgMonths: 12, color: "hsl(var(--chart-1))" },
+  { plan: "Essential", ltv: 1584, avgMonths: 16, color: "hsl(var(--chart-2))" },
+  { plan: "Growth", ltv: 4776, avgMonths: 24, color: "hsl(var(--chart-3))" },
+  { plan: "Scale", ltv: 11172, avgMonths: 28, color: "hsl(var(--chart-4))" },
+  { plan: "Executive", ltv: 27972, avgMonths: 35, color: "hsl(var(--chart-5))" },
+];
+
 // ─── Planos ─────────────────────────────────────
 export interface AdminPlan {
   id: number;

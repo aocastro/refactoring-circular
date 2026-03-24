@@ -57,7 +57,8 @@ const App = () => (
                   <Route path="/checkout" element={<Checkout />} />
                   <Route path="/criar-loja" element={<CriarLoja />} />
                   <Route path="/pdv/:id" element={<PDVPage />} />
-                  <Route path="/admin" element={<Admin />} />
+                  <Route path="/admin" element={<AdminLogin />} />
+                  <Route path="/admin/painel" element={<Admin />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>
