@@ -4,7 +4,6 @@ import { MessageSquare, Clock, CheckCircle, AlertCircle, User, Store, ChevronDow
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import FilterToolbar from "@/components/shared/FilterToolbar";
 import { toast } from "sonner";
