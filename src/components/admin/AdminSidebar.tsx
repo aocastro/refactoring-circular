@@ -32,6 +32,8 @@ const menuItems = [
   { id: "usuarios", title: "Usuários", icon: Users },
   { id: "esg", title: "Impacto Ambiental", icon: Leaf },
   { id: "blockchain", title: "Blockchain", icon: Link2 },
+  { id: "auditoria", title: "Auditoria", icon: FileText },
+  { id: "suporte", title: "Suporte", icon: MessageSquare },
 ];
 
 interface AdminSidebarProps {

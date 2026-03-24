@@ -10,6 +10,8 @@ import AdminFinanceiroContent from "@/components/admin/AdminFinanceiroContent";
 import AdminUsuariosContent from "@/components/admin/AdminUsuariosContent";
 import AdminESGContent from "@/components/admin/AdminESGContent";
 import AdminBlockchainContent from "@/components/admin/AdminBlockchainContent";
+import AdminAuditContent from "@/components/admin/AdminAuditContent";
+import AdminSuporteContent from "@/components/admin/AdminSuporteContent";
 
 const sectionComponents: Record<string, React.FC> = {
   dashboard: AdminDashboardContent,
@@ -19,6 +21,8 @@ const sectionComponents: Record<string, React.FC> = {
   usuarios: AdminUsuariosContent,
   esg: AdminESGContent,
   blockchain: AdminBlockchainContent,
+  auditoria: AdminAuditContent,
+  suporte: AdminSuporteContent,
 };
 
 const Admin = () => {
