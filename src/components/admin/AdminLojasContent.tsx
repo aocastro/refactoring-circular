@@ -57,7 +57,7 @@ const AdminLojasContent = () => {
           data={filtered}
           emptyMessage="Nenhuma loja encontrada."
           renderRow={(store: AdminStore) => (
-            <>
+            <tr key={store.id} className="border-b border-border/50 last:border-0 hover:bg-muted/30">
               <td className="px-4 py-3 text-sm text-foreground">{store.name}</td>
               <td className="hidden px-4 py-3 text-sm text-muted-foreground sm:table-cell">{store.owner}</td>
               <td className="px-4 py-3 text-sm"><Badge variant="outline">{store.plan}</Badge></td>
@@ -73,7 +73,7 @@ const AdminLojasContent = () => {
                   {store.status === "ativa" && <Button size="sm" variant="destructive" onClick={() => toast.success(`${store.name} suspensa`)}>Suspender</Button>}
                 </div>
               </td>
-            </>
+            </tr>
           )}
         />
       </motion.div>

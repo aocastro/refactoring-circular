@@ -134,7 +134,7 @@ const AdminNPSContent = () => {
             data={filtered}
             emptyMessage="Nenhuma resposta encontrada."
             renderRow={(r: NPSResponse) => (
-              <>
+              <tr key={r.id} className="border-b border-border/50 last:border-0 hover:bg-muted/30">
                 <td className="px-4 py-3 text-center">
                   <span className={`inline-flex h-8 w-8 items-center justify-center rounded-full border text-sm font-bold ${getScoreColor(r.score)}`}>
                     {r.score}
@@ -174,7 +174,7 @@ const AdminNPSContent = () => {
                     )}
                   </div>
                 </td>
-              </>
+              </tr>
             )}
           />
         </motion.div>

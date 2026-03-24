@@ -98,7 +98,7 @@ const AdminAuditContent = () => {
           data={filtered}
           emptyMessage="Nenhum registro encontrado."
           renderRow={(log: AuditLog) => (
-            <>
+            <tr key={log.id} className="border-b border-border/50 last:border-0 hover:bg-muted/30">
               <td className="px-4 py-3">
                 <div className="flex items-center gap-3">
                   <div className="shrink-0">{categoryIcon[log.category]}</div>
@@ -122,7 +122,7 @@ const AdminAuditContent = () => {
               <td className="hidden px-4 py-3 text-right font-mono text-[10px] text-muted-foreground lg:table-cell">
                 {log.ip}
               </td>
-            </>
+            </tr>
           )}
         />
       </motion.div>

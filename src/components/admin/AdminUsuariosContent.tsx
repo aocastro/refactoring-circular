@@ -63,7 +63,7 @@ const AdminUsuariosContent = () => {
           data={filtered}
           emptyMessage="Nenhum usuário encontrado."
           renderRow={(user: AdminUser) => (
-            <>
+            <tr key={user.id} className="border-b border-border/50 last:border-0 hover:bg-muted/30">
               <td className="px-4 py-3 text-sm font-medium text-foreground">{user.name}</td>
               <td className="hidden px-4 py-3 text-sm text-muted-foreground sm:table-cell">{user.email}</td>
               <td className="px-4 py-3 text-sm">
@@ -79,7 +79,7 @@ const AdminUsuariosContent = () => {
                   <Button size="sm" variant="destructive" onClick={() => toast.success(`${user.name} bloqueado`)}>Bloquear</Button>
                 ) : null}
               </td>
-            </>
+            </tr>
           )}
         />
       </motion.div>
