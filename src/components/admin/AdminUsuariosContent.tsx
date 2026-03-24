@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import FilterToolbar from "@/components/shared/FilterToolbar";
 import DataTable from "@/components/shared/DataTable";
 import { adminUsers, type AdminUser } from "@/data/admin";
-import type { TableColumn } from "@/types";
 import { toast } from "sonner";
 
 const roleIcon: Record<string, React.ReactNode> = {
@@ -21,22 +20,14 @@ const statusVariant: Record<string, "default" | "secondary" | "destructive"> = {
   bloqueado: "destructive",
 };
 
-const columns: TableColumn<AdminUser>[] = [
+const columns = [
   { key: "name", label: "Nome" },
-  { key: "email", label: "E-mail", hideOn: "sm" },
-  { key: "role", label: "Tipo", render: (r) => <span className="flex items-center gap-1.5 capitalize">{roleIcon[r.role]}{r.role}</span> },
-  { key: "stores", label: "Lojas", align: "right", hideOn: "md" },
-  { key: "lastLogin", label: "Último acesso", hideOn: "md" },
-  { key: "status", label: "Status", render: (r) => <Badge variant={statusVariant[r.status]}>{r.status}</Badge> },
-  { key: "actions", label: "", render: (r) => (
-    <div className="flex gap-1">
-      {r.status === "bloqueado" ? (
-        <Button size="sm" variant="outline" onClick={() => toast.success(`${r.name} desbloqueado`)}>Desbloquear</Button>
-      ) : r.role !== "admin" ? (
-        <Button size="sm" variant="destructive" onClick={() => toast.success(`${r.name} bloqueado`)}>Bloquear</Button>
-      ) : null}
-    </div>
-  )},
+  { key: "email", label: "E-mail", hideOn: "sm" as const },
+  { key: "role", label: "Tipo" },
+  { key: "stores", label: "Lojas", align: "right" as const, hideOn: "md" as const },
+  { key: "lastLogin", label: "Último acesso", hideOn: "md" as const },
+  { key: "status", label: "Status" },
+  { key: "actions", label: "" },
 ];
 
 const AdminUsuariosContent = () => {
@@ -67,7 +58,30 @@ const AdminUsuariosContent = () => {
       />
 
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-        <DataTable columns={columns} data={filtered} emptyMessage="Nenhum usuário encontrado." />
+        <DataTable
+          columns={columns}
+          data={filtered}
+          emptyMessage="Nenhum usuário encontrado."
+          renderRow={(user: AdminUser) => (
+            <>
+              <td className="px-4 py-3 text-sm font-medium text-foreground">{user.name}</td>
+              <td className="hidden px-4 py-3 text-sm text-muted-foreground sm:table-cell">{user.email}</td>
+              <td className="px-4 py-3 text-sm">
+                <span className="flex items-center gap-1.5 capitalize">{roleIcon[user.role]}{user.role}</span>
+              </td>
+              <td className="hidden px-4 py-3 text-right text-sm text-muted-foreground md:table-cell">{user.stores}</td>
+              <td className="hidden px-4 py-3 text-sm text-muted-foreground md:table-cell">{user.lastLogin}</td>
+              <td className="px-4 py-3"><Badge variant={statusVariant[user.status]}>{user.status}</Badge></td>
+              <td className="px-4 py-3">
+                {user.status === "bloqueado" ? (
+                  <Button size="sm" variant="outline" onClick={() => toast.success(`${user.name} desbloqueado`)}>Desbloquear</Button>
+                ) : user.role !== "admin" ? (
+                  <Button size="sm" variant="destructive" onClick={() => toast.success(`${user.name} bloqueado`)}>Bloquear</Button>
+                ) : null}
+              </td>
+            </>
+          )}
+        />
       </motion.div>
     </div>
   );

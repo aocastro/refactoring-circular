@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import FilterToolbar from "@/components/shared/FilterToolbar";
 import DataTable from "@/components/shared/DataTable";
 import { adminStores, type AdminStore } from "@/data/admin";
-import type { TableColumn } from "@/types";
 import { toast } from "sonner";
 
 const statusIcon: Record<string, React.ReactNode> = {
@@ -15,22 +14,14 @@ const statusIcon: Record<string, React.ReactNode> = {
   pendente: <Clock className="h-3.5 w-3.5 text-yellow-500" />,
 };
 
-const columns: TableColumn<AdminStore>[] = [
+const columns = [
   { key: "name", label: "Loja" },
-  { key: "owner", label: "Proprietário", hideOn: "sm" },
+  { key: "owner", label: "Proprietário", hideOn: "sm" as const },
   { key: "plan", label: "Plano" },
-  { key: "products", label: "Produtos", align: "right", hideOn: "md" },
-  { key: "revenue", label: "Receita", align: "right", render: (r) => `R$ ${r.revenue.toLocaleString("pt-BR")}` },
-  { key: "status", label: "Status", render: (r) => (
-    <span className="flex items-center gap-1.5 capitalize">{statusIcon[r.status]}{r.status}</span>
-  )},
-  { key: "actions", label: "", render: (r) => (
-    <div className="flex gap-1">
-      <Button variant="ghost" size="sm" aria-label={`Ver loja ${r.name}`}><Eye className="h-4 w-4" /></Button>
-      {r.status === "pendente" && <Button size="sm" variant="outline" onClick={() => toast.success(`${r.name} aprovada`)}>Aprovar</Button>}
-      {r.status === "ativa" && <Button size="sm" variant="destructive" onClick={() => toast.success(`${r.name} suspensa`)}>Suspender</Button>}
-    </div>
-  )},
+  { key: "products", label: "Produtos", align: "right" as const, hideOn: "md" as const },
+  { key: "revenue", label: "Receita", align: "right" as const },
+  { key: "status", label: "Status" },
+  { key: "actions", label: "" },
 ];
 
 const AdminLojasContent = () => {
@@ -61,7 +52,30 @@ const AdminLojasContent = () => {
       />
 
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-        <DataTable columns={columns} data={filtered} emptyMessage="Nenhuma loja encontrada." />
+        <DataTable
+          columns={columns}
+          data={filtered}
+          emptyMessage="Nenhuma loja encontrada."
+          renderRow={(store: AdminStore) => (
+            <>
+              <td className="px-4 py-3 text-sm text-foreground">{store.name}</td>
+              <td className="hidden px-4 py-3 text-sm text-muted-foreground sm:table-cell">{store.owner}</td>
+              <td className="px-4 py-3 text-sm"><Badge variant="outline">{store.plan}</Badge></td>
+              <td className="hidden px-4 py-3 text-right text-sm text-muted-foreground md:table-cell">{store.products}</td>
+              <td className="px-4 py-3 text-right text-sm font-medium text-foreground">R$ {store.revenue.toLocaleString("pt-BR")}</td>
+              <td className="px-4 py-3 text-sm">
+                <span className="flex items-center gap-1.5 capitalize">{statusIcon[store.status]}{store.status}</span>
+              </td>
+              <td className="px-4 py-3">
+                <div className="flex gap-1">
+                  <Button variant="ghost" size="sm" aria-label={`Ver loja ${store.name}`}><Eye className="h-4 w-4" /></Button>
+                  {store.status === "pendente" && <Button size="sm" variant="outline" onClick={() => toast.success(`${store.name} aprovada`)}>Aprovar</Button>}
+                  {store.status === "ativa" && <Button size="sm" variant="destructive" onClick={() => toast.success(`${store.name} suspensa`)}>Suspender</Button>}
+                </div>
+              </td>
+            </>
+          )}
+        />
       </motion.div>
     </div>
   );

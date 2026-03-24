@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Link2, Hash, Shield, Store, ArrowUpRight, CheckCircle, Clock, XCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { blockchainStats, blockchainTransactions, type BlockchainTransaction } from "@/data/admin";
+import { blockchainStats, blockchainTransactions } from "@/data/admin";
 
 const kpis = [
   { label: "Tokens Emitidos", value: blockchainStats.totalTokens.toLocaleString("pt-BR"), icon: Hash, change: "+342 este mês" },
