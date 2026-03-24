@@ -76,6 +76,7 @@ const menuItems: MenuItem[] = [
   { id: "blog", title: "Blog", icon: BookOpen },
   { id: "meu-linktree", title: "Meu Linktree", icon: Link2 },
   { id: "lojas", title: "Lojas", icon: Building2 },
+  { id: "suporte", title: "Suporte / Tickets", icon: Ticket },
 ];
 
 interface DashboardSidebarProps {
