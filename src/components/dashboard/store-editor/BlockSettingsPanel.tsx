@@ -160,12 +160,12 @@ const BlockSettingsPanel = ({ block, onUpdate, onClose }: Props) => {
               <div className="flex gap-2">
                 <input
                   type="color"
-                  value={(block.styles as any)[key]}
+                  value={(block.styles as Record<string, string>)[key]}
                   onChange={(e) => updateStyle(key, e.target.value)}
                   className="h-9 w-10 cursor-pointer rounded border border-border"
                 />
                 <Input
-                  value={(block.styles as any)[key]}
+                  value={(block.styles as Record<string, string>)[key]}
                   onChange={(e) => updateStyle(key, e.target.value)}
                   className="flex-1 border-border bg-secondary text-xs"
                 />

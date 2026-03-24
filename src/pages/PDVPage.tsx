@@ -102,13 +102,13 @@ const PDVPage = () => {
     setCart((prev) => prev.map((i) => i.id === id ? { ...i, quantity: qty } : i));
   }, []);
 
-  const startPayment = () => {
+  const startPayment = useCallback(() => {
     if (cart.length === 0) return;
     setPayments([]);
     setSplitMode(false);
     setSplitAmount("");
     setPaymentStep("select");
-  };
+  }, [cart.length]);
 
   const selectMethod = (method: string) => {
     setSelectedMethod(method);
@@ -216,7 +216,7 @@ const PDVPage = () => {
   body { font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.4; margin: 0; padding: 4mm; width: 72mm; color: #000; }
   pre { margin: 0; white-space: pre-wrap; word-break: break-all; }
 </style></head><body><pre>${lines.join("\n")}</pre>
-<script>window.onload=function(){window.print();setTimeout(function(){window.close()},500);}<\/script>
+<script>window.onload=function(){window.print();setTimeout(function(){window.close()},500);}</script>
 </body></html>`);
     printWindow.document.close();
   };
@@ -257,7 +257,7 @@ const PDVPage = () => {
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [paymentStep]);
+  }, [paymentStep, startPayment]);
 
   const dayTotal = sales.reduce((a, s) => a + s.total, 0);
   
