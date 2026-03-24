@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
+import React from "react";
 import logo from "@/assets/logo.png";
-import accessibilityIcon from "@/assets/accessibility-icon.png";
+import { A11yIcon } from "@/components/icons/A11yIcon";
 import { useState } from "react";
 import { Menu, X, Sun, Moon, ZoomIn, ZoomOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -71,7 +72,7 @@ const Navbar = () => {
               aria-controls="a11y-header-panel"
               title="Acessibilidade"
             >
-              <img src={accessibilityIcon} alt="" className="h-5 w-5 object-contain" aria-hidden="true" />
+              <A11yIcon className="h-5 w-5 text-current" aria-hidden="true" />
             </button>
 
             {a11yOpen && (
@@ -80,11 +81,11 @@ const Navbar = () => {
                 role="dialog"
                 aria-label="Menu de acessibilidade"
                 aria-modal="false"
-                className="absolute top-full right-0 mt-2 w-[min(22rem,calc(100vw-2rem))] rounded-2xl border border-border bg-card/95 p-4 shadow-card backdrop-blur z-50"
+                className="absolute top-full right-0 mt-3 w-[min(22rem,calc(100vw-2rem))] rounded-2xl border border-border/50 bg-background/90 p-5 shadow-2xl backdrop-blur-xl ring-1 ring-black/5 dark:ring-white/10 z-50 animate-in fade-in zoom-in-95 duration-200"
               >
                 <div className="mb-4 flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
-                    <img src={accessibilityIcon} alt="" className="h-5 w-5 object-contain" aria-hidden="true" />
+                    <A11yIcon className="h-5 w-5 text-current" aria-hidden="true" />
                     <h2 className="font-display text-sm font-semibold text-foreground">Acessibilidade</h2>
                   </div>
                   <Button type="button" variant="ghost" size="icon" aria-label="Fechar menu" onClick={() => setA11yOpen(false)}>
@@ -137,7 +138,7 @@ const Navbar = () => {
             className="p-1.5 rounded-lg hover:bg-secondary transition-colors"
             aria-label={a11yOpen ? "Fechar menu de acessibilidade" : "Abrir menu de acessibilidade"}
           >
-            <img src={accessibilityIcon} alt="" className="h-5 w-5 object-contain" aria-hidden="true" />
+            <A11yIcon className="h-5 w-5 text-current" aria-hidden="true" />
           </button>
           <button
             onClick={toggleTheme}
@@ -160,10 +161,10 @@ const Navbar = () => {
 
       {/* Mobile a11y panel */}
       {a11yOpen && (
-        <div className="md:hidden glass border-t border-border px-4 py-4" aria-label="Menu de acessibilidade">
+        <div className="md:hidden border-t border-border/50 bg-background/90 backdrop-blur-xl px-5 py-6 shadow-2xl animate-in slide-in-from-top-4 duration-200" aria-label="Menu de acessibilidade">
           <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <img src={accessibilityIcon} alt="" className="h-5 w-5 object-contain" aria-hidden="true" />
+              <A11yIcon className="h-5 w-5 text-current" aria-hidden="true" />
               <h2 className="font-display text-sm font-semibold text-foreground">Acessibilidade</h2>
             </div>
             <Button type="button" variant="ghost" size="icon" aria-label="Fechar" onClick={() => setA11yOpen(false)}>
