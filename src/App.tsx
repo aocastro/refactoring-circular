@@ -22,6 +22,7 @@ const Checkout = lazy(() => import("./pages/Checkout"));
 const CriarLoja = lazy(() => import("./pages/CriarLoja"));
 const PDVPage = lazy(() => import("./pages/PDVPage"));
 const Admin = lazy(() => import("./pages/Admin"));
+const AdminLogin = lazy(() => import("./pages/AdminLogin"));
 
 const queryClient = new QueryClient();
 
