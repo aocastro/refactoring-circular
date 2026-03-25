@@ -6,59 +6,16 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import KpiCard from "@/components/shared/KpiCard";
 import FilterToolbar from "@/components/shared/FilterToolbar";
-import { mockProducts } from "@/data/products";
+import DataTable from "@/components/shared/DataTable";
+import PaginationControls from "@/components/shared/PaginationControls";
+import { usePagination } from "@/hooks/use-pagination";
 import { mockClientes } from "@/data/clientes";
-import { getStatusColor } from "@/lib/status-colors";
-import type { KpiItem, Product } from "@/types";
-
-type BagStatus = "Montando" | "Pronta p/ Retirada" | "Com o Cliente" | "Devolvida" | "Vendida Parcial" | "Vendida Total" | "Cancelada";
-
-interface BagItem {
-  product: Product;
-  quantity: number;
-  returned?: boolean;
-  sold?: boolean;
-}
-
-interface Bag {
-  id: number;
-  code: string;
-  customer: string;
-  customerPhone: string;
-  customerEmail: string;
-  items: BagItem[];
-  total: number;
-  status: BagStatus;
-  createdAt: string;
-  trialDays: number;
-  returnDate: string;
-  notes: string;
-}
-
-const initialBags: Bag[] = [
-  {
-    id: 1, code: "SAC-001", customer: "Ana Silva", customerPhone: "(11) 99123-4567", customerEmail: "ana@email.com",
-    items: [{ product: mockProducts[0], quantity: 1 }, { product: mockProducts[4], quantity: 1 }],
-    total: 134.9, status: "Com o Cliente", createdAt: "10/03/2026", trialDays: 3, returnDate: "13/03/2026", notes: "Cliente quer testar para evento no sábado.",
-  },
-  {
-    id: 2, code: "SAC-002", customer: "Juliana Costa", customerPhone: "(21) 99876-5432", customerEmail: "ju@email.com",
-    items: [{ product: mockProducts[2], quantity: 1 }],
-    total: 210, status: "Devolvida", createdAt: "08/03/2026", trialDays: 5, returnDate: "13/03/2026", notes: "",
-  },
-  {
-    id: 3, code: "SAC-003", customer: "Fernanda Lima", customerPhone: "(31) 99234-5678", customerEmail: "fer@email.com",
-    items: [{ product: mockProducts[1], quantity: 1 }, { product: mockProducts[6], quantity: 1 }],
-    total: 237, status: "Montando", createdAt: "12/03/2026", trialDays: 3, returnDate: "15/03/2026", notes: "Separar embalagem especial.",
-  },
-  {
-    id: 4, code: "SAC-004", customer: "Maria Oliveira", customerPhone: "(11) 97654-3210", customerEmail: "maria@email.com",
-    items: [{ product: mockProducts[3], quantity: 1, sold: true }],
-    total: 120, status: "Vendida Total", createdAt: "05/03/2026", trialDays: 5, returnDate: "10/03/2026", notes: "Cliente comprou após teste.",
-  },
-];
+import api from "@/lib/api-mock";
+import type { KpiItem, Product, Bag, BagItem, BagStatus } from "@/types";
+import { addDays, format } from "date-fns";
 
 const bagStatusColor = (s: BagStatus) => {
   const map: Record<BagStatus, string> = {
@@ -74,11 +31,16 @@ const bagStatusColor = (s: BagStatus) => {
 };
 
 const SacolinhasContent = () => {
-  const [bags, setBags] = useState(initialBags);
+  const [bags, setBags] = useState<Bag[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("Todos");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [detailBag, setDetailBag] = useState<Bag | null>(null);
+  const [returnBag, setReturnBag] = useState<Bag | null>(null);
+  const [itemActions, setItemActions] = useState<Record<number, "returned" | "sold">>({});
+  const [page, setPage] = useState(1);
+  const ITEMS_PER_PAGE = 5;
 
   // Form state
   const [customerInput, setCustomerInput] = useState("");
@@ -99,15 +61,31 @@ const SacolinhasContent = () => {
     ).slice(0, 5);
   }, [customerInput, selectedCustomer]);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [bagsRes, productsRes] = await Promise.all([
+          api.get("/sacolinhas"),
+          api.get("/products"),
+        ]);
+        setBags(bagsRes.data);
+        setProducts(productsRes.data);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      }
+    };
+    fetchData();
+  }, []);
+
   const availableProducts = useMemo(() => {
     const selectedIds = new Set(selectedProducts.map((sp) => sp.product.id));
-    const available = mockProducts.filter((p) => p.status === "Disponível" && !selectedIds.has(p.id));
+    const available = products.filter((p) => p.status === "Disponível" && !selectedIds.has(p.id));
     if (!productSearch) return available;
     return available.filter((p) =>
       p.name.toLowerCase().includes(productSearch.toLowerCase()) ||
       p.sku.toLowerCase().includes(productSearch.toLowerCase())
     );
-  }, [productSearch, selectedProducts]);
+  }, [productSearch, selectedProducts, products]);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -139,29 +117,53 @@ const SacolinhasContent = () => {
     setNotes("");
   };
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     if (!selectedCustomer || selectedProducts.length === 0) return;
     const today = new Date();
     const returnD = new Date(today);
     returnD.setDate(returnD.getDate() + parseInt(trialDays));
     const total = selectedProducts.reduce((a, b) => a + b.product.price * b.quantity, 0);
 
-    setBags((prev) => [...prev, {
-      id: Date.now(),
-      code: `SAC-${String(prev.length + 1).padStart(3, "0")}`,
-      customer: selectedCustomer.name,
-      customerPhone: selectedCustomer.phone,
-      customerEmail: selectedCustomer.email,
-      items: selectedProducts,
-      total,
-      status: "Montando",
-      createdAt: today.toLocaleDateString("pt-BR"),
-      trialDays: parseInt(trialDays),
-      returnDate: returnD.toLocaleDateString("pt-BR"),
-      notes,
-    }]);
-    resetForm();
-    setDialogOpen(false);
+    try {
+      // 1. Update each product's status to "sacolinha"
+      await Promise.all(
+        selectedProducts.map((sp) =>
+          api.put(`/products/${sp.product.id}/status`, { status: "sacolinha" })
+        )
+      );
+
+      // 2. Create the bag
+      const newBagPayload = {
+        customer: selectedCustomer.name,
+        customerPhone: selectedCustomer.phone,
+        customerEmail: selectedCustomer.email,
+        items: selectedProducts,
+        total,
+        status: "Com o Cliente", // Automatically considered active
+        createdAt: today.toLocaleDateString("pt-BR"),
+        trialDays: parseInt(trialDays),
+        returnDate: returnD.toLocaleDateString("pt-BR"),
+        notes,
+      };
+
+      const { data: createdBag } = await api.post("/sacolinhas", newBagPayload);
+      setBags((prev) => [...prev, createdBag]);
+
+      // Update local products state
+      setProducts((prev) =>
+        prev.map((p) => {
+          if (selectedProducts.some((sp) => sp.product.id === p.id)) {
+            return { ...p, status: "sacolinha" as const };
+          }
+          return p;
+        })
+      );
+
+      resetForm();
+      setDialogOpen(false);
+    } catch (err) {
+      console.error("Error creating bag", err);
+    }
   };
 
   const addProduct = (product: Product) => {
@@ -173,17 +175,33 @@ const SacolinhasContent = () => {
     setSelectedProducts((prev) => prev.filter((sp) => sp.product.id !== productId));
   };
 
-  const advanceStatus = (id: number) => {
-    const steps: BagStatus[] = ["Montando", "Pronta p/ Retirada", "Com o Cliente", "Devolvida"];
-    setBags((prev) => prev.map((b) => {
-      if (b.id !== id) return b;
-      const idx = steps.indexOf(b.status);
-      if (idx < 0 || idx >= steps.length - 1) return b;
-      return { ...b, status: steps[idx + 1] };
-    }));
+  const handleProcessReturn = async () => {
+    if (!returnBag) return;
+
+    try {
+      const itemsPayload = returnBag.items.map((i) => ({
+        productId: i.product.id,
+        action: itemActions[i.product.id] || "returned", // Default to returned if not explicitly selected
+      }));
+
+      const { data: updatedBag } = await api.post(`/sacolinhas/${returnBag.id}/return`, { items: itemsPayload });
+
+      setBags((prev) => prev.map((b) => (b.id === updatedBag.id ? updatedBag : b)));
+
+      // Sync products data
+      const { data: updatedProducts } = await api.get("/products");
+      setProducts(updatedProducts);
+
+      setReturnBag(null);
+      setItemActions({});
+    } catch (err) {
+      console.error("Error processing return", err);
+    }
   };
 
   const bagTotal = selectedProducts.reduce((a, b) => a + b.product.price * b.quantity, 0);
+
+  const { paginatedItems, totalPages } = usePagination(filtered, ITEMS_PER_PAGE, page);
 
   return (
     <div className="space-y-6">
@@ -298,10 +316,11 @@ const SacolinhasContent = () => {
                   </div>
                   <div>
                     <Label>Devolução prevista</Label>
-                    <div className="mt-1 p-2.5 rounded-md bg-secondary border border-border text-sm text-foreground">
+                    <div className="mt-1 p-2.5 rounded-md bg-secondary border border-border text-sm text-foreground cursor-not-allowed opacity-80">
                       {(() => {
-                        const d = new Date(); d.setDate(d.getDate() + parseInt(trialDays || "0"));
-                        return d.toLocaleDateString("pt-BR");
+                        const days = parseInt(trialDays || "0");
+                        if (isNaN(days)) return "Data inválida";
+                        return format(addDays(new Date(), days), "dd/MM/yyyy");
                       })()}
                     </div>
                   </div>
@@ -322,49 +341,106 @@ const SacolinhasContent = () => {
         }
       />
 
-      <div className="rounded-xl border border-border bg-card overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border bg-secondary/30">
-                <th className="text-left py-3 px-4 text-muted-foreground font-medium">Código</th>
-                <th className="text-left py-3 px-4 text-muted-foreground font-medium">Cliente</th>
-                <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden sm:table-cell">Peças</th>
-                <th className="text-right py-3 px-4 text-muted-foreground font-medium hidden md:table-cell">Valor</th>
-                <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden lg:table-cell">Devolução</th>
-                <th className="text-left py-3 px-4 text-muted-foreground font-medium">Status</th>
-                <th className="text-right py-3 px-4 text-muted-foreground font-medium">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((bag) => (
-                <motion.tr key={bag.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors">
-                  <td className="py-3 px-4 text-foreground font-mono text-xs font-medium">{bag.code}</td>
-                  <td className="py-3 px-4">
-                    <p className="text-foreground text-sm">{bag.customer}</p>
-                    <p className="text-[10px] text-muted-foreground">{bag.customerPhone}</p>
-                  </td>
-                  <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">{bag.items.length} peças</td>
-                  <td className="py-3 px-4 text-foreground font-medium text-right hidden md:table-cell">R$ {bag.total.toFixed(2)}</td>
-                  <td className="py-3 px-4 text-muted-foreground hidden lg:table-cell">{bag.returnDate}</td>
-                  <td className="py-3 px-4"><span className={`text-xs px-2 py-1 rounded-full ${bagStatusColor(bag.status)}`}>{bag.status}</span></td>
-                  <td className="py-3 px-4 text-right">
-                    <div className="flex items-center justify-end gap-1">
-                      <Button size="sm" variant="ghost" onClick={() => setDetailBag(bag)}><Eye className="h-4 w-4" /></Button>
-                      {!["Devolvida", "Vendida Total", "Vendida Parcial", "Cancelada"].includes(bag.status) && (
-                        <Button size="sm" variant="ghost" onClick={() => advanceStatus(bag.id)}><Send className="h-4 w-4" /></Button>
-                      )}
+      <DataTable
+        columns={[
+          { header: "Código", accessor: "code" },
+          { header: "Cliente", accessor: "customer" },
+          { header: "Peças", accessor: "items", hidden: "sm" },
+          { header: "Valor", accessor: "total", hidden: "md" },
+          { header: "Devolução", accessor: "returnDate", hidden: "lg" },
+          { header: "Status", accessor: "status" },
+          { header: "Ações", accessor: "actions", className: "text-right" },
+        ]}
+        data={paginatedItems}
+        renderRow={(bag) => (
+          <motion.tr key={bag.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors">
+            <td className="py-3 px-4 text-foreground font-mono text-xs font-medium">{bag.code}</td>
+            <td className="py-3 px-4">
+              <p className="text-foreground text-sm">{bag.customer}</p>
+              <p className="text-[10px] text-muted-foreground">{bag.customerPhone}</p>
+            </td>
+            <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">{bag.items.length} peças</td>
+            <td className="py-3 px-4 text-foreground font-medium text-right hidden md:table-cell">R$ {bag.total.toFixed(2)}</td>
+            <td className="py-3 px-4 text-muted-foreground hidden lg:table-cell">{bag.returnDate}</td>
+            <td className="py-3 px-4">
+              <span className={`text-xs px-2 py-1 rounded-full ${bagStatusColor(bag.status)}`}>
+                {bag.status}
+              </span>
+            </td>
+            <td className="py-3 px-4 text-right">
+              <div className="flex items-center justify-end gap-1">
+                <Button size="sm" variant="ghost" onClick={() => setDetailBag(bag)}>
+                  <Eye className="h-4 w-4" />
+                </Button>
+                {bag.status === "Com o Cliente" && (
+                  <Button size="sm" variant="ghost" onClick={() => {
+                    setReturnBag(bag);
+                    const initActions: Record<number, "returned" | "sold"> = {};
+                    bag.items.forEach(i => initActions[i.product.id] = "returned");
+                    setItemActions(initActions);
+                  }}>
+                    <Send className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            </td>
+          </motion.tr>
+        )}
+        emptyMessage="Nenhuma sacolinha encontrada."
+      />
+
+      {totalPages > 1 && (
+        <PaginationControls page={page} totalPages={totalPages} setPage={setPage} />
+      )}
+
+      {/* Detail dialog */}
+      {/* Return flow dialog */}
+      <Dialog open={!!returnBag} onOpenChange={(open) => { if (!open) setReturnBag(null); }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader><DialogTitle className="flex items-center gap-2"><Send className="h-5 w-5 text-primary" /> Processar Devolução</DialogTitle></DialogHeader>
+          {returnBag && (
+            <div className="space-y-4 pt-2">
+              <p className="text-sm text-muted-foreground">Selecione o destino de cada item da sacolinha de {returnBag.customer}.</p>
+
+              <div className="space-y-3">
+                {returnBag.items.map((item, i) => (
+                  <div key={i} className="flex flex-col gap-3 p-3 rounded-lg bg-secondary/30 border border-border">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xl">{item.product.image}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground line-clamp-1">{item.product.name}</p>
+                        <p className="text-[10px] text-muted-foreground">{item.product.sku} • Tam. {item.product.size}</p>
+                      </div>
+                      <span className="text-sm font-bold text-foreground shrink-0">R$ {item.product.price.toFixed(2)}</span>
                     </div>
-                  </td>
-                </motion.tr>
-              ))}
-              {filtered.length === 0 && (
-                <tr><td colSpan={7} className="py-8 text-center text-muted-foreground">Nenhuma sacolinha encontrada.</td></tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+
+                    <RadioGroup
+                      value={itemActions[item.product.id]}
+                      onValueChange={(val: "returned" | "sold") => setItemActions(prev => ({...prev, [item.product.id]: val}))}
+                      className="flex items-center gap-6 pt-2 border-t border-border/50"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="returned" id={`r-ret-${item.product.id}`} />
+                        <Label htmlFor={`r-ret-${item.product.id}`} className="text-sm font-normal">Devolvido (Estoque)</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="sold" id={`r-sold-${item.product.id}`} />
+                        <Label htmlFor={`r-sold-${item.product.id}`} className="text-sm font-normal">Comprado (Venda)</Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+                ))}
+              </div>
+
+              <div className="pt-2">
+                <Button onClick={handleProcessReturn} className="w-full bg-gradient-primary text-primary-foreground">
+                  <CheckCircle className="h-4 w-4 mr-2" /> Confirmar Devolução
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Detail dialog */}
       <Dialog open={!!detailBag} onOpenChange={() => setDetailBag(null)}>
