@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useCart } from "@/hooks/use-cart";
 import { useToast } from "@/hooks/use-toast";
+import { AccessibilityControls } from "@/components/layout/AccessibilityControls";
 
 const shippingOptions = [
   { id: "pac", label: "PAC", days: "5-8 dias úteis", price: 18.9 },
@@ -66,6 +67,8 @@ const Checkout = () => {
             <ArrowLeft className="h-5 w-5" />
           </button>
           <h1 className="font-display font-bold text-foreground text-lg">Checkout</h1>
+          <div className="flex-1" />
+          <AccessibilityControls />
         </div>
       </header>
 

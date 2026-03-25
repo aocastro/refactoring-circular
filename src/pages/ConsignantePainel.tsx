@@ -8,15 +8,13 @@ import {
   Clock,
   CheckCircle,
   LogOut,
-  Sun,
-  Moon,
   FileText,
   Download,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useTheme } from "@/hooks/use-theme";
 import { exportToCSV } from "@/lib/export";
 import ConsignanteCharts from "@/components/consignante/ConsignanteCharts";
+import { AccessibilityControls } from "@/components/layout/AccessibilityControls";
 
 const myProducts = [
   { id: 1, name: "Vestido Floral Vintage", price: "R$ 89,90", status: "Vendido", date: "15/12/2025" },
@@ -42,7 +40,6 @@ const myPayments = [
 const ConsignantePainel = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<{ name: string; email: string } | null>(null);
-  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const stored = localStorage.getItem("consignante");
@@ -89,9 +86,7 @@ const ConsignantePainel = () => {
             </span>
           </Link>
           <div className="flex items-center gap-2">
-            <button onClick={toggleTheme} className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors">
-              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            </button>
+            <AccessibilityControls />
             <div className="w-8 h-8 rounded-full bg-gradient-primary flex items-center justify-center text-xs font-bold text-primary-foreground">
               {user.name.charAt(0)}
             </div>

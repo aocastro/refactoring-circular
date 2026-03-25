@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { storeProducts } from "@/data/store";
 import { mockClientes } from "@/data/clientes";
+import { AccessibilityControls } from "@/components/layout/AccessibilityControls";
 
 interface CartItem {
   id: number;
@@ -283,6 +284,7 @@ const PDVPage = () => {
           <span>ESC Limpar</span>
         </div>
         <div className="h-6 w-px bg-border" />
+        <AccessibilityControls />
         <button onClick={() => setShowHistory(!showHistory)} className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1">
           <Clock className="h-3.5 w-3.5" />
           {sales.length} vendas • {formatPrice(dayTotal)}

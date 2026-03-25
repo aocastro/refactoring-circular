@@ -1,20 +1,14 @@
 import { Link, useLocation } from "react-router-dom";
 import React from "react";
 import logo from "@/assets/logo.png";
-import { A11yIcon } from "@/components/icons/A11yIcon";
 import { useState } from "react";
-import { Menu, X, Sun, Moon, ZoomIn, ZoomOut } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useTheme } from "@/hooks/use-theme";
-import { useAccessibility } from "@/hooks/use-accessibility";
-import { AccessibilityControlsInline } from "./AccessibilityMenu";
+import { AccessibilityControls } from "./AccessibilityControls";
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [a11yOpen, setA11yOpen] = useState(false);
   const location = useLocation();
-  const { theme, toggleTheme } = useTheme();
-  const { fontSize, increaseFontSize, decreaseFontSize } = useAccessibility();
 
   const links = [
     { label: "Home", href: "/" },
@@ -45,68 +39,7 @@ const Navbar = () => {
         </nav>
 
         <div className="hidden md:flex items-center gap-1">
-          {/* Zoom controls */}
-          <button
-            onClick={decreaseFontSize}
-            className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
-            aria-label={`Diminuir fonte (atual: ${fontSize}px)`}
-            title="Diminuir fonte"
-          >
-            <ZoomOut className="h-4 w-4" />
-          </button>
-          <button
-            onClick={increaseFontSize}
-            className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
-            aria-label={`Aumentar fonte (atual: ${fontSize}px)`}
-            title="Aumentar fonte"
-          >
-            <ZoomIn className="h-4 w-4" />
-          </button>
-
-          {/* Accessibility menu */}
-          <div className="relative">
-            <button
-              onClick={() => setA11yOpen((v) => !v)}
-              className="p-1.5 rounded-lg hover:bg-secondary transition-colors"
-              aria-label={a11yOpen ? "Fechar menu de acessibilidade" : "Abrir menu de acessibilidade"}
-              aria-expanded={a11yOpen}
-              aria-controls="a11y-header-panel"
-              title="Acessibilidade"
-            >
-              <A11yIcon className="h-5 w-5 text-current" aria-hidden="true" />
-            </button>
-
-            {a11yOpen && (
-              <div
-                id="a11y-header-panel"
-                role="dialog"
-                aria-label="Menu de acessibilidade"
-                aria-modal="false"
-                className="absolute top-full right-0 mt-3 w-[min(22rem,calc(100vw-2rem))] rounded-2xl border border-border/50 bg-background/90 p-5 shadow-2xl backdrop-blur-xl ring-1 ring-black/5 dark:ring-white/10 z-50 animate-in fade-in zoom-in-95 duration-200"
-              >
-                <div className="mb-4 flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2">
-                    <A11yIcon className="h-5 w-5 text-current" aria-hidden="true" />
-                    <h2 className="font-display text-sm font-semibold text-foreground">Acessibilidade</h2>
-                  </div>
-                  <Button type="button" variant="ghost" size="icon" aria-label="Fechar menu" onClick={() => setA11yOpen(false)}>
-                    <X className="h-4 w-4" aria-hidden="true" />
-                  </Button>
-                </div>
-                <AccessibilityControlsInline />
-              </div>
-            )}
-          </div>
-
-          {/* Theme toggle */}
-          <button
-            onClick={toggleTheme}
-            className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
-            title={theme === "dark" ? "Modo claro" : "Modo escuro"}
-            aria-label={theme === "dark" ? "Ativar modo claro" : "Ativar modo escuro"}
-          >
-            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-          </button>
+          <AccessibilityControls />
 
           <div className="w-px h-6 bg-border mx-1" />
 
@@ -120,34 +53,7 @@ const Navbar = () => {
 
         {/* Mobile */}
         <div className="md:hidden flex items-center gap-1">
-          <button
-            onClick={decreaseFontSize}
-            className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
-            aria-label="Diminuir fonte"
-          >
-            <ZoomOut className="h-4 w-4" />
-          </button>
-          <button
-            onClick={increaseFontSize}
-            className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
-            aria-label="Aumentar fonte"
-          >
-            <ZoomIn className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => setA11yOpen((v) => !v)}
-            className="p-1.5 rounded-lg hover:bg-secondary transition-colors"
-            aria-label={a11yOpen ? "Fechar menu de acessibilidade" : "Abrir menu de acessibilidade"}
-          >
-            <A11yIcon className="h-5 w-5 text-current" aria-hidden="true" />
-          </button>
-          <button
-            onClick={toggleTheme}
-            className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
-            aria-label={theme === "dark" ? "Ativar modo claro" : "Ativar modo escuro"}
-          >
-            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-          </button>
+          <AccessibilityControls />
           <button
             className="text-foreground"
             onClick={() => setMobileOpen(!mobileOpen)}
@@ -159,22 +65,6 @@ const Navbar = () => {
           </button>
         </div>
       </div>
-
-      {/* Mobile a11y panel */}
-      {a11yOpen && (
-        <div className="md:hidden border-t border-border/50 bg-background/90 backdrop-blur-xl px-5 py-6 shadow-2xl animate-in slide-in-from-top-4 duration-200" aria-label="Menu de acessibilidade">
-          <div className="mb-3 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <A11yIcon className="h-5 w-5 text-current" aria-hidden="true" />
-              <h2 className="font-display text-sm font-semibold text-foreground">Acessibilidade</h2>
-            </div>
-            <Button type="button" variant="ghost" size="icon" aria-label="Fechar" onClick={() => setA11yOpen(false)}>
-              <X className="h-4 w-4" aria-hidden="true" />
-            </Button>
-          </div>
-          <AccessibilityControlsInline />
-        </div>
-      )}
 
       {mobileOpen && (
         <div id="mobile-menu" className="md:hidden glass border-t border-border px-4 py-4 space-y-3" aria-label="Menu móvel">

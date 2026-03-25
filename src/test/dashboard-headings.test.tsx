@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
+import { ThemeProvider } from "@/hooks/use-theme";
+import { AccessibilityProvider } from "@/hooks/use-accessibility";
 
 // Mock localStorage with a valid user
 beforeEach(() => {
@@ -15,7 +17,11 @@ const renderDashboard = async () => {
   const { default: Dashboard } = await import("@/pages/Dashboard");
   return render(
     <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-      <Dashboard />
+      <ThemeProvider>
+        <AccessibilityProvider>
+          <Dashboard />
+        </AccessibilityProvider>
+      </ThemeProvider>
     </MemoryRouter>,
   );
 };
