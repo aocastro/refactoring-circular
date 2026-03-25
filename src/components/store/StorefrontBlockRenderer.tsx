@@ -1,5 +1,6 @@
+import { useState, useEffect } from "react";
+import api from "@/api/axios";
 import { Star, Mail, Phone, ArrowRight, Send, Play, Image } from "lucide-react";
-import { storeProducts } from "@/data/store";
 import { Link } from "react-router-dom";
 import type { EditorBlock } from "@/components/dashboard/store-editor/types";
 
@@ -11,6 +12,27 @@ interface Props {
 const formatPrice = (price: number) => `R$ ${price.toFixed(2).replace(".", ",")}`;
 
 const StorefrontBlockRenderer = ({ block, slug }: Props) => {
+  const [loadingData, setLoadingData] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [storeProducts, setstoreProducts] = useState<any>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res_storeProducts = await api.get('/api/store/products');
+        setStoreProducts(res_storeProducts.data);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      } finally {
+        setLoadingData(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+
+
   const { styles, content } = block;
 
   switch (block.type) {
@@ -162,6 +184,8 @@ const StorefrontBlockRenderer = ({ block, slug }: Props) => {
       );
 
     case "text":
+
+
       return (
         <section style={{ backgroundColor: styles.backgroundColor, color: styles.textColor, padding: styles.padding, fontFamily: styles.fontFamily }}>
           <div className="mx-auto max-w-3xl">

@@ -1,8 +1,9 @@
+import { useState, useEffect } from "react";
+import api from "@/api/axios";
 import { motion } from "framer-motion";
 import { Leaf, Droplets, Recycle, Store, ArrowUpRight } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { adminEsg, adminEsgMonthly } from "@/data/admin";
 
 const kpis = [
   { label: "CO₂ Evitado", value: `${adminEsg.co2Evitado.toLocaleString("pt-BR")} kg`, icon: Leaf, change: "+18%", color: "text-green-600" },
@@ -11,7 +12,36 @@ const kpis = [
   { label: "Lojas com Selo ESG", value: adminEsg.lojasESG.toString(), icon: Store, change: "+12 este mês", color: "text-primary" },
 ];
 
-const AdminESGContent = () => (
+const AdminESGContent = () => {
+  const [loadingData, setLoadingData] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [adminEsg, setadminEsg] = useState<any>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [adminEsgMonthly, setadminEsgMonthly] = useState<any>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res_adminEsg = await api.get('/api/admin/esg');
+        setAdminEsg(res_adminEsg.data);
+        const res_adminEsgMonthly = await api.get('/api/admin/esg-monthly');
+        setAdminEsgMonthly(res_adminEsgMonthly.data);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      } finally {
+        setLoadingData(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+
+
+
+
+  return (
   <div className="space-y-6">
     <header>
       <h2 className="font-display text-2xl font-bold text-foreground">Impacto Ambiental</h2>
@@ -57,5 +87,6 @@ const AdminESGContent = () => (
     </Card>
   </div>
 );
+};
 
 export default AdminESGContent;

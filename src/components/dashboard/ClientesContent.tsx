@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import api from "@/api/axios";
+import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Users, Search, Plus, Download, Eye, ShoppingBag, DollarSign, UserCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,12 +9,37 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Label } from "@/components/ui/label";
 import KpiCard from "@/components/shared/KpiCard";
 import { exportToCSV } from "@/lib/export";
-import { mockClientes as initialClientes, mockPurchaseHistory } from "@/data/clientes";
 import type { Cliente } from "@/data/clientes";
 import type { KpiItem } from "@/types";
 import { toast } from "sonner";
 
 const ClientesContent = () => {
+  const [loadingData, setLoadingData] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [initialClientes, setinitialClientes] = useState<any>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [mockPurchaseHistory, setmockPurchaseHistory] = useState<any>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res_initialClientes = await api.get('/api/clientes');
+        setInitialClientes(res_initialClientes.data);
+        const res_mockPurchaseHistory = await api.get('/api/clientes/purchase-history');
+        setMockPurchaseHistory(res_mockPurchaseHistory.data);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      } finally {
+        setLoadingData(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+
+
   const [clientes, setClientes] = useState<Cliente[]>(initialClientes);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("Todos");
@@ -92,6 +118,8 @@ const ClientesContent = () => {
     setShowAddDialog(false);
     toast.success(`Cliente ${form.name} cadastrado com sucesso!`);
   };
+
+
 
   return (
     <section className="space-y-6" aria-labelledby="clientes-section-title" aria-describedby="clientes-section-description">

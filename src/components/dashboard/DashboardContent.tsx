@@ -1,3 +1,4 @@
+import api from "@/api/axios";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { AlertCircle, CreditCard } from "lucide-react";
@@ -15,7 +16,7 @@ import {
 } from "recharts";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import KpiCard from "@/components/shared/KpiCard";
-import { dashboardKpisByPeriod, revenueData, salesByCategory, recentSales, abcProductsData, type DashboardPeriod } from "@/data/dashboard";
+import { type DashboardPeriod } from "@/data/dashboard";
 import { chartTooltipStyle, chartGridStroke, chartAxisStroke, chartAxisFontSize, chartColors } from "@/lib/chart-config";
 
 interface DashboardContentProps {
@@ -23,6 +24,47 @@ interface DashboardContentProps {
 }
 
 const DashboardContent = ({ onSectionChange }: DashboardContentProps) => {
+  const [loadingData, setLoadingData] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [dashboardKpisByPeriod, setdashboardKpisByPeriod] = useState<any>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [revenueData, setrevenueData] = useState<any>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [salesByCategory, setsalesByCategory] = useState<any>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [recentSales, setrecentSales] = useState<any>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [abcProductsData, setabcProductsData] = useState<any>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res_dashboardKpisByPeriod = await api.get('/api/dashboard/kpis-by-period');
+        setDashboardKpisByPeriod(res_dashboardKpisByPeriod.data);
+        const res_revenueData = await api.get('/api/dashboard/revenue-data');
+        setRevenueData(res_revenueData.data);
+        const res_salesByCategory = await api.get('/api/dashboard/sales-by-category');
+        setSalesByCategory(res_salesByCategory.data);
+        const res_recentSales = await api.get('/api/dashboard/recent-sales');
+        setRecentSales(res_recentSales.data);
+        const res_abcProductsData = await api.get('/api/dashboard/abc-products');
+        setAbcProductsData(res_abcProductsData.data);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      } finally {
+        setLoadingData(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+
+
   const [trialDays, setTrialDays] = useState<number | null>(null);
   const [selectedPeriod, setSelectedPeriod] = useState<DashboardPeriod>("hoje");
 
@@ -37,6 +79,8 @@ const DashboardContent = ({ onSectionChange }: DashboardContentProps) => {
       }
     }
   }, []);
+
+
 
   return (
     <div className="space-y-6">

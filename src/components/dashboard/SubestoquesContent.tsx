@@ -8,13 +8,33 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import KpiCard from "@/components/shared/KpiCard";
 import FilterToolbar from "@/components/shared/FilterToolbar";
-import { mockProducts } from "@/data/products";
 import { getStatusColor } from "@/lib/status-colors";
 import type { KpiItem } from "@/types";
 import api from "@/api/axios";
 import { SubStock, SubStockProduct } from "@/data/dashboard";
 
 const SubestoquesContent = () => {
+  const [loadingData, setLoadingData] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [mockProducts, setmockProducts] = useState<any>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res_mockProducts = await api.get('/api/products');
+        setMockProducts(res_mockProducts.data);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      } finally {
+        setLoadingData(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+
+
   const [subStocks, setSubStocks] = useState<SubStock[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -446,6 +466,8 @@ const SubestoquesContent = () => {
           {filtered.map((sub, i) => {
             const itemCount = sub.products.reduce((a, b) => a + b.quantity, 0);
             const pct = sub.capacity > 0 ? Math.round((itemCount / sub.capacity) * 100) : 0;
+
+
             return (
               <motion.div key={sub.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
                 className="p-4 rounded-xl border border-border bg-card space-y-3 cursor-pointer hover:border-primary/50 hover:shadow-md transition-all"
