@@ -1,8 +1,16 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Search, SlidersHorizontal, X, ShoppingBag, Plus, Eye, Edit, Trash2, Tag, Ruler, Star, ShoppingCart, MessageCircle, ArrowLeft } from "lucide-react";
+import { Search, SlidersHorizontal, X, ShoppingBag, Plus, Eye, Edit, Trash2, Tag, Ruler, Star, ShoppingCart, MessageCircle, ArrowLeft, PackagePlus, FileSpreadsheet, Camera } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Select,
   SelectContent,
@@ -203,10 +211,30 @@ const CatalogoContent = () => {
           <h1 className="text-2xl font-bold font-display text-foreground">Catálogo</h1>
           <p className="text-muted-foreground text-sm">Gerencie o catálogo da sua loja</p>
         </div>
-        <Button size="sm" className="bg-gradient-primary text-primary-foreground">
-          <Plus className="h-4 w-4 mr-2" />
-          Novo Produto
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button size="sm" className="bg-gradient-primary text-primary-foreground">
+              <Plus className="h-4 w-4 mr-2" />
+              Novo Produto
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuLabel>Opções de Cadastro</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="cursor-pointer">
+              <PackagePlus className="mr-2 h-4 w-4" />
+              <span>Cadastro de Produto Único</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="cursor-pointer">
+              <FileSpreadsheet className="mr-2 h-4 w-4" />
+              <span>Cadastro em Massa</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="cursor-pointer">
+              <Camera className="mr-2 h-4 w-4" />
+              <span>Cadastro por Foto</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* Search + Filters */}
