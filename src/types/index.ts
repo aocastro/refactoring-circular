@@ -60,6 +60,7 @@ export interface Bag {
   trialDays: number;
   returnDate: string;
   notes: string;
+  logistics?: 'Retirada' | 'Entrega';
 }
 
 // ─── Dashboard Sales ─────────────────────────────

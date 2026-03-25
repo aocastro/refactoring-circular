@@ -49,6 +49,7 @@ const SacolinhasContent = () => {
   const [productSearch, setProductSearch] = useState("");
   const [selectedProducts, setSelectedProducts] = useState<BagItem[]>([]);
   const [trialDays, setTrialDays] = useState("3");
+  const [logistics, setLogistics] = useState<"Retirada" | "Entrega">("Retirada");
   const [notes, setNotes] = useState("");
   const customerDropRef = useRef<HTMLDivElement>(null);
 
@@ -115,6 +116,7 @@ const SacolinhasContent = () => {
     setSelectedProducts([]);
     setTrialDays("3");
     setNotes("");
+    setLogistics("Retirada");
   };
 
   const handleAdd = async () => {
@@ -144,6 +146,7 @@ const SacolinhasContent = () => {
         trialDays: parseInt(trialDays),
         returnDate: returnD.toLocaleDateString("pt-BR"),
         notes,
+        logistics,
       };
 
       const { data: createdBag } = await api.post("/sacolinhas", newBagPayload);
@@ -324,6 +327,21 @@ const SacolinhasContent = () => {
                       })()}
                     </div>
                   </div>
+                </div>
+
+                {/* Logistics */}
+                <div>
+                  <Label>Logística</Label>
+                  <RadioGroup value={logistics} onValueChange={(val: "Retirada" | "Entrega") => setLogistics(val)} className="flex gap-4 mt-2">
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="Retirada" id="r1" />
+                      <Label htmlFor="r1" className="cursor-pointer">Retirada na Loja</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="Entrega" id="r2" />
+                      <Label htmlFor="r2" className="cursor-pointer">Entrega ao Cliente</Label>
+                    </div>
+                  </RadioGroup>
                 </div>
 
                 {/* Notes */}
