@@ -68,6 +68,8 @@ const ProductDetail = ({ product, onBack }: { product: Product; onBack: () => vo
     .filter((p) => p.category === product.category && p.id !== product.id && p.status === "Disponível")
     .slice(0, 4);
 
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+
   return (
     <div className="space-y-6">
       <button
@@ -185,7 +187,6 @@ const CatalogoContent = () => {
     fetchData();
   }, []);
 
-  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
 
   const [search, setSearch] = useState("");

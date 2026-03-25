@@ -5,16 +5,17 @@ import { DollarSign, TrendingUp, ArrowUpRight, Percent } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-
+const kpis = [
+  { label: "Receita Total", value: `R$ ${adminFinancial.revenueTotal.toLocaleString("pt-BR")}`, icon: DollarSign, change: "+18.2%", positive: true },
+  { label: "Receita Mensal", value: `R$ ${adminFinancial.revenueMes.toLocaleString("pt-BR")}`, icon: TrendingUp, change: "+10.3%", positive: true },
+  { label: "Comissões Pendentes", value: `R$ ${adminFinancial.comissoesPendentes.toLocaleString("pt-BR")}`, icon: DollarSign, change: "8 lojas", positive: false },
+  { label: "Taxa de Conversão", value: `${adminFinancial.taxaConversao}%`, icon: Percent, change: "+0.6pp", positive: true },
+];
 
 const AdminFinanceiroContent = () => {
   const [loadingData, setLoadingData] = useState(true);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [adminFinancial, setadminFinancial] = useState<any>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [adminMonthlyRevenue, setadminMonthlyRevenue] = useState<any>([]);
+  const [adminFinancial, setAdminFinancial] = useState<any>(null);
+  const [adminMonthlyRevenue, setAdminMonthlyRevenue] = useState<any>(null);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -32,16 +33,6 @@ const AdminFinanceiroContent = () => {
   }, []);
 
   if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
-
-const kpis = [
-  { label: "Receita Total", value: `R$ ${adminFinancial.revenueTotal.toLocaleString("pt-BR")}`, icon: DollarSign, change: "+18.2%", positive: true },
-  { label: "Receita Mensal", value: `R$ ${adminFinancial.revenueMes.toLocaleString("pt-BR")}`, icon: TrendingUp, change: "+10.3%", positive: true },
-  { label: "Comissões Pendentes", value: `R$ ${adminFinancial.comissoesPendentes.toLocaleString("pt-BR")}`, icon: DollarSign, change: "8 lojas", positive: false },
-  { label: "Taxa de Conversão", value: `${adminFinancial.taxaConversao}%`, icon: Percent, change: "+0.6pp", positive: true },
-];
-
-
-
 
   return (
   <div className="space-y-6">

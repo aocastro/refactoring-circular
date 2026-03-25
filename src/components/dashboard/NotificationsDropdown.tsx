@@ -24,7 +24,7 @@ const NotificationsDropdown = () => {
   const [loadingData, setLoadingData] = useState(true);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [mockNotifications, setMockNotifications] = useState<any[]>([]);
+  const [mockNotifications, setMockNotifications] = useState<any>(null);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -39,11 +39,14 @@ const NotificationsDropdown = () => {
     fetchData();
   }, []);
 
-  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
-
-  const [notifications, setNotifications] = useState<AppNotification[]>(mockNotifications);
-  const unreadCount = notifications.filter((n) => !n.read).length;
+  const [notifications, setNotifications] = useState<AppNotification[]>([]);
+  useEffect(() => {
+    if (mockNotifications) {
+      setNotifications(mockNotifications);
+    }
+  }, [mockNotifications]);
+  const unreadCount = notifications ? notifications.filter((n) => !n.read).length : 0;
 
   const markAllRead = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
@@ -77,6 +80,7 @@ const NotificationsDropdown = () => {
         <div className="max-h-80 overflow-y-auto">
           {notifications.map((n) => {
             const Icon = iconMap[n.type] || ShoppingBag;
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
 
             return (

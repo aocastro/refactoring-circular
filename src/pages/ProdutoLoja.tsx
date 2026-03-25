@@ -32,7 +32,6 @@ const ProdutoLoja = () => {
     fetchData();
   }, []);
 
-  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
 
   const { slug, id } = useParams();
@@ -45,7 +44,9 @@ const ProdutoLoja = () => {
   const { toast } = useToast();
 
   if (!product) {
-    return (
+    if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+
+  return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <p className="text-muted-foreground text-lg mb-4">Produto não encontrado</p>

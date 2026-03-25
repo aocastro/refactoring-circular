@@ -36,9 +36,7 @@ const columns = [
 
 const AdminUsuariosContent = () => {
   const [loadingData, setLoadingData] = useState(true);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [adminUsers, setadminUsers] = useState<any>([]);
+  const [adminUsers, setAdminUsers] = useState<any>(null);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -52,8 +50,6 @@ const AdminUsuariosContent = () => {
     };
     fetchData();
   }, []);
-
-  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
 
   const [search, setSearch] = useState("");
@@ -72,7 +68,7 @@ const AdminUsuariosContent = () => {
 
   const { paginatedItems, totalPages, safePage, totalItems } = usePagination(filtered, 10, page);
 
-
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
   return (
     <div className="space-y-6">

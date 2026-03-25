@@ -40,17 +40,13 @@ const columns = [
 const AdminSuporteContent = () => {
   const [loadingData, setLoadingData] = useState(true);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [mockTickets, setmockTickets] = useState<any>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [mockTickets, setmockTickets] = useState<any>([]);
+  const [adminSuporteKpis, setadminSuporteKpis] = useState<any>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [adminTicketsVolume, setadminTicketsVolume] = useState<any>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [adminSuporteKpis, setadminSuporteKpis] = useState<any>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [adminTicketsVolume, setadminTicketsVolume] = useState<any>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [adminTicketsByCategory, setadminTicketsByCategory] = useState<any>([]);
+  const [adminTicketsByCategory, setadminTicketsByCategory] = useState<any>(null);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -70,8 +66,6 @@ const AdminSuporteContent = () => {
     };
     fetchData();
   }, []);
-
-  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
 
   const [tickets, setTickets] = useState<Ticket[]>(mockTickets);
@@ -191,7 +185,7 @@ const AdminSuporteContent = () => {
           renderRow={(ticket: Ticket) => {
             const cfg = statusConfig[ticket.status];
             const expanded = expandedId === ticket.id;
-
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
 
             return (

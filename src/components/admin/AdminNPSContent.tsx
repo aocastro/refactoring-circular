@@ -46,8 +46,8 @@ const getScoreColor = (score: number) => {
 const AdminNPSContent = () => {
   const [loadingData, setLoadingData] = useState(true);
   const [adminNpsStats, setAdminNpsStats] = useState<any>({});
-  const [adminNpsHistory, setAdminNpsHistory] = useState<any>([]);
-  const [adminNpsResponses, setAdminNpsResponses] = useState<any>([]);
+  const [adminNpsHistory, setAdminNpsHistory] = useState<any[]>([]);
+  const [adminNpsResponses, setAdminNpsResponses] = useState<any[]>([]);
   useEffect(() => {
     let mounted = true;
     const fetchData = async () => {
@@ -68,8 +68,6 @@ const AdminNPSContent = () => {
     fetchData();
     return () => { mounted = false; };
   }, []);
-
-  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
   const [responses, setResponses] = useState<NPSResponse[]>(adminNpsResponses);
   useEffect(() => {
     setPage(1);
@@ -94,6 +92,7 @@ const AdminNPSContent = () => {
     toast.success(`Status atualizado com sucesso!`);
   };
 
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
   return (
     <div className="space-y-6">
       <header className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">

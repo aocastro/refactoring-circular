@@ -30,7 +30,6 @@ const StorefrontBlockRenderer = ({ block, slug }: Props) => {
     fetchData();
   }, []);
 
-  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
 
   const { styles, content } = block;
@@ -38,7 +37,9 @@ const StorefrontBlockRenderer = ({ block, slug }: Props) => {
   switch (block.type) {
 
     case "about":
-      return (
+      if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+
+  return (
         <section style={{ backgroundColor: styles.backgroundColor, color: styles.textColor, padding: styles.padding, fontFamily: styles.fontFamily }}>
           <div className="mx-auto max-w-3xl">
             <h2 className="mb-3 text-2xl font-bold">{content.title}</h2>
