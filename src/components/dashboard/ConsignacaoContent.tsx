@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import api from "@/api/axios";
+import { useState, useEffect, useMemo } from "react";
 import { Plus, Users, FileText, DollarSign, Clock, CheckCircle, AlertCircle, Eye, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,13 +7,39 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import KpiCard from "@/components/shared/KpiCard";
 import FilterToolbar from "@/components/shared/FilterToolbar";
-import { mockConsignantes as initialConsignantes, mockContracts, consignanteStatusOptions, pendingRanges } from "@/data/consignacao";
+import { consignanteStatusOptions, pendingRanges } from "@/data/consignacao";
 import { getStatusColor } from "@/lib/status-colors";
 import { exportToCSV } from "@/lib/export";
 import type { KpiItem } from "@/types";
 import { toast } from "sonner";
 
 const ConsignacaoContent = () => {
+  const [loadingData, setLoadingData] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [initialConsignantes, setinitialConsignantes] = useState<any>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [mockContracts, setmockContracts] = useState<any>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res_initialConsignantes = await api.get('/api/consignacao/consignantes');
+        setInitialConsignantes(res_initialConsignantes.data);
+        const res_mockContracts = await api.get('/api/consignacao/contracts');
+        setMockContracts(res_mockContracts.data);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      } finally {
+        setLoadingData(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+
+
   const [consignantes, setConsignantes] = useState(initialConsignantes);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("Todos");
@@ -65,6 +92,8 @@ const ConsignacaoContent = () => {
     setShowAddDialog(false);
     toast.success(`Consignante ${form.name} cadastrado com sucesso!`);
   };
+
+
 
   return (
     <div className="space-y-6">

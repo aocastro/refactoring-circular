@@ -1,3 +1,5 @@
+import api from "@/api/axios";
+import { useState, useEffect } from "react";
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -13,8 +15,8 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { storeProducts } from "@/data/store";
-import { mockClientes } from "@/data/clientes";
+
+
 import { AccessibilityControls } from "@/components/layout/AccessibilityControls";
 
 interface CartItem {
@@ -53,6 +55,32 @@ const allPaymentMethods = [
 type PaymentStep = "idle" | "select" | "cash" | "card" | "pix" | "processing" | "approved" | "receipt";
 
 const PDVPage = () => {
+  const [loadingData, setLoadingData] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [storeProducts, setStoreProducts] = useState<any>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [mockClientes, setMockClientes] = useState<any>([]);
+  useEffect(() => {
+    let mounted = true;
+    const fetchData = async () => {
+      try {
+        const res_storeProducts = await api.get('/api/store/products');
+        const res_mockClientes = await api.get('/api/clientes');
+        if (mounted) {
+          setStoreProducts(res_storeProducts.data);
+          setMockClientes(res_mockClientes.data);
+          setLoadingData(false);
+        }
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      }
+    };
+    fetchData();
+    return () => { mounted = false; };
+  }, []);
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+
   const navigate = useNavigate();
   const { id: caixaId } = useParams();
   const [search, setSearch] = useState("");

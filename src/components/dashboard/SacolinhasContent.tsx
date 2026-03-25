@@ -1,3 +1,5 @@
+import api from "@/api/axios";
+import { useState, useEffect } from "react";
 import { useState, useMemo, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ShoppingBag, Plus, Eye, Clock, CheckCircle, Send, Search, X, Trash2, Package, User, Calendar, Phone, Mail } from "lucide-react";
@@ -31,6 +33,29 @@ const bagStatusColor = (s: BagStatus) => {
 };
 
 const SacolinhasContent = () => {
+  const [loadingData, setLoadingData] = useState(true);
+  const [mockProducts, setMockProducts] = useState<any[]>(null);
+  const [mockClientes, setMockClientes] = useState<any[]>(null);
+  useEffect(() => {
+    let mounted = true;
+    const fetchData = async () => {
+      try {
+        const res_mockProducts = await api.get('/api/products');
+        const res_mockClientes = await api.get('/api/clientes');
+        if (mounted) {
+          setMockProducts(res_mockProducts.data);
+          setMockClientes(res_mockClientes.data);
+          setLoadingData(false);
+        }
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      }
+    };
+    fetchData();
+    return () => { mounted = false; };
+  }, []);
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
   const [bags, setBags] = useState<Bag[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState("");
@@ -42,6 +67,7 @@ const SacolinhasContent = () => {
   const [page, setPage] = useState(1);
   const ITEMS_PER_PAGE = 5;
 
+  // Form state  const [selectedCustomer, setSelectedCustomer] = useState<{ name: string; phone: string; email: string } | null>(null);  const [selectedProducts, setSelectedProducts] = useState<BagItem[]>([]);  const customerDropRef = useRef<HTMLDivElement>(null);
   // Form state
   const [customerInput, setCustomerInput] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState<{ name: string; phone: string; email: string } | null>(null);

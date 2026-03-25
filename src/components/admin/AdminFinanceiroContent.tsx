@@ -1,8 +1,37 @@
+import { useState, useEffect } from "react";
+import api from "@/api/axios";
 import { motion } from "framer-motion";
 import { DollarSign, TrendingUp, ArrowUpRight, Percent } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { adminFinancial, adminMonthlyRevenue } from "@/data/admin";
+
+
+
+const AdminFinanceiroContent = () => {
+  const [loadingData, setLoadingData] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [adminFinancial, setadminFinancial] = useState<any>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [adminMonthlyRevenue, setadminMonthlyRevenue] = useState<any>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res_adminFinancial = await api.get('/api/admin/financial');
+        setAdminFinancial(res_adminFinancial.data);
+        const res_adminMonthlyRevenue = await api.get('/api/admin/monthly-revenue');
+        setAdminMonthlyRevenue(res_adminMonthlyRevenue.data);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      } finally {
+        setLoadingData(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
 const kpis = [
   { label: "Receita Total", value: `R$ ${adminFinancial.revenueTotal.toLocaleString("pt-BR")}`, icon: DollarSign, change: "+18.2%", positive: true },
@@ -11,7 +40,10 @@ const kpis = [
   { label: "Taxa de Conversão", value: `${adminFinancial.taxaConversao}%`, icon: Percent, change: "+0.6pp", positive: true },
 ];
 
-const AdminFinanceiroContent = () => (
+
+
+
+  return (
   <div className="space-y-6">
     <header>
       <h2 className="font-display text-2xl font-bold text-foreground">Financeiro da Plataforma</h2>
@@ -57,5 +89,6 @@ const AdminFinanceiroContent = () => (
     </Card>
   </div>
 );
+};
 
 export default AdminFinanceiroContent;

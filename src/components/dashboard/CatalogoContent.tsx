@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import api from "@/api/axios";
+import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Search, SlidersHorizontal, X, ShoppingBag, Plus, Eye, Edit, Trash2, Tag, Ruler, Star, ShoppingCart, MessageCircle, ArrowLeft, PackagePlus, FileSpreadsheet, Camera } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -18,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { mockProducts, productCategories, priceRanges } from "@/data/products";
+import { productCategories, priceRanges } from "@/data/products";
 import { getStatusColor } from "@/lib/status-colors";
 import type { Product } from "@/types";
 
@@ -166,6 +167,27 @@ const ProductDetail = ({ product, onBack }: { product: Product; onBack: () => vo
 };
 
 const CatalogoContent = () => {
+  const [loadingData, setLoadingData] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [mockProducts, setmockProducts] = useState<any>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res_mockProducts = await api.get('/api/products');
+        setMockProducts(res_mockProducts.data);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      } finally {
+        setLoadingData(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+
+
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("Todos");
   const [condition, setCondition] = useState("Todos");
@@ -203,6 +225,8 @@ const CatalogoContent = () => {
   if (selectedProduct) {
     return <ProductDetail product={selectedProduct} onBack={() => setSelectedProduct(null)} />;
   }
+
+
 
   return (
     <div className="space-y-6">

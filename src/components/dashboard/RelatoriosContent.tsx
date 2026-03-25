@@ -1,4 +1,5 @@
-import { useState } from "react";
+import api from "@/api/axios";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   DollarSign, TrendingUp, TrendingDown, ShoppingBag, BarChart3, Download, Calendar,
@@ -13,7 +14,6 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
 import KpiCard from "@/components/shared/KpiCard";
-import { cashFlowData, paymentMethods, recentPayments, esgMonthly } from "@/data/financeiro";
 import { chartTooltipStyle, chartGridStroke, chartAxisStroke, chartAxisFontSize, chartColors } from "@/lib/chart-config";
 
 /* ── Vendas data ── */
@@ -63,6 +63,42 @@ interface Props {
 }
 
 const RelatoriosContent = ({ defaultTab = "vendas" }: Props) => {
+  const [loadingData, setLoadingData] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [cashFlowData, setcashFlowData] = useState<any>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [paymentMethods, setpaymentMethods] = useState<any>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [recentPayments, setrecentPayments] = useState<any>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [esgMonthly, setesgMonthly] = useState<any>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res_cashFlowData = await api.get('/api/financeiro/cash-flow');
+        setCashFlowData(res_cashFlowData.data);
+        const res_paymentMethods = await api.get('/api/financeiro/payment-methods');
+        setPaymentMethods(res_paymentMethods.data);
+        const res_recentPayments = await api.get('/api/financeiro/recent-payments');
+        setRecentPayments(res_recentPayments.data);
+        const res_esgMonthly = await api.get('/api/financeiro/esg-monthly');
+        setEsgMonthly(res_esgMonthly.data);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      } finally {
+        setLoadingData(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+
+
   const [period, setPeriod] = useState("12m");
   const [paymentFilter, setPaymentFilter] = useState<"all" | "entrada" | "saida">("all");
 
@@ -73,6 +109,8 @@ const RelatoriosContent = ({ defaultTab = "vendas" }: Props) => {
   const filteredPayments = recentPayments.filter(
     (p) => paymentFilter === "all" || p.type === paymentFilter
   );
+
+
 
   return (
     <section className="space-y-6" aria-labelledby="relatorios-section-title" aria-describedby="relatorios-section-description">

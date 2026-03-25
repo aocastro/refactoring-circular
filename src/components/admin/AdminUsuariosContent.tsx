@@ -1,3 +1,4 @@
+import api from "@/api/axios";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Users, Shield, Store, Handshake } from "lucide-react";
@@ -8,7 +9,7 @@ import DataTable from "@/components/shared/DataTable";
 import PaginationControls from "@/components/shared/PaginationControls";
 import { usePagination } from "@/hooks/use-pagination";
 import { useEffect } from "react";
-import { adminUsers, type AdminUser } from "@/data/admin";
+import { type AdminUser } from "@/data/admin";
 import { toast } from "sonner";
 
 const roleIcon: Record<string, React.ReactNode> = {
@@ -34,6 +35,27 @@ const columns = [
 ];
 
 const AdminUsuariosContent = () => {
+  const [loadingData, setLoadingData] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [adminUsers, setadminUsers] = useState<any>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res_adminUsers = await api.get('/api/admin/users');
+        setAdminUsers(res_adminUsers.data);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      } finally {
+        setLoadingData(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+
+
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("Todos");
   const [page, setPage] = useState(1);
@@ -49,6 +71,8 @@ const AdminUsuariosContent = () => {
   });
 
   const { paginatedItems, totalPages, safePage, totalItems } = usePagination(filtered, 10, page);
+
+
 
   return (
     <div className="space-y-6">

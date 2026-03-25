@@ -1,19 +1,15 @@
+import api from "@/api/axios";
 import { motion } from "framer-motion";
 import { Link2, Hash, Shield, Store, ArrowUpRight, CheckCircle, Clock, XCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { blockchainStats, blockchainTransactions, type BlockchainTransaction } from "@/data/admin";
+import { type BlockchainTransaction } from "@/data/admin";
 import DataTable from "@/components/shared/DataTable";
 import PaginationControls from "@/components/shared/PaginationControls";
 import { usePagination } from "@/hooks/use-pagination";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-const kpis = [
-  { label: "Tokens Emitidos", value: blockchainStats.totalTokens.toLocaleString("pt-BR"), icon: Hash, change: "+342 este mês" },
-  { label: "Transações/Mês", value: blockchainStats.transacoesMes.toString(), icon: Link2, change: "+18%" },
-  { label: "Certificados", value: blockchainStats.certificadosEmitidos.toLocaleString("pt-BR"), icon: Shield, change: "+156" },
-  { label: "Lojas Blockchain", value: blockchainStats.lojasBlockchain.toString(), icon: Store, change: "+8 este mês" },
-];
+
 
 const statusConfig: Record<string, { icon: React.ReactNode; variant: "default" | "secondary" | "destructive" }> = {
   confirmado: { icon: <CheckCircle className="h-3.5 w-3.5" />, variant: "default" },
@@ -32,6 +28,39 @@ const columns = [
 ];
 
 const AdminBlockchainContent = () => {
+  const [loadingData, setLoadingData] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [blockchainStats, setblockchainStats] = useState<any>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [blockchainTransactions, setblockchainTransactions] = useState<any>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res_blockchainStats = await api.get('/api/admin/blockchain-stats');
+        setBlockchainStats(res_blockchainStats.data);
+        const res_blockchainTransactions = await api.get('/api/admin/blockchain-transactions');
+        setBlockchainTransactions(res_blockchainTransactions.data);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      } finally {
+        setLoadingData(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+
+const kpis = [
+  { label: "Tokens Emitidos", value: blockchainStats.totalTokens.toLocaleString("pt-BR"), icon: Hash, change: "+342 este mês" },
+  { label: "Transações/Mês", value: blockchainStats.transacoesMes.toString(), icon: Link2, change: "+18%" },
+  { label: "Certificados", value: blockchainStats.certificadosEmitidos.toLocaleString("pt-BR"), icon: Shield, change: "+156" },
+  { label: "Lojas Blockchain", value: blockchainStats.lojasBlockchain.toString(), icon: Store, change: "+8 este mês" },
+];
+
+
   const [page, setPage] = useState(1);
   const { paginatedItems, totalPages, safePage, totalItems } = usePagination(blockchainTransactions, 10, page);
 
@@ -71,6 +100,8 @@ const AdminBlockchainContent = () => {
         header={<h3 className="text-base font-semibold text-foreground">Transações Recentes</h3>}
         renderRow={(tx: BlockchainTransaction) => {
           const cfg = statusConfig[tx.status];
+
+
           return (
             <tr key={tx.hash} className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors">
               <td className="px-4 py-3">

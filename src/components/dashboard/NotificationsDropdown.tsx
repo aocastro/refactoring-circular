@@ -1,11 +1,11 @@
-import { useState } from "react";
+import api from "@/api/axios";
+import { useState, useEffect } from "react";
 import { Bell, ShoppingBag, DollarSign, Target, CheckCircle } from "lucide-react";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { mockNotifications } from "@/data/notifications";
 import type { AppNotification, NotificationType } from "@/types";
 
 const iconMap: Record<NotificationType, typeof ShoppingBag> = {
@@ -21,6 +21,27 @@ const typeStyles: Record<NotificationType, string> = {
 };
 
 const NotificationsDropdown = () => {
+  const [loadingData, setLoadingData] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [mockNotifications, setMockNotifications] = useState<any[]>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res_mockNotifications = await api.get('/api/notifications');
+        setMockNotifications(res_mockNotifications.data);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      } finally {
+        setLoadingData(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+
+
   const [notifications, setNotifications] = useState<AppNotification[]>(mockNotifications);
   const unreadCount = notifications.filter((n) => !n.read).length;
 
@@ -56,6 +77,8 @@ const NotificationsDropdown = () => {
         <div className="max-h-80 overflow-y-auto">
           {notifications.map((n) => {
             const Icon = iconMap[n.type] || ShoppingBag;
+
+
             return (
               <div
                 key={n.id}
