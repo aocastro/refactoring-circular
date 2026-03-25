@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Warehouse, Plus, Trash2, Package, MapPin, ArrowRightLeft, ArrowLeft, Search, Eye } from "lucide-react";
+import { Warehouse, Plus, Trash2, Package, MapPin, ArrowRightLeft, ArrowLeft, Search, Eye, Edit2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -23,10 +23,16 @@ const SubestoquesContent = () => {
 
   const [form, setForm] = useState({ name: "", location: "" });
   const [pendingProducts, setPendingProducts] = useState<SubStockProduct[]>([]);
-  const [newProductForm, setNewProductForm] = useState({ productId: "", quantity: "", position: "" });
+  const [newProductForm, setNewProductForm] = useState({ productId: "", quantity: "" });
 
   const [selectedStock, setSelectedStock] = useState<SubStock | null>(null);
   const [productSearch, setProductSearch] = useState("");
+
+  // States for adding/editing product in existing stock
+  const [addExistingProductDialogOpen, setAddExistingProductDialogOpen] = useState(false);
+  const [editExistingProductDialogOpen, setEditExistingProductDialogOpen] = useState(false);
+  const [existingProductForm, setExistingProductForm] = useState({ productId: "", quantity: "" });
+  const [editingProduct, setEditingProduct] = useState<SubStockProduct | null>(null);
 
   useEffect(() => {
     const fetchSubStocks = async () => {
@@ -82,16 +88,15 @@ const SubestoquesContent = () => {
   ];
 
   const handleAddPendingProduct = () => {
-    if (!newProductForm.productId || !newProductForm.quantity || !newProductForm.position) return;
+    if (!newProductForm.productId || !newProductForm.quantity) return;
     const product = mockProducts.find(p => p.id === newProductForm.productId);
     if (!product) return;
 
     setPendingProducts([...pendingProducts, {
       product,
-      quantity: parseInt(newProductForm.quantity, 10),
-      position: newProductForm.position
+      quantity: parseInt(newProductForm.quantity, 10)
     }]);
-    setNewProductForm({ productId: "", quantity: "", position: "" });
+    setNewProductForm({ productId: "", quantity: "" });
   };
 
   const handleRemovePendingProduct = (index: number) => {
@@ -127,13 +132,85 @@ const SubestoquesContent = () => {
     }
   };
 
+  const handleAddProductToExistingStock = async () => {
+    if (!selectedStock || !existingProductForm.productId || !existingProductForm.quantity) return;
+
+    const product = mockProducts.find(p => p.id === existingProductForm.productId);
+    if (!product) return;
+
+    try {
+      const quantity = parseInt(existingProductForm.quantity, 10);
+      const existingProductIndex = selectedStock.products.findIndex(p => p.product.id === product.id);
+
+      const updatedProducts = [...selectedStock.products];
+
+      if (existingProductIndex !== -1) {
+        // Update existing product quantity
+        updatedProducts[existingProductIndex] = {
+          ...updatedProducts[existingProductIndex],
+          quantity: updatedProducts[existingProductIndex].quantity + quantity
+        };
+      } else {
+        // Add new product
+        updatedProducts.push({ product, quantity });
+      }
+
+      const updatedStock = { ...selectedStock, products: updatedProducts };
+      await api.put(`/api/subestoques/${selectedStock.id}`, updatedStock);
+
+      setSelectedStock(updatedStock);
+      refreshSubStocks();
+      setAddExistingProductDialogOpen(false);
+      setExistingProductForm({ productId: "", quantity: "" });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleEditExistingProduct = async () => {
+    if (!selectedStock || !editingProduct || !existingProductForm.quantity) return;
+
+    try {
+      const quantity = parseInt(existingProductForm.quantity, 10);
+      const updatedProducts = selectedStock.products.map(p =>
+        p.product.id === editingProduct.product.id ? { ...p, quantity } : p
+      );
+
+      const updatedStock = { ...selectedStock, products: updatedProducts };
+      await api.put(`/api/subestoques/${selectedStock.id}`, updatedStock);
+
+      setSelectedStock(updatedStock);
+      refreshSubStocks();
+      setEditExistingProductDialogOpen(false);
+      setEditingProduct(null);
+      setExistingProductForm({ productId: "", quantity: "" });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleRemoveExistingProduct = async (productId: string) => {
+    if (!selectedStock) return;
+
+    try {
+      const updatedProducts = selectedStock.products.filter(p => p.product.id !== productId);
+
+      const updatedStock = { ...selectedStock, products: updatedProducts };
+      await api.put(`/api/subestoques/${selectedStock.id}`, updatedStock);
+
+      setSelectedStock(updatedStock);
+      refreshSubStocks();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const filteredStockProducts = useMemo(() => {
     if (!selectedStock) return [];
     if (!productSearch) return selectedStock.products;
     return selectedStock.products.filter((sp) =>
       sp.product.name.toLowerCase().includes(productSearch.toLowerCase()) ||
-      sp.product.sku.toLowerCase().includes(productSearch.toLowerCase()) ||
-      sp.position.toLowerCase().includes(productSearch.toLowerCase())
+      sp.product.sku.toLowerCase().includes(productSearch.toLowerCase())
     );
   }, [selectedStock, productSearch]);
 
@@ -169,9 +246,53 @@ const SubestoquesContent = () => {
         <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
           <div className="relative w-full sm:w-96">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Buscar produto por nome, SKU ou posição..." value={productSearch} onChange={(e) => setProductSearch(e.target.value)} className="pl-10 bg-secondary border-border" />
+            <Input placeholder="Buscar produto por nome ou SKU..." value={productSearch} onChange={(e) => setProductSearch(e.target.value)} className="pl-10 bg-secondary border-border" />
           </div>
+
+          <Dialog open={addExistingProductDialogOpen} onOpenChange={setAddExistingProductDialogOpen}>
+            <DialogTrigger asChild>
+              <Button size="sm" className="bg-gradient-primary text-primary-foreground"><Plus className="h-4 w-4 mr-2" /> Adicionar Produto</Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Adicionar Produto ao Subestoque</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 pt-4">
+                <div className="space-y-2">
+                  <Label>Produto</Label>
+                  <Select value={existingProductForm.productId} onValueChange={(v) => setExistingProductForm({ ...existingProductForm, productId: v })}>
+                    <SelectTrigger><SelectValue placeholder="Selecione um produto" /></SelectTrigger>
+                    <SelectContent>
+                      {mockProducts.map((p) => (
+                        <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Quantidade</Label>
+                  <Input type="number" value={existingProductForm.quantity} onChange={(e) => setExistingProductForm({ ...existingProductForm, quantity: e.target.value })} placeholder="Ex: 5" />
+                </div>
+                <Button onClick={handleAddProductToExistingStock} className="w-full bg-gradient-primary text-primary-foreground">Adicionar</Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
+
+        <Dialog open={editExistingProductDialogOpen} onOpenChange={setEditExistingProductDialogOpen}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Editar Quantidade: {editingProduct?.product.name}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 pt-4">
+              <div className="space-y-2">
+                <Label>Quantidade</Label>
+                <Input type="number" value={existingProductForm.quantity} onChange={(e) => setExistingProductForm({ ...existingProductForm, quantity: e.target.value })} placeholder="Ex: 5" />
+              </div>
+              <Button onClick={handleEditExistingProduct} className="w-full bg-gradient-primary text-primary-foreground">Salvar Alterações</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {filteredStockProducts.length === 0 ? (
           <div className="text-center py-12">
@@ -187,10 +308,10 @@ const SubestoquesContent = () => {
                     <th className="text-left py-3 px-4 text-muted-foreground font-medium">Produto</th>
                     <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden md:table-cell">SKU</th>
                     <th className="text-left py-3 px-4 text-muted-foreground font-medium hidden sm:table-cell">Categoria</th>
-                    <th className="text-left py-3 px-4 text-muted-foreground font-medium">Posição</th>
                     <th className="text-center py-3 px-4 text-muted-foreground font-medium">Qtd</th>
                     <th className="text-right py-3 px-4 text-muted-foreground font-medium">Preço Un.</th>
                     <th className="text-left py-3 px-4 text-muted-foreground font-medium">Status</th>
+                    <th className="text-right py-3 px-4 text-muted-foreground font-medium">Ações</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -205,10 +326,19 @@ const SubestoquesContent = () => {
                       </td>
                       <td className="py-3 px-4 text-muted-foreground hidden md:table-cell font-mono text-xs">{sp.product.sku}</td>
                       <td className="py-3 px-4 text-muted-foreground hidden sm:table-cell">{sp.product.category}</td>
-                      <td className="py-3 px-4 text-muted-foreground">{sp.position}</td>
                       <td className="py-3 px-4 text-center font-bold text-foreground">{sp.quantity}</td>
                       <td className="py-3 px-4 text-right text-foreground">R$ {sp.product.price.toFixed(2)}</td>
                       <td className="py-3 px-4"><span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(sp.product.status)}`}>{sp.product.status}</span></td>
+                      <td className="py-3 px-4 text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground" onClick={() => { setEditingProduct(sp); setExistingProductForm({ productId: sp.product.id, quantity: sp.quantity.toString() }); setEditExistingProductDialogOpen(true); }}>
+                            <Edit2 className="h-4 w-4" />
+                          </Button>
+                          <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => handleRemoveExistingProduct(sp.product.id)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </td>
                     </motion.tr>
                   ))}
                 </tbody>
@@ -254,7 +384,7 @@ const SubestoquesContent = () => {
                 <div className="pt-4 border-t border-border mt-4">
                   <h3 className="font-semibold text-sm mb-3">Produtos do Subestoque</h3>
                   <div className="grid grid-cols-12 gap-3 items-end">
-                    <div className="col-span-5">
+                    <div className="col-span-8">
                       <Label className="text-xs">Produto</Label>
                       <Select value={newProductForm.productId} onValueChange={(v) => setNewProductForm({ ...newProductForm, productId: v })}>
                         <SelectTrigger className="h-9"><SelectValue placeholder="Selecione um produto" /></SelectTrigger>
@@ -269,10 +399,6 @@ const SubestoquesContent = () => {
                       <Label className="text-xs">Quantidade</Label>
                       <Input className="h-9" type="number" value={newProductForm.quantity} onChange={(e) => setNewProductForm({ ...newProductForm, quantity: e.target.value })} placeholder="Qtd" />
                     </div>
-                    <div className="col-span-3">
-                      <Label className="text-xs">Posição</Label>
-                      <Input className="h-9" value={newProductForm.position} onChange={(e) => setNewProductForm({ ...newProductForm, position: e.target.value })} placeholder="Ex: P1" />
-                    </div>
                     <div className="col-span-1">
                       <Button size="icon" variant="secondary" className="h-9 w-full" onClick={handleAddPendingProduct}><Plus className="h-4 w-4" /></Button>
                     </div>
@@ -285,7 +411,6 @@ const SubestoquesContent = () => {
                           <tr>
                             <th className="py-2 px-3 font-medium">Produto</th>
                             <th className="py-2 px-3 font-medium">Qtd</th>
-                            <th className="py-2 px-3 font-medium">Posição</th>
                             <th className="py-2 px-3 font-medium w-10"></th>
                           </tr>
                         </thead>
@@ -294,7 +419,6 @@ const SubestoquesContent = () => {
                             <tr key={idx} className="border-b border-border/50 last:border-0">
                               <td className="py-2 px-3">{pp.product.name}</td>
                               <td className="py-2 px-3">{pp.quantity}</td>
-                              <td className="py-2 px-3">{pp.position}</td>
                               <td className="py-2 px-3 text-right">
                                 <Button size="sm" variant="ghost" className="h-6 w-6 p-0 text-destructive" onClick={() => handleRemovePendingProduct(idx)}><Trash2 className="h-3 w-3" /></Button>
                               </td>

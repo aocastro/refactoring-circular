@@ -24,6 +24,22 @@ mock.onPost('/api/subestoques').reply((config) => {
   return [201, stockToAdd];
 });
 
+// Mock PUT /api/subestoques/:id
+mock.onPut(/\/api\/subestoques\/\d+/).reply((config) => {
+  const url = config.url || '';
+  const idStr = url.split('/').pop();
+  if (idStr) {
+    const id = parseInt(idStr, 10);
+    const updatedStock = JSON.parse(config.data);
+    const index = subStocks.findIndex(s => s.id === id);
+    if (index !== -1) {
+      subStocks[index] = { ...subStocks[index], ...updatedStock };
+      return [200, subStocks[index]];
+    }
+  }
+  return [400];
+});
+
 // Mock DELETE /api/subestoques/:id
 mock.onDelete(/\/api\/subestoques\/\d+/).reply((config) => {
   const url = config.url || '';
