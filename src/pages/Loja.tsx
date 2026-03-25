@@ -10,6 +10,7 @@ import StorefrontBlockRenderer from "@/components/store/StorefrontBlockRenderer"
 import { getTemplateTheme, type TemplateTheme } from "@/lib/template-themes";
 import type { EditorBlock } from "@/components/dashboard/store-editor/types";
 import { buildDefaultBlocksFromTheme } from "@/components/dashboard/store-editor/StorePageEditor";
+import { AccessibilityControls } from "@/components/layout/AccessibilityControls";
 
 const Loja = () => {
   const { slug } = useParams();
@@ -150,6 +151,7 @@ const Loja = () => {
             </span>
           </div>
           <div className="hidden sm:flex items-center gap-4">
+            <AccessibilityControls />
             <div className="relative max-w-xs">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50" />
               <Input
