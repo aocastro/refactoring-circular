@@ -1,3 +1,4 @@
+import api from "@/api/axios";
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { MessageSquare, Clock, CheckCircle, AlertCircle, User, Store, ChevronDown, ChevronUp, Send, Users, ShieldAlert, BarChart3, TrendingUp } from "lucide-react";
@@ -13,7 +14,7 @@ import { usePagination } from "@/hooks/use-pagination";
 import { useEffect } from "react";
 import KpiCard from "@/components/shared/KpiCard";
 import { toast } from "sonner";
-import { mockTickets, adminSuporteKpis, adminTicketsVolume, adminTicketsByCategory, type Ticket, type TicketStatus, type TicketPriority } from "@/data/suporte";
+import { type Ticket, type TicketStatus, type TicketPriority } from "@/data/suporte";
 
 const statusConfig: Record<TicketStatus, { label: string; variant: "default" | "secondary" | "outline"; icon: React.ReactNode }> = {
   aberto: { label: "Aberto", variant: "default", icon: <AlertCircle className="h-3.5 w-3.5" /> },
@@ -37,6 +38,42 @@ const columns = [
 ];
 
 const AdminSuporteContent = () => {
+  const [loadingData, setLoadingData] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [mockTickets, setmockTickets] = useState<any>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [adminSuporteKpis, setadminSuporteKpis] = useState<any>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [adminTicketsVolume, setadminTicketsVolume] = useState<any>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [adminTicketsByCategory, setadminTicketsByCategory] = useState<any>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res_mockTickets = await api.get('/api/suporte/tickets');
+        setMockTickets(res_mockTickets.data);
+        const res_adminSuporteKpis = await api.get('/api/suporte/admin-kpis');
+        setAdminSuporteKpis(res_adminSuporteKpis.data);
+        const res_adminTicketsVolume = await api.get('/api/suporte/admin-tickets-volume');
+        setAdminTicketsVolume(res_adminTicketsVolume.data);
+        const res_adminTicketsByCategory = await api.get('/api/suporte/admin-tickets-by-category');
+        setAdminTicketsByCategory(res_adminTicketsByCategory.data);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      } finally {
+        setLoadingData(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+
+
   const [tickets, setTickets] = useState<Ticket[]>(mockTickets);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("Todos");
@@ -154,6 +191,8 @@ const AdminSuporteContent = () => {
           renderRow={(ticket: Ticket) => {
             const cfg = statusConfig[ticket.status];
             const expanded = expandedId === ticket.id;
+
+
 
             return (
               <React.Fragment key={ticket.id}>

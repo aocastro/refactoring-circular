@@ -1,3 +1,5 @@
+import { useState, useEffect } from "react";
+import api from "@/api/axios";
 import { motion } from "framer-motion";
 import { Store, Users, DollarSign, Leaf, ArrowUpRight, ArrowDownRight, TrendingDown, Timer } from "lucide-react";
 import {
@@ -5,7 +7,49 @@ import {
   PieChart, Pie, Cell, BarChart, Bar, Legend, LineChart, Line,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { adminKpis, adminMrrHistory, adminRevenueByPlan, adminChurnHistory, adminLtvByPlan } from "@/data/admin";
+
+
+
+const AdminDashboardContent = () => {
+  const [loadingData, setLoadingData] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [adminKpis, setadminKpis] = useState<any>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [adminMrrHistory, setadminMrrHistory] = useState<any>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [adminRevenueByPlan, setadminRevenueByPlan] = useState<any>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [adminChurnHistory, setadminChurnHistory] = useState<any>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [adminLtvByPlan, setadminLtvByPlan] = useState<any>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res_adminKpis = await api.get('/api/admin/kpis');
+        setAdminKpis(res_adminKpis.data);
+        const res_adminMrrHistory = await api.get('/api/admin/mrr-history');
+        setAdminMrrHistory(res_adminMrrHistory.data);
+        const res_adminRevenueByPlan = await api.get('/api/admin/revenue-by-plan');
+        setAdminRevenueByPlan(res_adminRevenueByPlan.data);
+        const res_adminChurnHistory = await api.get('/api/admin/churn-history');
+        setAdminChurnHistory(res_adminChurnHistory.data);
+        const res_adminLtvByPlan = await api.get('/api/admin/ltv-by-plan');
+        setAdminLtvByPlan(res_adminLtvByPlan.data);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      } finally {
+        setLoadingData(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
 const kpis = [
   { label: "Lojas Ativas", value: adminKpis.lojasAtivas, icon: Store, change: `+${adminKpis.novasLojasMes} este mês`, positive: true },
@@ -16,7 +60,10 @@ const kpis = [
   { label: "Lojas ESG", value: "142", icon: Leaf, change: "+12 este mês", positive: true },
 ];
 
-const AdminDashboardContent = () => (
+
+
+
+  return (
   <div className="space-y-6">
     <header>
       <h2 className="font-display text-2xl font-bold text-foreground">Painel Administrativo</h2>
@@ -144,5 +191,6 @@ const AdminDashboardContent = () => (
     </div>
   </div>
 );
+};
 
 export default AdminDashboardContent;

@@ -1,13 +1,35 @@
-import { useState } from "react";
+import api from "@/api/axios";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { CreditCard, Users, ToggleLeft, ToggleRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { adminPlans, type AdminPlan } from "@/data/admin";
+import { type AdminPlan } from "@/data/admin";
 import { toast } from "sonner";
 
 const AdminPlanosContent = () => {
+  const [loadingData, setLoadingData] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [adminPlans, setadminPlans] = useState<any>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res_adminPlans = await api.get('/api/admin/plans');
+        setAdminPlans(res_adminPlans.data);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      } finally {
+        setLoadingData(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+
+
   const [plans, setPlans] = useState<AdminPlan[]>(adminPlans);
 
   const toggleStatus = (id: number) => {
@@ -16,6 +38,8 @@ const AdminPlanosContent = () => {
     );
     toast.success("Status do plano atualizado");
   };
+
+
 
   return (
     <div className="space-y-6">

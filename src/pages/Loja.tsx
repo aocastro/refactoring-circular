@@ -1,9 +1,9 @@
+import api from "@/api/axios";
 import { useState, useMemo, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Search, ShoppingCart, ChevronLeft, ChevronRight, Leaf, Recycle, TreePine, Package } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { mockStore, storeProducts } from "@/data/store";
 import { useCart } from "@/hooks/use-cart";
 import CartDrawer from "@/components/store/CartDrawer";
 import StorefrontBlockRenderer from "@/components/store/StorefrontBlockRenderer";
@@ -13,6 +13,32 @@ import { buildDefaultBlocksFromTheme } from "@/components/dashboard/store-editor
 import { AccessibilityControls } from "@/components/layout/AccessibilityControls";
 
 const Loja = () => {
+  const [loadingData, setLoadingData] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [mockStore, setmockStore] = useState<any>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [storeProducts, setstoreProducts] = useState<any>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res_mockStore = await api.get('/api/store');
+        setMockStore(res_mockStore.data);
+        const res_storeProducts = await api.get('/api/store/products');
+        setStoreProducts(res_storeProducts.data);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      } finally {
+        setLoadingData(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+
+
   const { slug } = useParams();
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("Todos");
@@ -285,6 +311,8 @@ const Loja = () => {
               }
 
               if (block.type === "esg-impact") {
+
+
                 return (
                   <section key={block.id} className="container max-w-6xl mx-auto px-4 py-8" style={{ backgroundColor: block.styles.backgroundColor }}>
                     <h2 className={`text-xl font-bold mb-4 ${t.headingClass}`}

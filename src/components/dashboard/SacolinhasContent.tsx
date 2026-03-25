@@ -1,3 +1,5 @@
+import api from "@/api/axios";
+import { useState, useEffect } from "react";
 import { useState, useMemo, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ShoppingBag, Plus, Eye, Clock, CheckCircle, Send, Search, X, Trash2, Package, User, Calendar, Phone, Mail } from "lucide-react";
@@ -74,21 +76,32 @@ const bagStatusColor = (s: BagStatus) => {
 };
 
 const SacolinhasContent = () => {
-  const [bags, setBags] = useState(initialBags);
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("Todos");
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [loadingData, setLoadingData] = useState(true);
+  const [mockProducts, setMockProducts] = useState<any[]>(null);
+  const [mockClientes, setMockClientes] = useState<any[]>(null);
+  useEffect(() => {
+    let mounted = true;
+    const fetchData = async () => {
+      try {
+        const res_mockProducts = await api.get('/api/products');
+        const res_mockClientes = await api.get('/api/clientes');
+        if (mounted) {
+          setMockProducts(res_mockProducts.data);
+          setMockClientes(res_mockClientes.data);
+          setLoadingData(false);
+        }
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      }
+    };
+    fetchData();
+    return () => { mounted = false; };
+  }, []);
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
   const [detailBag, setDetailBag] = useState<Bag | null>(null);
 
-  // Form state
-  const [customerInput, setCustomerInput] = useState("");
-  const [selectedCustomer, setSelectedCustomer] = useState<{ name: string; phone: string; email: string } | null>(null);
-  const [showCustomerDrop, setShowCustomerDrop] = useState(false);
-  const [productSearch, setProductSearch] = useState("");
-  const [selectedProducts, setSelectedProducts] = useState<BagItem[]>([]);
-  const [trialDays, setTrialDays] = useState("3");
-  const [notes, setNotes] = useState("");
-  const customerDropRef = useRef<HTMLDivElement>(null);
+  // Form state  const [selectedCustomer, setSelectedCustomer] = useState<{ name: string; phone: string; email: string } | null>(null);  const [selectedProducts, setSelectedProducts] = useState<BagItem[]>([]);  const customerDropRef = useRef<HTMLDivElement>(null);
 
   const filteredClients = useMemo(() => {
     if (!customerInput || selectedCustomer) return [];
@@ -108,15 +121,6 @@ const SacolinhasContent = () => {
       p.sku.toLowerCase().includes(productSearch.toLowerCase())
     );
   }, [productSearch, selectedProducts]);
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (customerDropRef.current && !customerDropRef.current.contains(e.target as Node)) setShowCustomerDrop(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
-
   const filtered = bags.filter((b) => {
     const matchSearch = b.code.toLowerCase().includes(search.toLowerCase()) || b.customer.toLowerCase().includes(search.toLowerCase());
     const matchStatus = statusFilter === "Todos" || b.status === statusFilter;

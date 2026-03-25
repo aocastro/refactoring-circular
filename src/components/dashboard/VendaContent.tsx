@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import api from "@/api/axios";
+import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Plus, Package, Eye, Edit, Trash2, ShoppingCart, Tag, PackagePlus, FileSpreadsheet, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,11 +14,37 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import KpiCard from "@/components/shared/KpiCard";
 import FilterToolbar from "@/components/shared/FilterToolbar";
-import { mockProducts, mockPDVSales, productCategories, productStatuses, priceRanges } from "@/data/products";
+import { productCategories, productStatuses, priceRanges } from "@/data/products";
 import { getStatusColor } from "@/lib/status-colors";
 import type { KpiItem } from "@/types";
 
 const VendaContent = () => {
+  const [loadingData, setLoadingData] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [mockProducts, setmockProducts] = useState<any>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [mockPDVSales, setmockPDVSales] = useState<any>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res_mockProducts = await api.get('/api/products');
+        setMockProducts(res_mockProducts.data);
+        const res_mockPDVSales = await api.get('/api/products/pdv-sales');
+        setMockPDVSales(res_mockPDVSales.data);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      } finally {
+        setLoadingData(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+
+
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("Todos");
   const [statusFilter, setStatusFilter] = useState("Todos");
@@ -40,6 +67,8 @@ const VendaContent = () => {
     { label: "Reservados", value: mockProducts.filter((p) => p.status === "Reservado").length, icon: Eye },
     { label: "Vendidos", value: mockProducts.filter((p) => p.status === "Vendido").length, icon: ShoppingCart },
   ];
+
+
 
   return (
     <section aria-label="Módulo de vendas" className="space-y-6">

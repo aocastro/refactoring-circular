@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import api from "@/api/axios";
+import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Ticket, Search, Plus, Download, Copy, Percent, DollarSign, Truck, CheckCircle, XCircle, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,13 +9,37 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Label } from "@/components/ui/label";
 import KpiCard from "@/components/shared/KpiCard";
 import { exportToCSV } from "@/lib/export";
-import { mockCupons } from "@/data/cupons";
 import type { Cupom } from "@/data/cupons";
 import type { KpiItem } from "@/types";
 import { useToast } from "@/hooks/use-toast";
-import { mockClientes } from "@/data/clientes";
 
 const CuponsContent = () => {
+  const [loadingData, setLoadingData] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [mockCupons, setmockCupons] = useState<any>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [mockClientes, setmockClientes] = useState<any>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res_mockCupons = await api.get('/api/cupons');
+        setMockCupons(res_mockCupons.data);
+        const res_mockClientes = await api.get('/api/clientes');
+        setMockClientes(res_mockClientes.data);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      } finally {
+        setLoadingData(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+
+
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("Todos");
   const [showCreate, setShowCreate] = useState(false);
@@ -101,6 +126,8 @@ const CuponsContent = () => {
     }
     return 0;
   }, [targetType, targetValue]);
+
+
 
   return (
     <div className="space-y-6">

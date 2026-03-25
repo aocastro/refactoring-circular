@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import api from "@/api/axios";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { MessageSquare, Clock, CheckCircle, AlertCircle, ChevronDown, ChevronUp, Send, Plus, Search } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -10,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Label } from "@/components/ui/label";
 import DataTable from "@/components/shared/DataTable";
 import FilterToolbar from "@/components/shared/FilterToolbar";
-import { mockTickets, type Ticket, type TicketStatus, type TicketCategory } from "@/data/suporte";
+import { type Ticket, type TicketStatus, type TicketCategory } from "@/data/suporte";
 import { toast } from "sonner";
 
 const statusConfig: Record<TicketStatus, { label: string; variant: "default" | "secondary" | "outline"; icon: React.ReactNode }> = {
@@ -28,6 +29,27 @@ const columns = [
 ];
 
 const SuporteContent = () => {
+  const [loadingData, setLoadingData] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [mockTickets, setmockTickets] = useState<any>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res_mockTickets = await api.get('/api/suporte/tickets');
+        setMockTickets(res_mockTickets.data);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      } finally {
+        setLoadingData(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+
+
   // Only show tickets belonging to the current user (mocked as owner "Maria Silva")
   const currentUser = "Maria Silva";
   const [tickets, setTickets] = useState<Ticket[]>(mockTickets.filter(t => t.owner === currentUser));
@@ -122,6 +144,8 @@ const SuporteContent = () => {
           renderRow={(ticket: Ticket) => {
             const cfg = statusConfig[ticket.status];
             const expanded = expandedId === ticket.id;
+
+
 
             return (
               <React.Fragment key={ticket.id}>
