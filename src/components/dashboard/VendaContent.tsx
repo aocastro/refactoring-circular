@@ -1,7 +1,15 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Plus, Package, Eye, Edit, Trash2, ShoppingCart, Tag } from "lucide-react";
+import { Plus, Package, Eye, Edit, Trash2, ShoppingCart, Tag, PackagePlus, FileSpreadsheet, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import KpiCard from "@/components/shared/KpiCard";
 import FilterToolbar from "@/components/shared/FilterToolbar";
@@ -63,10 +71,30 @@ const VendaContent = () => {
               { key: "price", label: "Faixa de Preço", options: priceRanges.map((p) => p.label), value: priceFilter, onChange: setPriceFilter },
             ]}
             actions={
-              <Button size="sm" className="bg-gradient-primary text-primary-foreground">
-                <Plus className="h-4 w-4 mr-2" />
-                Novo Produto
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button size="sm" className="bg-gradient-primary text-primary-foreground">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Novo Produto
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>Opções de Cadastro</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="cursor-pointer">
+                    <PackagePlus className="mr-2 h-4 w-4" />
+                    <span>Cadastro de Produto Único</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer">
+                    <FileSpreadsheet className="mr-2 h-4 w-4" />
+                    <span>Cadastro em Massa</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer">
+                    <Camera className="mr-2 h-4 w-4" />
+                    <span>Cadastro por Foto</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             }
           />
 
