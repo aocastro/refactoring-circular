@@ -101,7 +101,6 @@ export const abcProductsData: ABCProductValue[] = [
 export interface SubStockProduct {
   product: import("@/types").Product;
   quantity: number;
-  position: string;
 }
 
 export interface SubStock {
@@ -120,37 +119,37 @@ export const initialSubStocks: SubStock[] = [
   {
     id: 1, name: "Arara Principal", location: "Loja - Térreo", capacity: 60, responsible: "Maria", status: "Ativo",
     products: [
-      { product: mockProducts[0], quantity: 3, position: "Seção A" },
-      { product: mockProducts[1], quantity: 2, position: "Seção A" },
-      { product: mockProducts[5], quantity: 5, position: "Seção B" },
-      { product: mockProducts[6], quantity: 4, position: "Seção C" },
+      { product: mockProducts[0], quantity: 3 },
+      { product: mockProducts[1], quantity: 2 },
+      { product: mockProducts[5], quantity: 5 },
+      { product: mockProducts[6], quantity: 4 },
     ],
   },
   {
     id: 2, name: "Vitrine Frontal", location: "Loja - Entrada", capacity: 15, responsible: "Ana", status: "Ativo",
     products: [
-      { product: mockProducts[2], quantity: 1, position: "Manequim 1" },
-      { product: mockProducts[3], quantity: 1, position: "Manequim 2" },
+      { product: mockProducts[2], quantity: 1 },
+      { product: mockProducts[3], quantity: 1 },
     ],
   },
   {
     id: 3, name: "Estoque Reserva", location: "Depósito - Subsolo", capacity: 200, responsible: "Carlos", status: "Ativo",
     products: [
-      { product: mockProducts[4], quantity: 15, position: "Prateleira A1" },
-      { product: mockProducts[7], quantity: 12, position: "Prateleira A2" },
-      { product: mockProducts[8], quantity: 8, position: "Prateleira B1" },
-      { product: mockProducts[9], quantity: 10, position: "Prateleira B2" },
-      { product: mockProducts[10], quantity: 5, position: "Prateleira C1" },
-      { product: mockProducts[11], quantity: 7, position: "Prateleira C2" },
-      { product: mockProducts[12], quantity: 6, position: "Prateleira D1" },
-      { product: mockProducts[13], quantity: 10, position: "Prateleira D2" },
+      { product: mockProducts[4], quantity: 15 },
+      { product: mockProducts[7], quantity: 12 },
+      { product: mockProducts[8], quantity: 8 },
+      { product: mockProducts[9], quantity: 10 },
+      { product: mockProducts[10], quantity: 5 },
+      { product: mockProducts[11], quantity: 7 },
+      { product: mockProducts[12], quantity: 6 },
+      { product: mockProducts[13], quantity: 10 },
     ],
   },
   {
     id: 4, name: "Arara Promoções", location: "Loja - Fundo", capacity: 40, responsible: "Juliana", status: "Ativo",
     products: [
-      { product: mockProducts[14], quantity: 5, position: "Cesto 1" },
-      { product: mockProducts[15], quantity: 5, position: "Cesto 2" },
+      { product: mockProducts[14], quantity: 5 },
+      { product: mockProducts[15], quantity: 5 },
     ],
   },
   {

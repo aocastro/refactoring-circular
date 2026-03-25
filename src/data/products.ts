@@ -20,7 +20,7 @@ export const mockPDVSales: PDVSale[] = [
 ];
 
 export const productCategories = ["Todos", "Roupas", "Acessórios", "Calçados", "Bolsas"];
-export const productStatuses = ["Todos", "Disponível", "Reservado", "Vendido"];
+export const productStatuses = ["Todos", "Disponível", "Reservado", "Vendido", "sacolinha"];
 
 export const priceRanges: RangeFilter[] = [
   { label: "Todos", min: 0, max: Infinity },

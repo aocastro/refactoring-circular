@@ -12,7 +12,7 @@ export interface KpiItem {
 }
 
 // ─── Products ────────────────────────────────────
-export type ProductStatus = "Disponível" | "Reservado" | "Vendido";
+export type ProductStatus = "Disponível" | "Reservado" | "Vendido" | "sacolinha";
 export type ProductCondition = "Novo" | "Excelente" | "Bom" | "Regular";
 
 export interface Product {
@@ -35,6 +35,32 @@ export interface PDVSale {
   total: string;
   payment: string;
   customer: string;
+}
+
+// ─── Sacolinhas ──────────────────────────────────
+export type BagStatus = "Montando" | "Pronta p/ Retirada" | "Com o Cliente" | "Devolvida" | "Vendida Parcial" | "Vendida Total" | "Cancelada" | string;
+
+export interface BagItem {
+  product: Product;
+  quantity: number;
+  returned?: boolean;
+  sold?: boolean;
+}
+
+export interface Bag {
+  id: number;
+  code: string;
+  customer: string;
+  customerPhone: string;
+  customerEmail: string;
+  items: BagItem[];
+  total: number;
+  status: BagStatus;
+  createdAt: string;
+  trialDays: number;
+  returnDate: string;
+  notes: string;
+  logistics?: 'Retirada' | 'Entrega';
 }
 
 // ─── Dashboard Sales ─────────────────────────────
