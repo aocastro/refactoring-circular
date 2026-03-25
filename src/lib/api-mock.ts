@@ -68,7 +68,7 @@ api.interceptors.request.use(async (config) => {
   // PUT /api/products/:id/status
   if (method === "put" && url?.match(/^\/products\/\d+\/status$/)) {
     const id = parseInt(url.split("/")[2]);
-    const { status } = JSON.parse(data);
+    const { status } = typeof data === 'string' ? JSON.parse(data) : data;
 
     inMemoryProducts = inMemoryProducts.map((p) =>
       p.id === id ? { ...p, status } : p
@@ -87,7 +87,7 @@ api.interceptors.request.use(async (config) => {
 
   // POST /api/sacolinhas
   if (method === "post" && url === "/sacolinhas") {
-    const payload = JSON.parse(data);
+    const payload = typeof data === 'string' ? JSON.parse(data) : data;
     const newBag: Bag = {
       ...payload,
       id: Date.now(),
@@ -107,7 +107,7 @@ api.interceptors.request.use(async (config) => {
   // POST /api/sacolinhas/:id/return
   if (method === "post" && url?.match(/^\/sacolinhas\/\d+\/return$/)) {
     const id = parseInt(url.split("/")[2]);
-    const { items } = JSON.parse(data); // items is an array of { productId, action: 'returned' | 'sold' }
+    const { items } = typeof data === 'string' ? JSON.parse(data) : data; // items is an array of { productId, action: 'returned' | 'sold' }
 
     // Process items
     for (const item of items) {
