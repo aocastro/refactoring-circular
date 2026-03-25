@@ -4,6 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { blockchainStats, blockchainTransactions, type BlockchainTransaction } from "@/data/admin";
 import DataTable from "@/components/shared/DataTable";
+import PaginationControls from "@/components/shared/PaginationControls";
+import { usePagination } from "@/hooks/use-pagination";
+import { useState } from "react";
 
 const kpis = [
   { label: "Tokens Emitidos", value: blockchainStats.totalTokens.toLocaleString("pt-BR"), icon: Hash, change: "+342 este mês" },
@@ -28,7 +31,11 @@ const columns = [
   { key: "status", label: "Status" },
 ];
 
-const AdminBlockchainContent = () => (
+const AdminBlockchainContent = () => {
+  const [page, setPage] = useState(1);
+  const { paginatedItems, totalPages, safePage, totalItems } = usePagination(blockchainTransactions, 10, page);
+
+  return (
   <div className="space-y-6">
     <header>
       <h2 className="font-display text-2xl font-bold text-foreground">Blockchain & Rastreabilidade</h2>
@@ -59,13 +66,13 @@ const AdminBlockchainContent = () => (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
       <DataTable
         columns={columns}
-        data={blockchainTransactions}
+        data={paginatedItems}
         emptyMessage="Nenhuma transação encontrada."
         header={<h3 className="text-base font-semibold text-foreground">Transações Recentes</h3>}
         renderRow={(tx: BlockchainTransaction) => {
           const cfg = statusConfig[tx.status];
           return (
-            <>
+            <tr key={tx.hash} className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors">
               <td className="px-4 py-3">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
@@ -88,12 +95,20 @@ const AdminBlockchainContent = () => (
                   {cfg.icon}{tx.status}
                 </Badge>
               </td>
-            </>
+            </tr>
           );
         }}
       />
+      <PaginationControls
+        currentPage={safePage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        itemsPerPage={10}
+        onPageChange={setPage}
+      />
     </motion.div>
   </div>
-);
+  );
+};
 
 export default AdminBlockchainContent;
