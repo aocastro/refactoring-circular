@@ -6,6 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import DataTable from "@/components/shared/DataTable";
+import PaginationControls from "@/components/shared/PaginationControls";
+import { usePagination } from "@/hooks/use-pagination";
+import { useEffect } from "react";
 import FilterToolbar from "@/components/shared/FilterToolbar";
 import { adminNpsStats, adminNpsHistory, adminNpsResponses, type NPSResponse } from "@/data/admin";
 import { toast } from "sonner";
@@ -42,12 +45,19 @@ const AdminNPSContent = () => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("Todos");
   const [responses, setResponses] = useState<NPSResponse[]>(adminNpsResponses);
+  const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    setPage(1);
+  }, [search, statusFilter]);
 
   const filtered = responses.filter((r) => {
     const matchSearch = r.user.toLowerCase().includes(search.toLowerCase()) || r.store.toLowerCase().includes(search.toLowerCase()) || r.comment.toLowerCase().includes(search.toLowerCase());
     const matchStatus = statusFilter === "Todos" || r.status === statusFilter;
     return matchSearch && matchStatus;
   });
+
+  const { paginatedItems, totalPages, safePage, totalItems } = usePagination(filtered, 10, page);
 
   const handleAction = (id: number, action: "analisar" | "contatar") => {
     setResponses((prev) =>
@@ -131,10 +141,10 @@ const AdminNPSContent = () => {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           <DataTable
             columns={columns}
-            data={filtered}
+            data={paginatedItems}
             emptyMessage="Nenhuma resposta encontrada."
             renderRow={(r: NPSResponse) => (
-              <>
+              <tr key={r.id} className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors">
                 <td className="px-4 py-3 text-center">
                   <span className={`inline-flex h-8 w-8 items-center justify-center rounded-full border text-sm font-bold ${getScoreColor(r.score)}`}>
                     {r.score}
@@ -174,8 +184,15 @@ const AdminNPSContent = () => {
                     )}
                   </div>
                 </td>
-              </>
+              </tr>
             )}
+          />
+          <PaginationControls
+            currentPage={safePage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            itemsPerPage={10}
+            onPageChange={setPage}
           />
         </motion.div>
       </div>

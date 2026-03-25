@@ -8,6 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import FilterToolbar from "@/components/shared/FilterToolbar";
 import DataTable from "@/components/shared/DataTable";
+import PaginationControls from "@/components/shared/PaginationControls";
+import { usePagination } from "@/hooks/use-pagination";
+import { useEffect } from "react";
 import KpiCard from "@/components/shared/KpiCard";
 import { toast } from "sonner";
 import { mockTickets, adminSuporteKpis, adminTicketsVolume, adminTicketsByCategory, type Ticket, type TicketStatus, type TicketPriority } from "@/data/suporte";
@@ -39,12 +42,19 @@ const AdminSuporteContent = () => {
   const [statusFilter, setStatusFilter] = useState("Todos");
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [replyText, setReplyText] = useState("");
+  const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    setPage(1);
+  }, [search, statusFilter]);
 
   const filtered = tickets.filter((t) => {
     const matchSearch = t.subject.toLowerCase().includes(search.toLowerCase()) || t.store.toLowerCase().includes(search.toLowerCase());
     const matchStatus = statusFilter === "Todos" || t.status === statusFilter;
     return matchSearch && matchStatus;
   });
+
+  const { paginatedItems, totalPages, safePage, totalItems } = usePagination(filtered, 10, page);
 
   const sendReply = (ticketId: number) => {
     if (!replyText.trim()) return;
@@ -139,7 +149,7 @@ const AdminSuporteContent = () => {
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
         <DataTable
           columns={columns}
-          data={filtered}
+          data={paginatedItems}
           emptyMessage="Nenhum ticket encontrado."
           renderRow={(ticket: Ticket) => {
             const cfg = statusConfig[ticket.status];
@@ -216,6 +226,13 @@ const AdminSuporteContent = () => {
               </React.Fragment>
             );
           }}
+        />
+        <PaginationControls
+          currentPage={safePage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          itemsPerPage={10}
+          onPageChange={setPage}
         />
       </motion.div>
     </div>

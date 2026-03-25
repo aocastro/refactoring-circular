@@ -5,6 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import FilterToolbar from "@/components/shared/FilterToolbar";
 import DataTable from "@/components/shared/DataTable";
+import PaginationControls from "@/components/shared/PaginationControls";
+import { usePagination } from "@/hooks/use-pagination";
+import { useEffect } from "react";
 import { adminUsers, type AdminUser } from "@/data/admin";
 import { toast } from "sonner";
 
@@ -33,12 +36,19 @@ const columns = [
 const AdminUsuariosContent = () => {
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("Todos");
+  const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    setPage(1);
+  }, [search, roleFilter]);
 
   const filtered = adminUsers.filter((u) => {
     const matchSearch = u.name.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase());
     const matchRole = roleFilter === "Todos" || u.role === roleFilter;
     return matchSearch && matchRole;
   });
+
+  const { paginatedItems, totalPages, safePage, totalItems } = usePagination(filtered, 10, page);
 
   return (
     <div className="space-y-6">
@@ -60,10 +70,10 @@ const AdminUsuariosContent = () => {
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
         <DataTable
           columns={columns}
-          data={filtered}
+          data={paginatedItems}
           emptyMessage="Nenhum usuário encontrado."
           renderRow={(user: AdminUser) => (
-            <>
+            <tr key={user.id} className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors">
               <td className="px-4 py-3 text-sm font-medium text-foreground">{user.name}</td>
               <td className="hidden px-4 py-3 text-sm text-muted-foreground sm:table-cell">{user.email}</td>
               <td className="px-4 py-3 text-sm">
@@ -79,8 +89,15 @@ const AdminUsuariosContent = () => {
                   <Button size="sm" variant="destructive" onClick={() => toast.success(`${user.name} bloqueado`)}>Bloquear</Button>
                 ) : null}
               </td>
-            </>
+            </tr>
           )}
+        />
+        <PaginationControls
+          currentPage={safePage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          itemsPerPage={10}
+          onPageChange={setPage}
         />
       </motion.div>
     </div>

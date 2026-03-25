@@ -5,6 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import FilterToolbar from "@/components/shared/FilterToolbar";
 import DataTable from "@/components/shared/DataTable";
+import PaginationControls from "@/components/shared/PaginationControls";
+import { usePagination } from "@/hooks/use-pagination";
+import { useEffect } from "react";
 
 interface AuditLog {
   id: number;
@@ -57,6 +60,11 @@ const columns = [
 const AdminAuditContent = () => {
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("Todos");
+  const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    setPage(1);
+  }, [search, categoryFilter]);
 
   const filtered = logs.filter((l) => {
     const matchSearch =
@@ -66,6 +74,8 @@ const AdminAuditContent = () => {
     const matchCat = categoryFilter === "Todos" || l.category === categoryFilter;
     return matchSearch && matchCat;
   });
+
+  const { paginatedItems, totalPages, safePage, totalItems } = usePagination(filtered, 10, page);
 
   return (
     <div className="space-y-6">
@@ -95,10 +105,10 @@ const AdminAuditContent = () => {
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
         <DataTable
           columns={columns}
-          data={filtered}
+          data={paginatedItems}
           emptyMessage="Nenhum registro encontrado."
           renderRow={(log: AuditLog) => (
-            <>
+            <tr key={log.id} className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors">
               <td className="px-4 py-3">
                 <div className="flex items-center gap-3">
                   <div className="shrink-0">{categoryIcon[log.category]}</div>
@@ -122,8 +132,15 @@ const AdminAuditContent = () => {
               <td className="hidden px-4 py-3 text-right font-mono text-[10px] text-muted-foreground lg:table-cell">
                 {log.ip}
               </td>
-            </>
+            </tr>
           )}
+        />
+        <PaginationControls
+          currentPage={safePage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          itemsPerPage={10}
+          onPageChange={setPage}
         />
       </motion.div>
     </div>

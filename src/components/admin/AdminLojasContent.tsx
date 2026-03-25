@@ -5,6 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import FilterToolbar from "@/components/shared/FilterToolbar";
 import DataTable from "@/components/shared/DataTable";
+import PaginationControls from "@/components/shared/PaginationControls";
+import { usePagination } from "@/hooks/use-pagination";
+import { useEffect } from "react";
 import { adminStores, type AdminStore } from "@/data/admin";
 import { toast } from "sonner";
 
@@ -27,12 +30,19 @@ const columns = [
 const AdminLojasContent = () => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("Todos");
+  const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    setPage(1);
+  }, [search, statusFilter]);
 
   const filtered = adminStores.filter((s) => {
     const matchSearch = s.name.toLowerCase().includes(search.toLowerCase()) || s.owner.toLowerCase().includes(search.toLowerCase());
     const matchStatus = statusFilter === "Todos" || s.status === statusFilter;
     return matchSearch && matchStatus;
   });
+
+  const { paginatedItems, totalPages, safePage, totalItems } = usePagination(filtered, 10, page);
 
   return (
     <div className="space-y-6">
@@ -54,10 +64,10 @@ const AdminLojasContent = () => {
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
         <DataTable
           columns={columns}
-          data={filtered}
+          data={paginatedItems}
           emptyMessage="Nenhuma loja encontrada."
           renderRow={(store: AdminStore) => (
-            <>
+            <tr key={store.id} className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors">
               <td className="px-4 py-3 text-sm text-foreground">{store.name}</td>
               <td className="hidden px-4 py-3 text-sm text-muted-foreground sm:table-cell">{store.owner}</td>
               <td className="px-4 py-3 text-sm"><Badge variant="outline">{store.plan}</Badge></td>
@@ -73,8 +83,15 @@ const AdminLojasContent = () => {
                   {store.status === "ativa" && <Button size="sm" variant="destructive" onClick={() => toast.success(`${store.name} suspensa`)}>Suspender</Button>}
                 </div>
               </td>
-            </>
+            </tr>
           )}
+        />
+        <PaginationControls
+          currentPage={safePage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          itemsPerPage={10}
+          onPageChange={setPage}
         />
       </motion.div>
     </div>
