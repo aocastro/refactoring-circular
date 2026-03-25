@@ -1,116 +1,131 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Warehouse, Plus, Trash2, Package, MapPin, ArrowRightLeft, ArrowLeft, Search, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import KpiCard from "@/components/shared/KpiCard";
 import FilterToolbar from "@/components/shared/FilterToolbar";
 import { mockProducts } from "@/data/products";
 import { getStatusColor } from "@/lib/status-colors";
-import type { KpiItem, Product } from "@/types";
-
-interface SubStockProduct {
-  product: Product;
-  quantity: number;
-  position: string;
-}
-
-interface SubStock {
-  id: number;
-  name: string;
-  location: string;
-  capacity: number;
-  responsible: string;
-  status: "Ativo" | "Inativo";
-  products: SubStockProduct[];
-}
-
-const initialSubStocks: SubStock[] = [
-  {
-    id: 1, name: "Arara Principal", location: "Loja - Térreo", capacity: 60, responsible: "Maria", status: "Ativo",
-    products: [
-      { product: mockProducts[0], quantity: 3, position: "Seção A" },
-      { product: mockProducts[1], quantity: 2, position: "Seção A" },
-      { product: mockProducts[5], quantity: 5, position: "Seção B" },
-      { product: mockProducts[6], quantity: 4, position: "Seção C" },
-    ],
-  },
-  {
-    id: 2, name: "Vitrine Frontal", location: "Loja - Entrada", capacity: 15, responsible: "Ana", status: "Ativo",
-    products: [
-      { product: mockProducts[2], quantity: 1, position: "Display Central" },
-      { product: mockProducts[7], quantity: 1, position: "Display Lateral" },
-    ],
-  },
-  {
-    id: 3, name: "Estoque Reserva", location: "Depósito - Subsolo", capacity: 200, responsible: "Carlos", status: "Ativo",
-    products: [
-      { product: mockProducts[0], quantity: 10, position: "Prateleira 1" },
-      { product: mockProducts[1], quantity: 8, position: "Prateleira 1" },
-      { product: mockProducts[2], quantity: 5, position: "Prateleira 2" },
-      { product: mockProducts[3], quantity: 12, position: "Prateleira 2" },
-      { product: mockProducts[4], quantity: 15, position: "Prateleira 3" },
-      { product: mockProducts[5], quantity: 10, position: "Prateleira 3" },
-      { product: mockProducts[6], quantity: 7, position: "Prateleira 4" },
-      { product: mockProducts[7], quantity: 6, position: "Prateleira 4" },
-    ],
-  },
-  {
-    id: 4, name: "Arara Promoções", location: "Loja - Fundo", capacity: 40, responsible: "Juliana", status: "Ativo",
-    products: [
-      { product: mockProducts[3], quantity: 4, position: "Promoção 1" },
-      { product: mockProducts[4], quantity: 6, position: "Promoção 2" },
-    ],
-  },
-  {
-    id: 5, name: "Pop-up Store Centro", location: "Externo - Shopping", capacity: 25, responsible: "Pedro", status: "Inativo",
-    products: [],
-  },
-];
+import type { KpiItem } from "@/types";
+import api from "@/api/axios";
+import { SubStock, SubStockProduct } from "@/data/dashboard";
 
 const SubestoquesContent = () => {
-  const [subStocks, setSubStocks] = useState(initialSubStocks);
+  const [subStocks, setSubStocks] = useState<SubStock[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("Todos");
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [form, setForm] = useState({ name: "", location: "", capacity: "", responsible: "" });
+
+  const [form, setForm] = useState({ name: "", location: "" });
+  const [pendingProducts, setPendingProducts] = useState<SubStockProduct[]>([]);
+  const [newProductForm, setNewProductForm] = useState({ productId: "", quantity: "", position: "" });
+
   const [selectedStock, setSelectedStock] = useState<SubStock | null>(null);
   const [productSearch, setProductSearch] = useState("");
 
-  const filtered = subStocks.filter((s) => {
-    const matchSearch = s.name.toLowerCase().includes(search.toLowerCase()) || s.location.toLowerCase().includes(search.toLowerCase());
-    const matchStatus = statusFilter === "Todos" || s.status === statusFilter;
-    return matchSearch && matchStatus;
-  });
+  useEffect(() => {
+    const fetchSubStocks = async () => {
+      try {
+        setLoading(true);
+        const res = await api.get('/api/subestoques');
+        setSubStocks(res.data);
+        if (selectedStock) {
+          const updated = res.data.find((s: SubStock) => s.id === selectedStock.id);
+          if (updated) setSelectedStock(updated);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSubStocks();
+  }, [selectedStock]);
+
+  const refreshSubStocks = async () => {
+    try {
+      const res = await api.get('/api/subestoques');
+      setSubStocks(res.data);
+      if (selectedStock) {
+        const updated = res.data.find((s: SubStock) => s.id === selectedStock.id);
+        if (updated) setSelectedStock(updated);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const filtered = useMemo(() => {
+    return subStocks.filter((s) => {
+      const matchSearch = s.name.toLowerCase().includes(search.toLowerCase()) ||
+                          s.location.toLowerCase().includes(search.toLowerCase()) ||
+                          s.responsible.toLowerCase().includes(search.toLowerCase());
+      const matchStatus = statusFilter === "Todos" || s.status === statusFilter;
+      return matchSearch && matchStatus;
+    });
+  }, [search, statusFilter, subStocks]);
 
   const totalItems = subStocks.reduce((a, b) => a + b.products.reduce((x, y) => x + y.quantity, 0), 0);
   const totalCapacity = subStocks.reduce((a, b) => a + b.capacity, 0);
+  const occupancyRate = totalCapacity > 0 ? Math.round((totalItems / totalCapacity) * 100) : 0;
 
   const kpis: KpiItem[] = [
     { label: "Subestoques", value: subStocks.filter((s) => s.status === "Ativo").length, icon: Warehouse },
     { label: "Itens Alocados", value: totalItems, icon: Package },
     { label: "Capacidade Total", value: totalCapacity, icon: MapPin },
-    { label: "Ocupação", value: `${Math.round((totalItems / totalCapacity) * 100)}%`, icon: ArrowRightLeft },
+    { label: "Ocupação", value: `${occupancyRate}%`, icon: ArrowRightLeft },
   ];
 
-  const handleAdd = () => {
-    if (!form.name) return;
-    setSubStocks((prev) => [...prev, {
-      id: Date.now(),
-      name: form.name,
-      location: form.location,
-      capacity: parseInt(form.capacity) || 50,
-      responsible: form.responsible,
-      status: "Ativo" as const,
-      products: [],
+  const handleAddPendingProduct = () => {
+    if (!newProductForm.productId || !newProductForm.quantity || !newProductForm.position) return;
+    const product = mockProducts.find(p => p.id === newProductForm.productId);
+    if (!product) return;
+
+    setPendingProducts([...pendingProducts, {
+      product,
+      quantity: parseInt(newProductForm.quantity, 10),
+      position: newProductForm.position
     }]);
-    setForm({ name: "", location: "", capacity: "", responsible: "" });
-    setDialogOpen(false);
+    setNewProductForm({ productId: "", quantity: "", position: "" });
   };
 
-  const handleRemove = (id: number) => setSubStocks((prev) => prev.filter((s) => s.id !== id));
+  const handleRemovePendingProduct = (index: number) => {
+    setPendingProducts(pendingProducts.filter((_, i) => i !== index));
+  };
+
+  const handleAdd = async () => {
+    if (!form.name) return;
+    try {
+      await api.post('/api/subestoques', {
+        name: form.name,
+        location: form.location,
+        capacity: 0,
+        responsible: "",
+        products: pendingProducts
+      });
+      refreshSubStocks();
+      setForm({ name: "", location: "" });
+      setPendingProducts([]);
+      setDialogOpen(false);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleRemove = async (id: number) => {
+    try {
+      await api.delete(`/api/subestoques/${id}`);
+      refreshSubStocks();
+      if (selectedStock?.id === id) setSelectedStock(null);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const filteredStockProducts = useMemo(() => {
     if (!selectedStock) return [];
@@ -122,10 +137,9 @@ const SubestoquesContent = () => {
     );
   }, [selectedStock, productSearch]);
 
-  // Detail view for a selected substock
   if (selectedStock) {
     const stockItemCount = selectedStock.products.reduce((a, b) => a + b.quantity, 0);
-    const pct = Math.round((stockItemCount / selectedStock.capacity) * 100);
+    const pct = selectedStock.capacity > 0 ? Math.round((stockItemCount / selectedStock.capacity) * 100) : 0;
 
     return (
       <div className="space-y-6">
@@ -136,7 +150,7 @@ const SubestoquesContent = () => {
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-2xl font-bold font-display text-foreground">{selectedStock.name}</h1>
-            <p className="text-muted-foreground text-sm">{selectedStock.location} • Responsável: {selectedStock.responsible}</p>
+            <p className="text-muted-foreground text-sm">{selectedStock.location}</p>
           </div>
           <span className={`text-xs px-2 py-1 rounded-full ${selectedStock.status === "Ativo" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>{selectedStock.status}</span>
         </div>
@@ -144,13 +158,19 @@ const SubestoquesContent = () => {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <KpiCard label="Produtos Únicos" value={selectedStock.products.length} icon={Package} delay={0} />
           <KpiCard label="Total de Peças" value={stockItemCount} icon={Warehouse} delay={0.05} />
-          <KpiCard label="Capacidade" value={selectedStock.capacity} icon={MapPin} delay={0.1} />
-          <KpiCard label="Ocupação" value={`${pct}%`} icon={ArrowRightLeft} delay={0.15} />
+          {selectedStock.capacity > 0 && (
+            <>
+              <KpiCard label="Capacidade" value={selectedStock.capacity} icon={MapPin} delay={0.1} />
+              <KpiCard label="Ocupação" value={`${pct}%`} icon={ArrowRightLeft} delay={0.15} />
+            </>
+          )}
         </div>
 
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Buscar produto por nome, SKU ou posição..." value={productSearch} onChange={(e) => setProductSearch(e.target.value)} className="pl-10 bg-secondary border-border" />
+        <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+          <div className="relative w-full sm:w-96">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input placeholder="Buscar produto por nome, SKU ou posição..." value={productSearch} onChange={(e) => setProductSearch(e.target.value)} className="pl-10 bg-secondary border-border" />
+          </div>
         </div>
 
         {filteredStockProducts.length === 0 ? (
@@ -223,56 +243,120 @@ const SubestoquesContent = () => {
             <DialogTrigger asChild>
               <Button size="sm" className="bg-gradient-primary text-primary-foreground"><Plus className="h-4 w-4 mr-2" /> Novo Subestoque</Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader><DialogTitle>Novo Subestoque</DialogTitle></DialogHeader>
               <div className="space-y-4 pt-2">
-                <div><Label>Nome</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Ex: Arara A1" /></div>
-                <div><Label>Localização</Label><Input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} placeholder="Ex: Loja - Térreo" /></div>
-                <div><Label>Capacidade</Label><Input type="number" value={form.capacity} onChange={(e) => setForm({ ...form, capacity: e.target.value })} placeholder="50" /></div>
-                <div><Label>Responsável</Label><Input value={form.responsible} onChange={(e) => setForm({ ...form, responsible: e.target.value })} placeholder="Nome" /></div>
-                <Button onClick={handleAdd} className="w-full bg-gradient-primary text-primary-foreground">Criar Subestoque</Button>
+                <div className="grid grid-cols-2 gap-4">
+                  <div><Label>Nome</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Ex: Arara A1" /></div>
+                  <div><Label>Localização</Label><Input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} placeholder="Ex: Loja - Térreo" /></div>
+                </div>
+
+                <div className="pt-4 border-t border-border mt-4">
+                  <h3 className="font-semibold text-sm mb-3">Produtos do Subestoque</h3>
+                  <div className="grid grid-cols-12 gap-3 items-end">
+                    <div className="col-span-5">
+                      <Label className="text-xs">Produto</Label>
+                      <Select value={newProductForm.productId} onValueChange={(v) => setNewProductForm({ ...newProductForm, productId: v })}>
+                        <SelectTrigger className="h-9"><SelectValue placeholder="Selecione um produto" /></SelectTrigger>
+                        <SelectContent>
+                          {mockProducts.map((p) => (
+                            <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="col-span-3">
+                      <Label className="text-xs">Quantidade</Label>
+                      <Input className="h-9" type="number" value={newProductForm.quantity} onChange={(e) => setNewProductForm({ ...newProductForm, quantity: e.target.value })} placeholder="Qtd" />
+                    </div>
+                    <div className="col-span-3">
+                      <Label className="text-xs">Posição</Label>
+                      <Input className="h-9" value={newProductForm.position} onChange={(e) => setNewProductForm({ ...newProductForm, position: e.target.value })} placeholder="Ex: P1" />
+                    </div>
+                    <div className="col-span-1">
+                      <Button size="icon" variant="secondary" className="h-9 w-full" onClick={handleAddPendingProduct}><Plus className="h-4 w-4" /></Button>
+                    </div>
+                  </div>
+
+                  {pendingProducts.length > 0 && (
+                    <div className="mt-4 border rounded-md overflow-hidden">
+                      <table className="w-full text-xs text-left">
+                        <thead className="bg-secondary/50 border-b border-border">
+                          <tr>
+                            <th className="py-2 px-3 font-medium">Produto</th>
+                            <th className="py-2 px-3 font-medium">Qtd</th>
+                            <th className="py-2 px-3 font-medium">Posição</th>
+                            <th className="py-2 px-3 font-medium w-10"></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {pendingProducts.map((pp, idx) => (
+                            <tr key={idx} className="border-b border-border/50 last:border-0">
+                              <td className="py-2 px-3">{pp.product.name}</td>
+                              <td className="py-2 px-3">{pp.quantity}</td>
+                              <td className="py-2 px-3">{pp.position}</td>
+                              <td className="py-2 px-3 text-right">
+                                <Button size="sm" variant="ghost" className="h-6 w-6 p-0 text-destructive" onClick={() => handleRemovePendingProduct(idx)}><Trash2 className="h-3 w-3" /></Button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+
+                <Button onClick={handleAdd} className="w-full mt-6 bg-gradient-primary text-primary-foreground">Criar Subestoque</Button>
               </div>
             </DialogContent>
           </Dialog>
         }
       />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filtered.map((sub, i) => {
-          const itemCount = sub.products.reduce((a, b) => a + b.quantity, 0);
-          const pct = sub.capacity > 0 ? Math.round((itemCount / sub.capacity) * 100) : 0;
-          return (
-            <motion.div key={sub.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-              className="p-4 rounded-xl border border-border bg-card space-y-3 cursor-pointer hover:border-primary/50 hover:shadow-md transition-all"
-              onClick={() => setSelectedStock(sub)}>
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="font-semibold text-foreground">{sub.name}</h3>
-                  <p className="text-xs text-muted-foreground">{sub.location}</p>
+      {loading ? (
+        <div className="flex justify-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filtered.map((sub, i) => {
+            const itemCount = sub.products.reduce((a, b) => a + b.quantity, 0);
+            const pct = sub.capacity > 0 ? Math.round((itemCount / sub.capacity) * 100) : 0;
+            return (
+              <motion.div key={sub.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+                className="p-4 rounded-xl border border-border bg-card space-y-3 cursor-pointer hover:border-primary/50 hover:shadow-md transition-all"
+                onClick={() => setSelectedStock(sub)}>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h3 className="font-semibold text-foreground">{sub.name}</h3>
+                    <p className="text-xs text-muted-foreground">{sub.location}</p>
+                  </div>
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${sub.status === "Ativo" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>{sub.status}</span>
                 </div>
-                <span className={`text-xs px-2 py-0.5 rounded-full ${sub.status === "Ativo" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>{sub.status}</span>
-              </div>
-              <div>
-                <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                  <span>{itemCount} / {sub.capacity} itens</span>
-                  <span>{pct}%</span>
+                {sub.capacity > 0 && (
+                  <div>
+                    <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                      <span>{itemCount} / {sub.capacity} itens</span>
+                      <span>{pct}%</span>
+                    </div>
+                    <div className="w-full h-2 rounded-full bg-secondary">
+                      <div className={`h-full rounded-full transition-all ${pct > 85 ? "bg-destructive" : "bg-primary"}`} style={{ width: `${Math.min(pct, 100)}%` }} />
+                    </div>
+                  </div>
+                )}
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">{sub.products.length} produtos únicos</span>
+                  <div className="flex items-center gap-1">
+                    <Eye className="h-3.5 w-3.5 text-muted-foreground" />
+                    <Button size="sm" variant="ghost" className="text-destructive h-7" onClick={(e) => { e.stopPropagation(); handleRemove(sub.id); }}><Trash2 className="h-3.5 w-3.5" /></Button>
+                  </div>
                 </div>
-                <div className="w-full h-2 rounded-full bg-secondary">
-                  <div className={`h-full rounded-full transition-all ${pct > 85 ? "bg-destructive" : "bg-primary"}`} style={{ width: `${Math.min(pct, 100)}%` }} />
-                </div>
-              </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">Resp: {sub.responsible} • {sub.products.length} produtos</span>
-                <div className="flex items-center gap-1">
-                  <Eye className="h-3.5 w-3.5 text-muted-foreground" />
-                  <Button size="sm" variant="ghost" className="text-destructive h-7" onClick={(e) => { e.stopPropagation(); handleRemove(sub.id); }}><Trash2 className="h-3.5 w-3.5" /></Button>
-                </div>
-              </div>
-            </motion.div>
-          );
-        })}
-        {filtered.length === 0 && <p className="text-muted-foreground text-sm col-span-full text-center py-8">Nenhum subestoque encontrado.</p>}
-      </div>
+              </motion.div>
+            );
+          })}
+          {filtered.length === 0 && <p className="text-muted-foreground text-sm col-span-full text-center py-8">Nenhum subestoque encontrado.</p>}
+        </div>
+      )}
     </div>
   );
 };
