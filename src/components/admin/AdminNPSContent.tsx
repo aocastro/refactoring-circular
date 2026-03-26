@@ -1,6 +1,5 @@
 import api from "@/api/axios";
 import { useState, useEffect } from "react";
-import { useState } from "react";
 import { motion } from "framer-motion";
 import { Smile, Frown, Meh, BarChart2, TrendingUp, CheckCircle, Clock, MessageSquare } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
@@ -10,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import DataTable from "@/components/shared/DataTable";
 import PaginationControls from "@/components/shared/PaginationControls";
 import { usePagination } from "@/hooks/use-pagination";
-import { useEffect } from "react";
 import FilterToolbar from "@/components/shared/FilterToolbar";
 import { adminNpsStats, adminNpsHistory, adminNpsResponses, type NPSResponse } from "@/data/admin";
 import { toast } from "sonner";
@@ -44,10 +42,15 @@ const getScoreColor = (score: number) => {
 };
 
 const AdminNPSContent = () => {
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("Todos");
+
   const [loadingData, setLoadingData] = useState(true);
   const [adminNpsStats, setAdminNpsStats] = useState<any>({});
   const [adminNpsHistory, setAdminNpsHistory] = useState<any>([]);
   const [adminNpsResponses, setAdminNpsResponses] = useState<any>([]);
+
   useEffect(() => {
     let mounted = true;
     const fetchData = async () => {
@@ -69,8 +72,14 @@ const AdminNPSContent = () => {
     return () => { mounted = false; };
   }, []);
 
-  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
   const [responses, setResponses] = useState<NPSResponse[]>(adminNpsResponses);
+
+  useEffect(() => {
+    if (!loadingData) {
+      setResponses(adminNpsResponses);
+    }
+  }, [loadingData, adminNpsResponses]);
+
   useEffect(() => {
     setPage(1);
   }, [search, statusFilter]);
@@ -82,6 +91,8 @@ const AdminNPSContent = () => {
   });
 
   const { paginatedItems, totalPages, safePage, totalItems } = usePagination(filtered, 10, page);
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
   const handleAction = (id: number, action: "analisar" | "contatar") => {
     setResponses((prev) =>

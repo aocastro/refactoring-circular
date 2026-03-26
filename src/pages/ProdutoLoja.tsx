@@ -9,6 +9,14 @@ import CartDrawer from "@/components/store/CartDrawer";
 import { useToast } from "@/hooks/use-toast";
 
 const ProdutoLoja = () => {
+  const { slug, id } = useParams();
+  const navigate = useNavigate();
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [quantity, setQuantity] = useState(1);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const { addItem, totalItems, setIsOpen } = useCart();
+  const { toast } = useToast();
+
   const [loadingData, setLoadingData] = useState(true);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -34,15 +42,8 @@ const ProdutoLoja = () => {
 
   if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
-
-  const { slug, id } = useParams();
-  const navigate = useNavigate();
-  const product = storeProducts.find((p) => p.id === Number(id));
-  const [selectedSize, setSelectedSize] = useState<string | null>(null);
-  const [quantity, setQuantity] = useState(1);
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const { addItem, totalItems, setIsOpen } = useCart();
-  const { toast } = useToast();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const product = storeProducts.find((p: any) => p.id === Number(id));
 
   if (!product) {
     return (

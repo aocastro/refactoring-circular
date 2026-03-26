@@ -5,21 +5,13 @@ import { Leaf, Droplets, Recycle, Store, ArrowUpRight } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-const kpis = [
-  { label: "CO₂ Evitado", value: `${adminEsg.co2Evitado.toLocaleString("pt-BR")} kg`, icon: Leaf, change: "+18%", color: "text-green-600" },
-  { label: "Água Economizada", value: `${(adminEsg.aguaEconomizada / 1000).toFixed(0)} mil L`, icon: Droplets, change: "+22%", color: "text-blue-500" },
-  { label: "Peças Circuladas", value: adminEsg.pecasCirculadas.toLocaleString("pt-BR"), icon: Recycle, change: "+15%", color: "text-amber-600" },
-  { label: "Lojas com Selo ESG", value: adminEsg.lojasESG.toString(), icon: Store, change: "+12 este mês", color: "text-primary" },
-];
-
 const AdminESGContent = () => {
   const [loadingData, setLoadingData] = useState(true);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [adminEsg, setAdminEsg] = useState<any>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [adminEsg, setadminEsg] = useState<any>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [adminEsgMonthly, setadminEsgMonthly] = useState<any>([]);
+  const [adminEsgMonthly, setAdminEsgMonthly] = useState<any>([]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -36,10 +28,14 @@ const AdminESGContent = () => {
     fetchData();
   }, []);
 
-  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+  if (loadingData || !adminEsg) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
-
-
+  const kpis = [
+    { label: "CO₂ Evitado", value: `${adminEsg.co2Evitado?.toLocaleString("pt-BR") || 0} kg`, icon: Leaf, change: "+18%", color: "text-green-600" },
+    { label: "Água Economizada", value: `${((adminEsg.aguaEconomizada || 0) / 1000).toFixed(0)} mil L`, icon: Droplets, change: "+22%", color: "text-blue-500" },
+    { label: "Peças Circuladas", value: adminEsg.pecasCirculadas?.toLocaleString("pt-BR") || 0, icon: Recycle, change: "+15%", color: "text-amber-600" },
+    { label: "Lojas com Selo ESG", value: adminEsg.lojasESG?.toString() || "0", icon: Store, change: "+12 este mês", color: "text-primary" },
+  ];
 
   return (
   <div className="space-y-6">

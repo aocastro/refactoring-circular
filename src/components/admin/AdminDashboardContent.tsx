@@ -13,20 +13,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 const AdminDashboardContent = () => {
   const [loadingData, setLoadingData] = useState(true);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [adminKpis, setAdminKpis] = useState<any>([]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [adminKpis, setadminKpis] = useState<any>([]);
+  const [adminMrrHistory, setAdminMrrHistory] = useState<any>([]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [adminRevenueByPlan, setAdminRevenueByPlan] = useState<any>([]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [adminMrrHistory, setadminMrrHistory] = useState<any>([]);
+  const [adminChurnHistory, setAdminChurnHistory] = useState<any>([]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [adminRevenueByPlan, setadminRevenueByPlan] = useState<any>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [adminChurnHistory, setadminChurnHistory] = useState<any>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [adminLtvByPlan, setadminLtvByPlan] = useState<any>([]);
+  const [adminLtvByPlan, setAdminLtvByPlan] = useState<any>([]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
