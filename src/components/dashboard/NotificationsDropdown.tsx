@@ -25,11 +25,14 @@ const NotificationsDropdown = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [mockNotifications, setMockNotifications] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<AppNotification[]>(mockNotifications);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res_mockNotifications = await api.get('/api/notifications');
         setMockNotifications(res_mockNotifications.data);
+        setNotifications(res_mockNotifications.data);
       } catch (err) {
         console.error("Error fetching data:", err);
       } finally {
@@ -40,9 +43,6 @@ const NotificationsDropdown = () => {
   }, []);
 
   if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
-
-
-  const [notifications, setNotifications] = useState<AppNotification[]>(mockNotifications);
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   const markAllRead = () => {

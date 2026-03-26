@@ -40,19 +40,22 @@ const DashboardContent = ({ onSectionChange }: DashboardContentProps) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [abcProductsData, setabcProductsData] = useState<any>([]);
+  const [trialDays, setTrialDays] = useState<number | null>(null);
+  const [selectedPeriod, setSelectedPeriod] = useState<DashboardPeriod>("hoje");
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res_dashboardKpisByPeriod = await api.get('/api/dashboard/kpis-by-period');
-        setDashboardKpisByPeriod(res_dashboardKpisByPeriod.data);
+        setdashboardKpisByPeriod(res_dashboardKpisByPeriod.data);
         const res_revenueData = await api.get('/api/dashboard/revenue-data');
-        setRevenueData(res_revenueData.data);
+        setrevenueData(res_revenueData.data);
         const res_salesByCategory = await api.get('/api/dashboard/sales-by-category');
-        setSalesByCategory(res_salesByCategory.data);
+        setsalesByCategory(res_salesByCategory.data);
         const res_recentSales = await api.get('/api/dashboard/recent-sales');
-        setRecentSales(res_recentSales.data);
+        setrecentSales(res_recentSales.data);
         const res_abcProductsData = await api.get('/api/dashboard/abc-products');
-        setAbcProductsData(res_abcProductsData.data);
+        setabcProductsData(res_abcProductsData.data);
       } catch (err) {
         console.error("Error fetching data:", err);
       } finally {
@@ -61,12 +64,6 @@ const DashboardContent = ({ onSectionChange }: DashboardContentProps) => {
     };
     fetchData();
   }, []);
-
-  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
-
-
-  const [trialDays, setTrialDays] = useState<number | null>(null);
-  const [selectedPeriod, setSelectedPeriod] = useState<DashboardPeriod>("hoje");
 
   useEffect(() => {
     const storeConfig = JSON.parse(localStorage.getItem("storeConfig") || "{}");
@@ -80,6 +77,7 @@ const DashboardContent = ({ onSectionChange }: DashboardContentProps) => {
     }
   }, []);
 
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
 
   return (
