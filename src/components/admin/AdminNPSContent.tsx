@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import DataTable from "@/components/shared/DataTable";
 import PaginationControls from "@/components/shared/PaginationControls";
 import { usePagination } from "@/hooks/use-pagination";
-import { useEffect } from "react";
 import FilterToolbar from "@/components/shared/FilterToolbar";
 import { adminNpsStats, adminNpsHistory, adminNpsResponses, type NPSResponse } from "@/data/admin";
 import { toast } from "sonner";
@@ -80,6 +79,8 @@ const AdminNPSContent = () => {
   });
 
   const { paginatedItems, totalPages, safePage, totalItems } = usePagination(filtered, 10, page);
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
   const handleAction = (id: number, action: "analisar" | "contatar") => {
     setResponses((prev) =>

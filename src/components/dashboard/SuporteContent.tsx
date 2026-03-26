@@ -143,6 +143,8 @@ const SuporteContent = () => {
             const cfg = statusConfig[ticket.status];
             const expanded = expandedId === ticket.id;
 
+
+
             return (
               <React.Fragment key={ticket.id}>
                 <tr className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors">

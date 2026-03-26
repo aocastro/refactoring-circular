@@ -105,6 +105,31 @@ const PDVPage = () => {
   const [splitAmount, setSplitAmount] = useState("");
   const [lastSale, setLastSale] = useState<RegisteredSale | null>(null);
 
+  const [loadingData, setLoadingData] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [storeProducts, setStoreProducts] = useState<any>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [mockClientes, setMockClientes] = useState<any>([]);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchData = async () => {
+      try {
+        const res_storeProducts = await api.get('/api/store/products');
+        const res_mockClientes = await api.get('/api/clientes');
+        if (mounted) {
+          setStoreProducts(res_storeProducts.data);
+          setMockClientes(res_mockClientes.data);
+          setLoadingData(false);
+        }
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      }
+    };
+    fetchData();
+    return () => { mounted = false; };
+  }, []);
+
   const cartTotal = cart.reduce((a, i) => a + i.price * i.quantity, 0);
   const discountValue = (cartTotal * discount) / 100;
   const cartTotalWithDiscount = cartTotal - discountValue;
@@ -288,6 +313,8 @@ const PDVPage = () => {
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [paymentStep, startPayment]);
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
   const dayTotal = sales.reduce((a, s) => a + s.total, 0);
   

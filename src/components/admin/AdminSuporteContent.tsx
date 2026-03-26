@@ -188,6 +188,8 @@ const AdminSuporteContent = () => {
   if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
 
+
+
             return (
               <React.Fragment key={ticket.id}>
               <tr className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors">
