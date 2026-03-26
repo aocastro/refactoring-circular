@@ -13,6 +13,31 @@ import { buildDefaultBlocksFromTheme } from "@/components/dashboard/store-editor
 import { AccessibilityControls } from "@/components/layout/AccessibilityControls";
 
 const Loja = () => {
+  const [loadingData, setLoadingData] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [mockStore, setmockStore] = useState<any>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [storeProducts, setstoreProducts] = useState<any>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res_mockStore = await api.get('/api/store');
+        setMockStore(res_mockStore.data);
+        const res_storeProducts = await api.get('/api/store/products');
+        setStoreProducts(res_storeProducts.data);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      } finally {
+        setLoadingData(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+
+
   const { slug } = useParams();
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("Todos");
@@ -162,6 +187,8 @@ const Loja = () => {
       </div>
     </Link>
   );
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
   return (
     <div

@@ -55,6 +55,33 @@ const allPaymentMethods = [
 type PaymentStep = "idle" | "select" | "cash" | "card" | "pix" | "processing" | "approved" | "receipt";
 
 const PDVPage = () => {
+  const [loadingData, setLoadingData] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [storeProducts, setStoreProducts] = useState<any>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [mockClientes, setMockClientes] = useState<any>([]);
+  useEffect(() => {
+    let mounted = true;
+    const fetchData = async () => {
+      try {
+        const res_storeProducts = await api.get('/api/store/products');
+        const res_mockClientes = await api.get('/api/clientes');
+        if (mounted) {
+          setStoreProducts(res_storeProducts.data);
+          setMockClientes(res_mockClientes.data);
+          setLoadingData(false);
+        }
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      }
+    };
+    fetchData();
+    if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+
+  return () => { mounted = false; };
+  }, []);
+
+
   const navigate = useNavigate();
   const { id: caixaId } = useParams();
   const [search, setSearch] = useState("");

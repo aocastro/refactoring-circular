@@ -9,6 +9,31 @@ import CartDrawer from "@/components/store/CartDrawer";
 import { useToast } from "@/hooks/use-toast";
 
 const ProdutoLoja = () => {
+  const [loadingData, setLoadingData] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [mockStore, setmockStore] = useState<any>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [storeProducts, setstoreProducts] = useState<any>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res_mockStore = await api.get('/api/store');
+        setMockStore(res_mockStore.data);
+        const res_storeProducts = await api.get('/api/store/products');
+        setStoreProducts(res_storeProducts.data);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      } finally {
+        setLoadingData(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+
+
   const { slug, id } = useParams();
   const navigate = useNavigate();
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
@@ -46,7 +71,9 @@ const ProdutoLoja = () => {
   const product = storeProducts.find((p: any) => p.id === Number(id));
 
   if (!product) {
-    return (
+    if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+
+  return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <p className="text-muted-foreground text-lg mb-4">Produto não encontrado</p>

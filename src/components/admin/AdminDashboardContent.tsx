@@ -1,41 +1,43 @@
-import { useState, useEffect } from "react";
 import api from "@/api/axios";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Store, Users, DollarSign, Leaf, ArrowUpRight, ArrowDownRight, TrendingDown, Timer } from "lucide-react";
-import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, BarChart, Bar, Legend, LineChart, Line,
-} from "recharts";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { MessageSquare, Clock, CheckCircle, AlertCircle, ChevronDown, ChevronUp, Send, Plus, Search } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import DataTable from "@/components/shared/DataTable";
+import FilterToolbar from "@/components/shared/FilterToolbar";
+import { type Ticket, type TicketStatus, type TicketCategory } from "@/data/suporte";
+import { toast } from "sonner";
 
+const statusConfig: Record<TicketStatus, { label: string; variant: "default" | "secondary" | "outline"; icon: React.ReactNode }> = {
+  aberto: { label: "Aberto", variant: "default", icon: <AlertCircle className="h-3.5 w-3.5" /> },
+  em_andamento: { label: "Em andamento", variant: "secondary", icon: <Clock className="h-3.5 w-3.5" /> },
+  resolvido: { label: "Resolvido", variant: "outline", icon: <CheckCircle className="h-3.5 w-3.5" /> },
+};
 
+const columns = [
+  { key: "subject", label: "Assunto" },
+  { key: "category", label: "Categoria", hideOn: "sm" as const },
+  { key: "status", label: "Status" },
+  { key: "lastUpdate", label: "Última Atualização", hideOn: "md" as const },
+  { key: "actions", label: "" },
+];
 
-const AdminDashboardContent = () => {
+const SuporteContent = () => {
   const [loadingData, setLoadingData] = useState(true);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [adminKpis, setAdminKpis] = useState<any>([]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [adminMrrHistory, setAdminMrrHistory] = useState<any>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [adminRevenueByPlan, setAdminRevenueByPlan] = useState<any>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [adminChurnHistory, setAdminChurnHistory] = useState<any>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [adminLtvByPlan, setAdminLtvByPlan] = useState<any>([]);
-
+  const [mockTickets, setmockTickets] = useState<any>(null);
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res_adminKpis = await api.get('/api/admin/kpis');
-        setAdminKpis(res_adminKpis.data);
-        const res_adminMrrHistory = await api.get('/api/admin/mrr-history');
-        setAdminMrrHistory(res_adminMrrHistory.data);
-        const res_adminRevenueByPlan = await api.get('/api/admin/revenue-by-plan');
-        setAdminRevenueByPlan(res_adminRevenueByPlan.data);
-        const res_adminChurnHistory = await api.get('/api/admin/churn-history');
-        setAdminChurnHistory(res_adminChurnHistory.data);
-        const res_adminLtvByPlan = await api.get('/api/admin/ltv-by-plan');
-        setAdminLtvByPlan(res_adminLtvByPlan.data);
+        const res_mockTickets = await api.get('/api/suporte/tickets');
+        setMockTickets(res_mockTickets.data);
       } catch (err) {
         console.error("Error fetching data:", err);
       } finally {
@@ -45,148 +47,223 @@ const AdminDashboardContent = () => {
     fetchData();
   }, []);
 
-  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
-const kpis = [
-  { label: "Lojas Ativas", value: adminKpis.lojasAtivas, icon: Store, change: `+${adminKpis.novasLojasMes} este mês`, positive: true },
-  { label: "Usuários", value: adminKpis.totalUsuarios.toLocaleString("pt-BR"), icon: Users, change: "+8.4%", positive: true },
-  { label: "MRR", value: `R$ ${adminKpis.mrrAtual.toLocaleString("pt-BR")}`, icon: DollarSign, change: `+${(((adminKpis.mrrAtual - adminKpis.mrrAnterior) / adminKpis.mrrAnterior) * 100).toFixed(1)}%`, positive: true },
-  { label: "Churn Rate", value: `${adminKpis.churnRate}%`, icon: TrendingDown, change: "-0.3pp", positive: true },
-  { label: "Ticket Médio", value: `R$ ${adminKpis.ticketMedio}`, icon: DollarSign, change: "+5.2%", positive: true },
-  { label: "Lojas ESG", value: "142", icon: Leaf, change: "+12 este mês", positive: true },
-];
+  // Only show tickets belonging to the current user (mocked as owner "Maria Silva")
+  const currentUser = "Maria Silva";
+  const [tickets, setTickets] = useState<Ticket[]>(mockTickets.filter(t => t.owner === currentUser));
 
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("Todos");
+  const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [replyText, setReplyText] = useState("");
+  const [isNewTicketOpen, setIsNewTicketOpen] = useState(false);
+  const [newTicketSubject, setNewTicketSubject] = useState("");
+  const [newTicketCategory, setNewTicketCategory] = useState<TicketCategory | "">("");
+  const [newTicketMessage, setNewTicketMessage] = useState("");
 
+  const filtered = tickets.filter((t) => {
+    const matchSearch = t.subject.toLowerCase().includes(search.toLowerCase());
+    const matchStatus = statusFilter === "Todos" || t.status === statusFilter;
+    return matchSearch && matchStatus;
+  });
 
+  const sendReply = (ticketId: number) => {
+    if (!replyText.trim()) return;
+    setTickets((prev) =>
+      prev.map((t) =>
+        t.id === ticketId
+          ? {
+              ...t,
+              lastUpdate: "Agora",
+              messages: [...t.messages, { from: currentUser, role: "lojista" as const, text: replyText, time: "Agora" }],
+            }
+          : t
+      )
+    );
+    setReplyText("");
+    toast.success("Mensagem enviada!");
+  };
+
+  const handleCreateTicket = () => {
+    if (!newTicketSubject || !newTicketCategory || !newTicketMessage) {
+      toast.error("Preencha todos os campos.");
+      return;
+    }
+
+    const newTicket: Ticket = {
+      id: Date.now(),
+      subject: newTicketSubject,
+      category: newTicketCategory as TicketCategory,
+      store: "Sua Loja",
+      owner: currentUser,
+      status: "aberto",
+      priority: "média",
+      createdAt: "Agora",
+      lastUpdate: "Agora",
+      messages: [{ from: currentUser, role: "lojista", text: newTicketMessage, time: "Agora" }]
+    };
+
+    setTickets([newTicket, ...tickets]);
+    setIsNewTicketOpen(false);
+    setNewTicketSubject("");
+    setNewTicketCategory("");
+    setNewTicketMessage("");
+    toast.success("Chamado aberto com sucesso!");
+  };
 
   return (
-  <div className="space-y-6">
-    <header>
-      <h2 className="font-display text-2xl font-bold text-foreground">Painel Administrativo</h2>
-      <p className="text-sm text-muted-foreground">Visão geral da plataforma Circular u-Shar</p>
-    </header>
+    <div className="space-y-6">
+      <header className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <h2 className="font-display text-2xl font-bold text-foreground">Suporte</h2>
+          <p className="text-sm text-muted-foreground">Abra chamados e acompanhe suas solicitações de atendimento.</p>
+        </div>
+        <Button onClick={() => setIsNewTicketOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" /> Novo Chamado
+        </Button>
+      </header>
 
-    {/* KPIs */}
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {kpis.map((kpi, i) => (
-        <motion.div key={kpi.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-          <Card>
-            <CardContent className="flex items-center gap-4 p-5">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                <kpi.icon className="h-6 w-6" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-xs text-muted-foreground">{kpi.label}</p>
-                <p className="text-xl font-bold text-foreground">{kpi.value}</p>
-                <p className="flex items-center gap-1 text-xs text-green-600">
-                  {kpi.positive ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
-                  {kpi.change}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      ))}
-    </div>
+      <FilterToolbar
+        search={search}
+        onSearchChange={setSearch}
+        searchPlaceholder="Buscar por assunto..."
+        filters={[{
+          key: "status", label: "Status",
+          options: ["Todos", "aberto", "em_andamento", "resolvido"],
+          value: statusFilter, onChange: setStatusFilter,
+        }]}
+      />
 
-    {/* MRR + Receita por Plano */}
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-      <Card className="lg:col-span-2">
-        <CardHeader><CardTitle className="text-base">Evolução do MRR</CardTitle></CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={280}>
-            <AreaChart data={adminMrrHistory}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-              <XAxis dataKey="month" className="text-xs fill-muted-foreground" />
-              <YAxis className="text-xs fill-muted-foreground" tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`} />
-              <Tooltip formatter={(v: number) => `R$ ${v.toLocaleString("pt-BR")}`} />
-              <Area type="monotone" dataKey="value" stroke="hsl(var(--primary))" fill="hsl(var(--primary) / .15)" strokeWidth={2} />
-            </AreaChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+        <DataTable
+          columns={columns}
+          data={filtered}
+          emptyMessage="Nenhum chamado encontrado."
+          renderRow={(ticket: Ticket) => {
+            const cfg = statusConfig[ticket.status];
+            const expanded = expandedId === ticket.id;
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
-      <Card>
-        <CardHeader><CardTitle className="text-base">Receita por Plano</CardTitle></CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={280}>
-            <PieChart>
-              <Pie data={adminRevenueByPlan} dataKey="value" nameKey="plan" cx="50%" cy="50%" outerRadius={90} label={({ plan }) => plan}>
-                {adminRevenueByPlan.map((entry, i) => (
-                  <Cell key={i} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip formatter={(v: number) => `R$ ${v.toLocaleString("pt-BR")}`} />
-            </PieChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
-    </div>
 
-    {/* Churn Rate + LTV */}
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base">
-            <TrendingDown className="h-4 w-4 text-destructive" />
-            Churn Rate (%)
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={260}>
-            <LineChart data={adminChurnHistory}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-              <XAxis dataKey="month" className="text-xs fill-muted-foreground" />
-              <YAxis className="text-xs fill-muted-foreground" domain={[0, 6]} tickFormatter={(v) => `${v}%`} />
-              <Tooltip formatter={(v: number, name: string) => name === "churn" ? `${v}%` : v} />
-              <Legend />
-              <Line type="monotone" dataKey="churn" name="Churn (%)" stroke="hsl(var(--destructive))" strokeWidth={2} dot={{ r: 4 }} />
-              <Line type="monotone" dataKey="newStores" name="Novas Lojas" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 4 }} />
-              <Line type="monotone" dataKey="cancelled" name="Cancelamentos" stroke="hsl(var(--muted-foreground))" strokeWidth={2} strokeDasharray="5 5" dot={{ r: 3 }} />
-            </LineChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Timer className="h-4 w-4 text-primary" />
-            Lifetime Value (LTV) por Plano
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={adminLtvByPlan}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-              <XAxis dataKey="plan" className="text-xs fill-muted-foreground" />
-              <YAxis className="text-xs fill-muted-foreground" tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`} />
-              <Tooltip
-                formatter={(v: number, name: string) =>
-                  name === "ltv" ? `R$ ${v.toLocaleString("pt-BR")}` : `${v} meses`
-                }
+            return (
+              <React.Fragment key={ticket.id}>
+                <tr className="border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors">
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <MessageSquare className="h-4 w-4 text-primary shrink-0" />
+                      <div className="min-w-0">
+                        <span className="text-xs font-semibold text-muted-foreground mr-2">#{ticket.id}</span>
+                        <span className="text-sm font-medium text-foreground">{ticket.subject}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="hidden px-4 py-3 text-sm text-muted-foreground sm:table-cell">
+                    {ticket.category}
+                  </td>
+                  <td className="px-4 py-3">
+                    <Badge variant={cfg.variant} className="flex w-fit items-center gap-1">{cfg.icon}{cfg.label}</Badge>
+                  </td>
+                  <td className="hidden px-4 py-3 text-sm text-muted-foreground md:table-cell">
+                    {ticket.lastUpdate}
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <Button variant="ghost" size="sm" onClick={() => setExpandedId(expanded ? null : ticket.id)}>
+                      {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                    </Button>
+                  </td>
+                </tr>
+                {expanded && (
+                  <tr>
+                    <td colSpan={columns.length} className="px-4 pb-4 pt-2 border-b border-border bg-muted/20">
+                      <div className="space-y-3">
+                        {ticket.messages.map((msg, mi) => (
+                          <div key={mi} className={`rounded-lg p-3 text-sm ${msg.role === "lojista" ? "ml-6 bg-primary/5 border border-primary/10" : "mr-6 bg-card border border-border"}`}>
+                            <div className="flex items-center justify-between">
+                              <span className={`text-xs font-medium ${msg.role === "lojista" ? "text-primary" : "text-foreground"}`}>
+                                {msg.from} {msg.role === "admin" && "(Suporte Circular)"}
+                              </span>
+                              <span className="text-[10px] text-muted-foreground">{msg.time}</span>
+                            </div>
+                            <p className="mt-1 text-foreground">{msg.text}</p>
+                          </div>
+                        ))}
+                      </div>
+
+                      {ticket.status !== "resolvido" && (
+                        <div className="mt-4 space-y-2">
+                          <Textarea
+                            placeholder="Escreva uma resposta..."
+                            value={expandedId === ticket.id ? replyText : ""}
+                            onChange={(e) => setReplyText(e.target.value)}
+                            className="min-h-[80px] resize-none"
+                          />
+                          <div className="flex gap-2 justify-end">
+                            <Button size="sm" onClick={() => sendReply(ticket.id)} disabled={!replyText.trim()}>
+                              <Send className="mr-1 h-3.5 w-3.5" />Enviar Mensagem
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
+            );
+          }}
+        />
+      </motion.div>
+
+      {/* New Ticket Modal */}
+      <Dialog open={isNewTicketOpen} onOpenChange={setIsNewTicketOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Abrir Novo Chamado</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="subject">Assunto</Label>
+              <Input
+                id="subject"
+                placeholder="Ex: Dúvida sobre integração de pagamento"
+                value={newTicketSubject}
+                onChange={(e) => setNewTicketSubject(e.target.value)}
               />
-              <Legend />
-              <Bar dataKey="ltv" name="LTV (R$)" radius={[4, 4, 0, 0]}>
-                {adminLtvByPlan.map((entry, i) => (
-                  <Cell key={i} fill={entry.color} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-          <div className="mt-3 flex flex-wrap gap-3">
-            {adminLtvByPlan.map((p) => (
-              <div key={p.plan} className="text-center">
-                <p className="text-[10px] text-muted-foreground">{p.plan}</p>
-                <p className="text-xs font-semibold text-foreground">~{p.avgMonths} meses</p>
-              </div>
-            ))}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="category">Categoria</Label>
+              <Select value={newTicketCategory} onValueChange={(val) => setNewTicketCategory(val as TicketCategory)}>
+                <SelectTrigger id="category">
+                  <SelectValue placeholder="Selecione uma categoria" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Dúvida">Dúvida</SelectItem>
+                  <SelectItem value="Problema Técnico">Problema Técnico</SelectItem>
+                  <SelectItem value="Financeiro">Financeiro</SelectItem>
+                  <SelectItem value="Sugestão">Sugestão</SelectItem>
+                  <SelectItem value="Outros">Outros</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="message">Mensagem</Label>
+              <Textarea
+                id="message"
+                placeholder="Descreva detalhadamente sua solicitação..."
+                className="min-h-[100px]"
+                value={newTicketMessage}
+                onChange={(e) => setNewTicketMessage(e.target.value)}
+              />
+            </div>
           </div>
-        </CardContent>
-      </Card>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsNewTicketOpen(false)}>Cancelar</Button>
+            <Button onClick={handleCreateTicket}>Enviar Chamado</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
-  </div>
-);
+  );
 };
 
-export default AdminDashboardContent;
+export default SuporteContent;

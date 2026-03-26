@@ -1,5 +1,6 @@
 import api from "@/api/axios";
 import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Smile, Frown, Meh, BarChart2, TrendingUp, CheckCircle, Clock, MessageSquare } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
@@ -42,15 +43,10 @@ const getScoreColor = (score: number) => {
 };
 
 const AdminNPSContent = () => {
-  const [page, setPage] = useState(1);
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("Todos");
-
   const [loadingData, setLoadingData] = useState(true);
   const [adminNpsStats, setAdminNpsStats] = useState<any>({});
-  const [adminNpsHistory, setAdminNpsHistory] = useState<any>([]);
-  const [adminNpsResponses, setAdminNpsResponses] = useState<any>([]);
-
+  const [adminNpsHistory, setAdminNpsHistory] = useState<any[]>([]);
+  const [adminNpsResponses, setAdminNpsResponses] = useState<any[]>([]);
   useEffect(() => {
     let mounted = true;
     const fetchData = async () => {
@@ -71,15 +67,7 @@ const AdminNPSContent = () => {
     fetchData();
     return () => { mounted = false; };
   }, []);
-
   const [responses, setResponses] = useState<NPSResponse[]>(adminNpsResponses);
-
-  useEffect(() => {
-    if (!loadingData) {
-      setResponses(adminNpsResponses);
-    }
-  }, [loadingData, adminNpsResponses]);
-
   useEffect(() => {
     setPage(1);
   }, [search, statusFilter]);
@@ -105,6 +93,7 @@ const AdminNPSContent = () => {
     toast.success(`Status atualizado com sucesso!`);
   };
 
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
   return (
     <div className="space-y-6">
       <header className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
