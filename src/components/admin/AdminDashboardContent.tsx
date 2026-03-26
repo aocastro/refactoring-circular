@@ -13,7 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 const AdminDashboardContent = () => {
   const [loadingData, setLoadingData] = useState(true);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [adminKpis, setAdminKpis] = useState<any>([]);
+  const [adminKpis, setAdminKpis] = useState<any>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [adminMrrHistory, setAdminMrrHistory] = useState<any>([]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -45,12 +45,12 @@ const AdminDashboardContent = () => {
     fetchData();
   }, []);
 
-  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+  if (loadingData || !adminKpis || Object.keys(adminKpis).length === 0) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
 const kpis = [
   { label: "Lojas Ativas", value: adminKpis.lojasAtivas, icon: Store, change: `+${adminKpis.novasLojasMes} este mês`, positive: true },
-  { label: "Usuários", value: adminKpis.totalUsuarios.toLocaleString("pt-BR"), icon: Users, change: "+8.4%", positive: true },
-  { label: "MRR", value: `R$ ${adminKpis.mrrAtual.toLocaleString("pt-BR")}`, icon: DollarSign, change: `+${(((adminKpis.mrrAtual - adminKpis.mrrAnterior) / adminKpis.mrrAnterior) * 100).toFixed(1)}%`, positive: true },
+  { label: "Usuários", value: adminKpis.totalUsuarios?.toLocaleString("pt-BR"), icon: Users, change: "+8.4%", positive: true },
+  { label: "MRR", value: `R$ ${adminKpis.mrrAtual?.toLocaleString("pt-BR")}`, icon: DollarSign, change: `+${(((adminKpis.mrrAtual - adminKpis.mrrAnterior) / adminKpis.mrrAnterior) * 100).toFixed(1)}%`, positive: true },
   { label: "Churn Rate", value: `${adminKpis.churnRate}%`, icon: TrendingDown, change: "-0.3pp", positive: true },
   { label: "Ticket Médio", value: `R$ ${adminKpis.ticketMedio}`, icon: DollarSign, change: "+5.2%", positive: true },
   { label: "Lojas ESG", value: "142", icon: Leaf, change: "+12 este mês", positive: true },
