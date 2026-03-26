@@ -13,6 +13,12 @@ import { buildDefaultBlocksFromTheme } from "@/components/dashboard/store-editor
 import { AccessibilityControls } from "@/components/layout/AccessibilityControls";
 
 const Loja = () => {
+  const { slug } = useParams();
+  const [search, setSearch] = useState("");
+  const [activeCategory, setActiveCategory] = useState("Todos");
+  const [bannerIndex, setBannerIndex] = useState(0);
+  const { totalItems, setIsOpen } = useCart();
+
   const [loadingData, setLoadingData] = useState(true);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -20,6 +26,7 @@ const Loja = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [storeProducts, setstoreProducts] = useState<any>([]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -35,15 +42,6 @@ const Loja = () => {
     };
     fetchData();
   }, []);
-
-  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
-
-
-  const { slug } = useParams();
-  const [search, setSearch] = useState("");
-  const [activeCategory, setActiveCategory] = useState("Todos");
-  const [bannerIndex, setBannerIndex] = useState(0);
-  const { totalItems, setIsOpen } = useCart();
 
   // Load store config from localStorage if slug matches the user's store
   const savedConfig = (() => {
@@ -80,6 +78,17 @@ const Loja = () => {
     document.head.appendChild(link);
   }, [theme]);
 
+  const filteredProducts = useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return storeProducts.filter((p: any) => {
+      const matchSearch = search === "" || p.name.toLowerCase().includes(search.toLowerCase());
+      const matchCategory = activeCategory === "Todos" || p.category === activeCategory;
+      return matchSearch && matchCategory;
+    });
+  }, [search, activeCategory, storeProducts]);
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+
   const store = savedConfig
     ? {
         ...mockStore,
@@ -91,15 +100,9 @@ const Loja = () => {
     : mockStore;
 
   const newArrivals = storeProducts.slice(0, 10);
-  const featured = storeProducts.filter((p) => p.highlight);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const featured = storeProducts.filter((p: any) => p.highlight);
 
-  const filteredProducts = useMemo(() => {
-    return storeProducts.filter((p) => {
-      const matchSearch = search === "" || p.name.toLowerCase().includes(search.toLowerCase());
-      const matchCategory = activeCategory === "Todos" || p.category === activeCategory;
-      return matchSearch && matchCategory;
-    });
-  }, [search, activeCategory]);
 
   const nextBanner = () => setBannerIndex((i) => (i + 1) % store.banners.length);
   const prevBanner = () => setBannerIndex((i) => (i - 1 + store.banners.length) % store.banners.length);

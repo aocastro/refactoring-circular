@@ -1,5 +1,4 @@
 import api from "@/api/axios";
-import { useState, useEffect } from "react";
 import { useState, useMemo, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ShoppingBag, Plus, Eye, Clock, CheckCircle, Send, Search, X, Trash2, Package, User, Calendar, Phone, Mail } from "lucide-react";
@@ -67,7 +66,6 @@ const SacolinhasContent = () => {
   const [page, setPage] = useState(1);
   const ITEMS_PER_PAGE = 5;
 
-  // Form state  const [selectedCustomer, setSelectedCustomer] = useState<{ name: string; phone: string; email: string } | null>(null);  const [selectedProducts, setSelectedProducts] = useState<BagItem[]>([]);  const customerDropRef = useRef<HTMLDivElement>(null);
   // Form state
   const [customerInput, setCustomerInput] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState<{ name: string; phone: string; email: string } | null>(null);
