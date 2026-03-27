@@ -75,6 +75,10 @@ const AdminNPSContent = () => {
   const [responses, setResponses] = useState<NPSResponse[]>(adminNpsResponses);
 
   useEffect(() => {
+    setResponses(adminNpsResponses);
+  }, [adminNpsResponses]);
+
+  useEffect(() => {
     if (!loadingData) {
       setResponses(adminNpsResponses);
     }
@@ -92,7 +96,6 @@ const AdminNPSContent = () => {
 
   const { paginatedItems, totalPages, safePage, totalItems } = usePagination(filtered, 10, page);
 
-  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
   const handleAction = (id: number, action: "analisar" | "contatar") => {
     setResponses((prev) =>
@@ -104,6 +107,8 @@ const AdminNPSContent = () => {
     );
     toast.success(`Status atualizado com sucesso!`);
   };
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
   return (
     <div className="space-y-6">

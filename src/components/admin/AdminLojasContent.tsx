@@ -12,10 +12,13 @@ import { useEffect } from "react";
 import { type AdminStore } from "@/data/admin";
 import { toast } from "sonner";
 
-const statusIcon: Record<string, React.ReactNode> = {
-  ativa: <CheckCircle className="h-3.5 w-3.5 text-green-600" />,
-  suspensa: <XCircle className="h-3.5 w-3.5 text-red-500" />,
-  pendente: <Clock className="h-3.5 w-3.5 text-yellow-500" />,
+const getStatusIcon = (status: string) => {
+  switch (status) {
+    case "ativa": return <CheckCircle className="h-3.5 w-3.5 text-green-600" />;
+    case "suspensa": return <XCircle className="h-3.5 w-3.5 text-red-500" />;
+    case "pendente": return <Clock className="h-3.5 w-3.5 text-yellow-500" />;
+    default: return null;
+  }
 };
 
 const columns = [
@@ -32,7 +35,7 @@ const AdminLojasContent = () => {
   const [loadingData, setLoadingData] = useState(true);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [adminStores, setadminStores] = useState<any>([]);
+  const [adminStores, setAdminStores] = useState<any>([]);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -47,7 +50,6 @@ const AdminLojasContent = () => {
     fetchData();
   }, []);
 
-  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
 
   const [search, setSearch] = useState("");
@@ -67,6 +69,8 @@ const AdminLojasContent = () => {
   const { paginatedItems, totalPages, safePage, totalItems } = usePagination(filtered, 10, page);
 
 
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
   return (
     <div className="space-y-6">
@@ -98,7 +102,7 @@ const AdminLojasContent = () => {
               <td className="hidden px-4 py-3 text-right text-sm text-muted-foreground md:table-cell">{store.products}</td>
               <td className="px-4 py-3 text-right text-sm font-medium text-foreground">R$ {store.revenue.toLocaleString("pt-BR")}</td>
               <td className="px-4 py-3 text-sm">
-                <span className="flex items-center gap-1.5 capitalize">{statusIcon[store.status]}{store.status}</span>
+                <span className="flex items-center gap-1.5 capitalize">{getStatusIcon(store.status)}{store.status}</span>
               </td>
               <td className="px-4 py-3">
                 <div className="flex gap-1">

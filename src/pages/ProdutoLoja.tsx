@@ -40,7 +40,6 @@ const ProdutoLoja = () => {
     fetchData();
   }, []);
 
-  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const product = storeProducts.find((p: any) => p.id === Number(id));
@@ -76,6 +75,8 @@ const ProdutoLoja = () => {
 
 
 
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
   return (
     <div className="min-h-screen bg-background">

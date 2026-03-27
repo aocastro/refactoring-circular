@@ -31,10 +31,10 @@ const AdminBlockchainContent = () => {
   const [loadingData, setLoadingData] = useState(true);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [blockchainStats, setblockchainStats] = useState<any>([]);
+  const [blockchainStats, setBlockchainStats] = useState<any>([]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [blockchainTransactions, setblockchainTransactions] = useState<any>([]);
+  const [blockchainTransactions, setBlockchainTransactions] = useState<any>([]);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -51,18 +51,19 @@ const AdminBlockchainContent = () => {
     fetchData();
   }, []);
 
-  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
 const kpis = [
-  { label: "Tokens Emitidos", value: blockchainStats.totalTokens.toLocaleString("pt-BR"), icon: Hash, change: "+342 este mês" },
-  { label: "Transações/Mês", value: blockchainStats.transacoesMes.toString(), icon: Link2, change: "+18%" },
-  { label: "Certificados", value: blockchainStats.certificadosEmitidos.toLocaleString("pt-BR"), icon: Shield, change: "+156" },
-  { label: "Lojas Blockchain", value: blockchainStats.lojasBlockchain.toString(), icon: Store, change: "+8 este mês" },
+  { label: "Tokens Emitidos", value: (blockchainStats?.totalTokens || 0).toLocaleString("pt-BR"), icon: Hash, change: "+342 este mês" },
+  { label: "Transações/Mês", value: (blockchainStats?.transacoesMes || 0).toString(), icon: Link2, change: "+18%" },
+  { label: "Certificados", value: (blockchainStats?.certificadosEmitidos || 0).toLocaleString("pt-BR"), icon: Shield, change: "+156" },
+  { label: "Lojas Blockchain", value: (blockchainStats?.lojasBlockchain || 0).toString(), icon: Store, change: "+8 este mês" },
 ];
 
 
   const [page, setPage] = useState(1);
   const { paginatedItems, totalPages, safePage, totalItems } = usePagination(blockchainTransactions, 10, page);
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
   return (
   <div className="space-y-6">

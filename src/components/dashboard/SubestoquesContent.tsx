@@ -17,7 +17,7 @@ const SubestoquesContent = () => {
   const [loadingData, setLoadingData] = useState(true);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [mockProducts, setmockProducts] = useState<any>([]);
+  const [mockProducts, setMockProducts] = useState<any>([]);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -32,7 +32,6 @@ const SubestoquesContent = () => {
     fetchData();
   }, []);
 
-  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
 
   const [subStocks, setSubStocks] = useState<SubStock[]>([]);
@@ -209,7 +208,7 @@ const SubestoquesContent = () => {
     }
   };
 
-  const handleRemoveExistingProduct = async (productId: string) => {
+  const handleRemoveExistingProduct = async (productId: number) => {
     if (!selectedStock) return;
 
     try {
@@ -351,7 +350,7 @@ const SubestoquesContent = () => {
                       <td className="py-3 px-4"><span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(sp.product.status)}`}>{sp.product.status}</span></td>
                       <td className="py-3 px-4 text-right">
                         <div className="flex items-center justify-end gap-1">
-                          <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground" onClick={() => { setEditingProduct(sp); setExistingProductForm({ productId: sp.product.id, quantity: sp.quantity.toString() }); setEditExistingProductDialogOpen(true); }}>
+                          <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground" onClick={() => { setEditingProduct(sp); setExistingProductForm({ productId: sp.product.id.toString(), quantity: sp.quantity.toString() }); setEditExistingProductDialogOpen(true); }}>
                             <Edit2 className="h-4 w-4" />
                           </Button>
                           <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => handleRemoveExistingProduct(sp.product.id)}>
@@ -369,6 +368,8 @@ const SubestoquesContent = () => {
       </div>
     );
   }
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
   return (
     <div className="space-y-6">

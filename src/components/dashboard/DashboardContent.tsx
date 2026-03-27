@@ -2,6 +2,7 @@ import api from "@/api/axios";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { AlertCircle, CreditCard } from "lucide-react";
+import * as Icons from "lucide-react";
 import {
   AreaChart,
   Area,
@@ -77,8 +78,9 @@ const DashboardContent = ({ onSectionChange }: DashboardContentProps) => {
     }
   }, []);
 
-  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
   return (
     <div className="space-y-6">
@@ -133,14 +135,18 @@ const DashboardContent = ({ onSectionChange }: DashboardContentProps) => {
 
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {dashboardKpisByPeriod[selectedPeriod].map((kpi, i) => (
-          <KpiCard
-            key={kpi.label}
-            {...kpi}
-            delay={i * 0.05}
-            onClick={kpi.target ? () => onSectionChange?.(kpi.target!) : undefined}
-          />
-        ))}
+        {dashboardKpisByPeriod[selectedPeriod]?.map((kpi: any, i: number) => {
+          const IconComponent = typeof kpi.icon === 'string' ? (Icons as any)[kpi.icon] : kpi.icon;
+          return (
+            <KpiCard
+              key={kpi.label}
+              {...kpi}
+              icon={IconComponent}
+              delay={i * 0.05}
+              onClick={kpi.target ? () => onSectionChange?.(kpi.target!) : undefined}
+            />
+          );
+        })}
       </div>
 
       {/* Charts */}
@@ -212,13 +218,13 @@ const DashboardContent = ({ onSectionChange }: DashboardContentProps) => {
           <div className="space-y-4">
             <div className="p-3 rounded-lg bg-primary/5 border border-primary/10">
               <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-1">Top Produto</p>
-              <p className="text-lg font-bold text-foreground leading-tight">{abcProductsData[0].product}</p>
-              <p className="text-xs text-success font-medium mt-1">Responsável por {abcProductsData[0].value}% da sua receita total.</p>
+              <p className="text-lg font-bold text-foreground leading-tight">{abcProductsData?.[0]?.product || 'N/A'}</p>
+              <p className="text-xs text-success font-medium mt-1">Responsável por {abcProductsData?.[0]?.value || 0}% da sua receita total.</p>
             </div>
             <div className="space-y-2">
               <p className="text-xs text-muted-foreground font-medium">Otimização Sugerida:</p>
               <ul className="text-xs text-foreground space-y-1.5 list-disc pl-4">
-                <li>Aumentar estoque de <strong>{abcProductsData[0].product}</strong> e {abcProductsData[1].product}.</li>
+                <li>Aumentar estoque de <strong>{abcProductsData?.[0]?.product || 'N/A'}</strong> e {abcProductsData?.[1]?.product || 'N/A'}.</li>
                 <li>Fazer liquidação de itens na Classe C para liberar espaço.</li>
                 <li>Reavaliar margens de produtos na Classe B.</li>
               </ul>

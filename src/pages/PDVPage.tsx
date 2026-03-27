@@ -287,12 +287,13 @@ const PDVPage = () => {
     return () => window.removeEventListener("keydown", handler);
   }, [paymentStep, startPayment]);
 
-  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
   const dayTotal = sales.reduce((a, s) => a + s.total, 0);
   
 
   const currentPayAmount = splitMode && splitAmount ? Math.min(Number(splitAmount), remaining) : remaining;
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
   return (
     <div className="h-screen w-screen bg-background flex flex-col overflow-hidden">

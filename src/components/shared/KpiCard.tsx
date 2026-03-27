@@ -21,7 +21,8 @@ const KpiCard = ({ label, value, change, icon: Icon, positive = true, delay = 0,
   >
     <div className="flex items-center justify-between mb-2">
       <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
-        <Icon className="h-4 w-4 text-primary" />
+        {console.log('DEBUG_ICON:', typeof Icon, Icon)}
+        {Icon && <Icon className="h-4 w-4 text-primary" />}
       </div>
       {change && (
         <span className={`text-xs font-medium flex items-center gap-0.5 ${positive ? "text-success" : "text-destructive"}`}>

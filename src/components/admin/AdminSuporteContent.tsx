@@ -41,16 +41,16 @@ const AdminSuporteContent = () => {
   const [loadingData, setLoadingData] = useState(true);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [mockTickets, setmockTickets] = useState<any>([]);
+  const [mockTickets, setMockTickets] = useState<any>([]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [adminSuporteKpis, setadminSuporteKpis] = useState<any>([]);
+  const [adminSuporteKpis, setAdminSuporteKpis] = useState<any>([]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [adminTicketsVolume, setadminTicketsVolume] = useState<any>([]);
+  const [adminTicketsVolume, setAdminTicketsVolume] = useState<any>([]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [adminTicketsByCategory, setadminTicketsByCategory] = useState<any>([]);
+  const [adminTicketsByCategory, setAdminTicketsByCategory] = useState<any>([]);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -71,10 +71,13 @@ const AdminSuporteContent = () => {
     fetchData();
   }, []);
 
-  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
 
   const [tickets, setTickets] = useState<Ticket[]>(mockTickets);
+
+  useEffect(() => {
+    setTickets(mockTickets);
+  }, [mockTickets]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("Todos");
   const [expandedId, setExpandedId] = useState<number | null>(null);
@@ -118,6 +121,8 @@ const AdminSuporteContent = () => {
 
   const openCount = tickets.filter((t) => t.status === "aberto").length;
   const inProgressCount = tickets.filter((t) => t.status === "em_andamento").length;
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
   return (
     <div className="space-y-6">

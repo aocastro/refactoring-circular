@@ -94,6 +94,11 @@ const BlogContent = ({ defaultTab = "posts" }: Props) => {
   // Pagination
   const [postsPage, setPostsPage] = useState(1);
   const postsPerPage = 5;
+  const totalItems = postsList.length;
+  const totalPages = Math.ceil(totalItems / postsPerPage);
+  const safePage = Math.max(1, Math.min(postsPage, totalPages));
+  const startIndex = (safePage - 1) * postsPerPage;
+  const paginatedItems = postsList.slice(startIndex, startIndex + postsPerPage);
 
   const resetPostForm = () => { setPTitulo(""); setPCategoria(""); setPConteudo(""); setPStatus("rascunho"); setEditingPost(null); setErrors({}); };
   const resetCatForm = () => { setCNome(""); setEditingCat(null); setErrors({}); };

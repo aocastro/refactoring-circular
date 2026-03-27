@@ -28,15 +28,18 @@ const initialNotifications: AdminNotification[] = [
   { id: 6, type: "store", title: "Loja suspensa", desc: "Ação automática: Second Hand SP (inadimplência)", time: "5h", read: true },
 ];
 
-const iconMap: Record<string, React.ReactNode> = {
-  store: <Store className="h-4 w-4 text-blue-500" />,
-  payment: <DollarSign className="h-4 w-4 text-green-600" />,
-  alert: <AlertTriangle className="h-4 w-4 text-amber-500" />,
-  success: <CheckCircle className="h-4 w-4 text-primary" />,
+const getIcon = (type: string) => {
+  switch (type) {
+    case "store": return <Store className="h-4 w-4 text-blue-500" />;
+    case "payment": return <DollarSign className="h-4 w-4 text-green-600" />;
+    case "alert": return <AlertTriangle className="h-4 w-4 text-amber-500" />;
+    case "success": return <CheckCircle className="h-4 w-4 text-primary" />;
+    default: return <Bell className="h-4 w-4 text-muted-foreground" />;
+  }
 };
 
 export function AdminNotifications() {
-  const [notifications, setNotifications] = useState(initialNotifications);
+  const [notifications, setNotifications] = useState<AdminNotification[]>(initialNotifications);
   const unread = notifications.filter((n) => !n.read).length;
 
   const markAllRead = () => {
@@ -44,48 +47,48 @@ export function AdminNotifications() {
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative" aria-label={`${unread} notificações não lidas`}>
-          <Bell className="h-5 w-5" />
+    <div className="relative">
+      <DropdownMenu>
+        <DropdownMenuTrigger className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-secondary relative border-none outline-none focus:ring-2 focus:ring-ring">
+          <Bell className="h-5 w-5 text-foreground" />
           {unread > 0 && (
             <Badge className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full p-0 text-[10px]">
               {unread}
             </Badge>
           )}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-80">
-        <div className="flex items-center justify-between px-3 py-2">
-          <p className="text-sm font-semibold text-foreground">Notificações</p>
-          {unread > 0 && (
-            <button onClick={markAllRead} className="text-xs text-primary hover:underline">
-              Marcar todas como lidas
-            </button>
-          )}
-        </div>
-        <DropdownMenuSeparator />
-        <div className="max-h-80 overflow-y-auto">
-          {notifications.map((n) => (
-            <DropdownMenuItem
-              key={n.id}
-              className={`flex items-start gap-3 px-3 py-3 ${!n.read ? "bg-primary/5" : ""}`}
-              onSelect={(e) => {
-                e.preventDefault();
-                setNotifications((prev) => prev.map((x) => x.id === n.id ? { ...x, read: true } : x));
-              }}
-            >
-              <div className="mt-0.5 shrink-0">{iconMap[n.type]}</div>
-              <div className="min-w-0 flex-1">
-                <p className={`text-sm ${!n.read ? "font-semibold text-foreground" : "text-foreground"}`}>{n.title}</p>
-                <p className="text-xs text-muted-foreground">{n.desc}</p>
-                <p className="mt-1 text-[10px] text-muted-foreground">{n.time}</p>
-              </div>
-              {!n.read && <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />}
-            </DropdownMenuItem>
-          ))}
-        </div>
-      </DropdownMenuContent>
-    </DropdownMenu>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-80">
+          <div className="flex items-center justify-between px-3 py-2">
+            <p className="text-sm font-semibold text-foreground">Notificações</p>
+            {unread > 0 && (
+              <button onClick={markAllRead} className="text-xs text-primary hover:underline">
+                Marcar todas como lidas
+              </button>
+            )}
+          </div>
+          <DropdownMenuSeparator />
+          <div className="max-h-80 overflow-y-auto">
+            {notifications.map((n) => (
+              <DropdownMenuItem
+                key={n.id}
+                className={`flex items-start gap-3 px-3 py-3 ${!n.read ? "bg-primary/5" : ""}`}
+                onSelect={(e) => {
+                  e.preventDefault();
+                  setNotifications((prev) => prev.map((x) => x.id === n.id ? { ...x, read: true } : x));
+                }}
+              >
+                <div className="mt-0.5 shrink-0">{getIcon(n.type)}</div>
+                <div className="min-w-0 flex-1">
+                  <p className={`text-sm ${!n.read ? "font-semibold text-foreground" : "text-foreground"}`}>{n.title}</p>
+                  <p className="text-xs text-muted-foreground">{n.desc}</p>
+                  <p className="mt-1 text-[10px] text-muted-foreground">{n.time}</p>
+                </div>
+                {!n.read && <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />}
+              </DropdownMenuItem>
+            ))}
+          </div>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 }

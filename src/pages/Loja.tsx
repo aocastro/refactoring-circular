@@ -87,7 +87,6 @@ const Loja = () => {
     });
   }, [search, activeCategory, storeProducts]);
 
-  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
   const store = savedConfig
     ? {
@@ -162,6 +161,8 @@ const Loja = () => {
       </div>
     </Link>
   );
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
   return (
     <div

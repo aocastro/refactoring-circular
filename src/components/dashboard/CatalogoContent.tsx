@@ -24,7 +24,6 @@ import { getStatusColor } from "@/lib/status-colors";
 import type { Product } from "@/types";
 
 const conditions = ["Todos", "Novo", "Excelente", "Bom", "Regular"];
-const sizes = ["Todos", ...Array.from(new Set(mockProducts.map((p) => p.size)))];
 
 const ProductCard = ({ product, index, onSelect }: { product: Product; index: number; onSelect: (p: Product) => void }) => (
   <motion.div
@@ -63,7 +62,7 @@ const ProductCard = ({ product, index, onSelect }: { product: Product; index: nu
   </motion.div>
 );
 
-const ProductDetail = ({ product, onBack }: { product: Product; onBack: () => void }) => {
+const ProductDetail = ({ product, onBack, mockProducts }: { product: Product; onBack: () => void; mockProducts: any[] }) => {
   const related = mockProducts
     .filter((p) => p.category === product.category && p.id !== product.id && p.status === "Disponível")
     .slice(0, 4);
@@ -170,7 +169,7 @@ const CatalogoContent = () => {
   const [loadingData, setLoadingData] = useState(true);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [mockProducts, setmockProducts] = useState<any>([]);
+  const [mockProducts, setMockProducts] = useState<any>([]);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -185,7 +184,6 @@ const CatalogoContent = () => {
     fetchData();
   }, []);
 
-  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
 
   const [search, setSearch] = useState("");
@@ -195,6 +193,8 @@ const CatalogoContent = () => {
   const [priceRange, setPriceRange] = useState("Todos");
   const [showFilters, setShowFilters] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  const sizes: string[] = useMemo(() => ["Todos", ...Array.from(new Set(mockProducts.map((p: any) => String(p.size))))], [mockProducts]);
 
   const activeFilters = [category, condition, size, priceRange].filter((f) => f !== "Todos").length;
 
@@ -223,10 +223,12 @@ const CatalogoContent = () => {
   };
 
   if (selectedProduct) {
-    return <ProductDetail product={selectedProduct} onBack={() => setSelectedProduct(null)} />;
+    return <ProductDetail product={selectedProduct} onBack={() => setSelectedProduct(null)} mockProducts={mockProducts} />;
   }
 
 
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
   return (
     <div className="space-y-6">

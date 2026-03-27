@@ -5,7 +5,7 @@ export interface KpiItem {
   label: string;
   value: string | number;
   change?: string;
-  icon: LucideIcon;
+  icon: any; // Allow string names from mock API
   positive?: boolean;
   period?: string;
   target?: string;

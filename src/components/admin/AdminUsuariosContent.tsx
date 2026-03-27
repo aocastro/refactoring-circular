@@ -12,10 +12,13 @@ import { useEffect } from "react";
 import { type AdminUser } from "@/data/admin";
 import { toast } from "sonner";
 
-const roleIcon: Record<string, React.ReactNode> = {
-  admin: <Shield className="h-3.5 w-3.5 text-primary" />,
-  lojista: <Store className="h-3.5 w-3.5 text-blue-500" />,
-  consignante: <Handshake className="h-3.5 w-3.5 text-green-600" />,
+const getRoleIcon = (role: string) => {
+  switch (role) {
+    case "admin": return <Shield className="h-3.5 w-3.5 text-primary" />;
+    case "lojista": return <Store className="h-3.5 w-3.5 text-blue-500" />;
+    case "consignante": return <Handshake className="h-3.5 w-3.5 text-green-600" />;
+    default: return null;
+  }
 };
 
 const statusVariant: Record<string, "default" | "secondary" | "destructive"> = {
@@ -38,7 +41,7 @@ const AdminUsuariosContent = () => {
   const [loadingData, setLoadingData] = useState(true);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [adminUsers, setadminUsers] = useState<any>([]);
+  const [adminUsers, setAdminUsers] = useState<any>([]);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -53,7 +56,6 @@ const AdminUsuariosContent = () => {
     fetchData();
   }, []);
 
-  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
 
   const [search, setSearch] = useState("");
@@ -73,6 +75,8 @@ const AdminUsuariosContent = () => {
   const { paginatedItems, totalPages, safePage, totalItems } = usePagination(filtered, 10, page);
 
 
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
   return (
     <div className="space-y-6">
@@ -101,7 +105,7 @@ const AdminUsuariosContent = () => {
               <td className="px-4 py-3 text-sm font-medium text-foreground">{user.name}</td>
               <td className="hidden px-4 py-3 text-sm text-muted-foreground sm:table-cell">{user.email}</td>
               <td className="px-4 py-3 text-sm">
-                <span className="flex items-center gap-1.5 capitalize">{roleIcon[user.role]}{user.role}</span>
+                <span className="flex items-center gap-1.5 capitalize">{getRoleIcon(user.role)}{user.role}</span>
               </td>
               <td className="hidden px-4 py-3 text-right text-sm text-muted-foreground md:table-cell">{user.stores}</td>
               <td className="hidden px-4 py-3 text-sm text-muted-foreground md:table-cell">{user.lastLogin}</td>

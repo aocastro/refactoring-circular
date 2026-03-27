@@ -96,7 +96,6 @@ const RelatoriosContent = ({ defaultTab = "vendas" }: Props) => {
     fetchData();
   }, []);
 
-  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
 
   const [period, setPeriod] = useState("12m");
@@ -111,6 +110,8 @@ const RelatoriosContent = ({ defaultTab = "vendas" }: Props) => {
   );
 
 
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
   return (
     <section className="space-y-6" aria-labelledby="relatorios-section-title" aria-describedby="relatorios-section-description">

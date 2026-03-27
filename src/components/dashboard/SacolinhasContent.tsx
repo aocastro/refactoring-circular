@@ -13,8 +13,6 @@ import FilterToolbar from "@/components/shared/FilterToolbar";
 import DataTable from "@/components/shared/DataTable";
 import PaginationControls from "@/components/shared/PaginationControls";
 import { usePagination } from "@/hooks/use-pagination";
-import { mockClientes } from "@/data/clientes";
-import api from "@/lib/api-mock";
 import type { KpiItem, Product, Bag, BagItem, BagStatus } from "@/types";
 import { addDays, format } from "date-fns";
 
@@ -33,8 +31,8 @@ const bagStatusColor = (s: BagStatus) => {
 
 const SacolinhasContent = () => {
   const [loadingData, setLoadingData] = useState(true);
-  const [mockProducts, setMockProducts] = useState<any[]>(null);
-  const [mockClientes, setMockClientes] = useState<any[]>(null);
+  const [mockProducts, setMockProducts] = useState<any[]>([]);
+  const [mockClientes, setMockClientes] = useState<any[]>([]);
   useEffect(() => {
     let mounted = true;
     const fetchData = async () => {
@@ -54,7 +52,6 @@ const SacolinhasContent = () => {
     return () => { mounted = false; };
   }, []);
 
-  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
   const [bags, setBags] = useState<Bag[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState("");
@@ -90,8 +87,8 @@ const SacolinhasContent = () => {
     const fetchData = async () => {
       try {
         const [bagsRes, productsRes] = await Promise.all([
-          api.get("/sacolinhas"),
-          api.get("/products"),
+          api.get("/api/sacolinhas"),
+          api.get("/api/products"),
         ]);
         setBags(bagsRes.data);
         setProducts(productsRes.data);
@@ -229,6 +226,8 @@ const SacolinhasContent = () => {
   const bagTotal = selectedProducts.reduce((a, b) => a + b.product.price * b.quantity, 0);
 
   const { paginatedItems, totalPages } = usePagination(filtered, ITEMS_PER_PAGE, page);
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
   return (
     <div className="space-y-6">
@@ -385,13 +384,13 @@ const SacolinhasContent = () => {
 
       <DataTable
         columns={[
-          { header: "Código", accessor: "code" },
-          { header: "Cliente", accessor: "customer" },
-          { header: "Peças", accessor: "items", hidden: "sm" },
-          { header: "Valor", accessor: "total", hidden: "md" },
-          { header: "Devolução", accessor: "returnDate", hidden: "lg" },
-          { header: "Status", accessor: "status" },
-          { header: "Ações", accessor: "actions", className: "text-right" },
+          { label: "Código", key: "code" },
+          { label: "Cliente", key: "customer" },
+          { label: "Peças", key: "items", hideOn: "sm" },
+          { label: "Valor", key: "total", hideOn: "md" },
+          { label: "Devolução", key: "returnDate", hideOn: "lg" },
+          { label: "Status", key: "status" },
+          { label: "Ações", key: "actions", align: "right" },
         ]}
         data={paginatedItems}
         renderRow={(bag) => (
@@ -432,7 +431,13 @@ const SacolinhasContent = () => {
       />
 
       {totalPages > 1 && (
-        <PaginationControls page={page} totalPages={totalPages} setPage={setPage} />
+        <PaginationControls
+          currentPage={page}
+          totalPages={totalPages}
+          totalItems={filtered.length}
+          itemsPerPage={ITEMS_PER_PAGE}
+          onPageChange={setPage}
+        />
       )}
 
       {/* Detail dialog */}

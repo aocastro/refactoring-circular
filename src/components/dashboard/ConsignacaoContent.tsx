@@ -17,10 +17,10 @@ const ConsignacaoContent = () => {
   const [loadingData, setLoadingData] = useState(true);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [initialConsignantes, setinitialConsignantes] = useState<any>([]);
+  const [initialConsignantes, setInitialConsignantes] = useState<any>([]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [mockContracts, setmockContracts] = useState<any>([]);
+  const [mockContracts, setMockContracts] = useState<any>([]);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -37,7 +37,6 @@ const ConsignacaoContent = () => {
     fetchData();
   }, []);
 
-  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
 
   const [consignantes, setConsignantes] = useState(initialConsignantes);
@@ -94,6 +93,8 @@ const ConsignacaoContent = () => {
   };
 
 
+
+  if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
   return (
     <div className="space-y-6">
