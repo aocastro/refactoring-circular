@@ -43,7 +43,7 @@ interface AdminSidebarProps {
 }
 
 export function AdminSidebar({ activeSection, onSectionChange }: AdminSidebarProps) {
-  const { state } = useSidebar();
+  const { state, setOpenMobile, isMobile } = useSidebar();
   const collapsed = state === "collapsed";
   const navigate = useNavigate();
 
@@ -69,7 +69,10 @@ export function AdminSidebar({ activeSection, onSectionChange }: AdminSidebarPro
                   <SidebarMenuItem key={item.id}>
                     <SidebarMenuButton
                       type="button"
-                      onClick={() => onSectionChange(item.id)}
+                      onClick={() => {
+                        onSectionChange(item.id);
+                        if (isMobile) setOpenMobile(false);
+                      }}
                       isActive={activeSection === item.id}
                       className="cursor-pointer"
                       aria-current={activeSection === item.id ? "page" : undefined}
@@ -91,7 +94,10 @@ export function AdminSidebar({ activeSection, onSectionChange }: AdminSidebarPro
           <SidebarMenuItem>
             <SidebarMenuButton
               type="button"
-              onClick={() => navigate("/")}
+              onClick={() => {
+                navigate("/");
+                if (isMobile) setOpenMobile(false);
+              }}
               className="cursor-pointer text-destructive"
               aria-label="Sair do painel admin"
             >

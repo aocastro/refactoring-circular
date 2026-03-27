@@ -146,25 +146,28 @@ const kpis = [
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
       <Card className="lg:col-span-2">
         <CardHeader><CardTitle className="text-base">Evolução do MRR</CardTitle></CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={280}>
-            <AreaChart data={adminMrrHistory}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-              <XAxis dataKey="month" className="text-xs fill-muted-foreground" />
+        <CardContent className="overflow-x-auto pb-4">
+          <div className="min-w-[600px] h-[280px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={adminMrrHistory}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                <XAxis dataKey="month" className="text-xs fill-muted-foreground" />
               <YAxis className="text-xs fill-muted-foreground" tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`} />
               <Tooltip formatter={(v: number) => `R$ ${v.toLocaleString("pt-BR")}`} />
-              <Area type="monotone" dataKey="value" stroke="hsl(var(--primary))" fill="hsl(var(--primary) / .15)" strokeWidth={2} />
-            </AreaChart>
-          </ResponsiveContainer>
+                <Area type="monotone" dataKey="value" stroke="hsl(var(--primary))" fill="hsl(var(--primary) / .15)" strokeWidth={2} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader><CardTitle className="text-base">Receita por Plano</CardTitle></CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={280}>
-            <PieChart>
-              <Pie
+        <CardContent className="overflow-x-auto pb-4">
+          <div className="min-w-[300px] h-[280px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
                 data={adminRevenueByPlan}
                 dataKey="value"
                 nameKey="plan"
@@ -178,10 +181,11 @@ const kpis = [
                   <Cell key={i} fill={entry.color} />
                 ))}
               </Pie>
-              <Tooltip formatter={(v: number) => `R$ ${v.toLocaleString("pt-BR")}`} />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
+                <Tooltip formatter={(v: number) => `R$ ${v.toLocaleString("pt-BR")}`} />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
         </CardContent>
       </Card>
     </div>
@@ -195,20 +199,22 @@ const kpis = [
             Churn Rate (%)
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={260}>
-            <LineChart data={adminChurnHistory}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+        <CardContent className="overflow-x-auto pb-4">
+          <div className="min-w-[600px] h-[260px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={adminChurnHistory}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
               <XAxis dataKey="month" className="text-xs fill-muted-foreground" />
               <YAxis yAxisId="left" className="text-xs fill-muted-foreground" domain={[0, 6]} tickFormatter={(v) => `${v}%`} />
               <YAxis yAxisId="right" orientation="right" className="text-xs fill-muted-foreground" />
               <Tooltip formatter={(v: number, name: string) => name === "Churn (%)" ? `${v}%` : v} />
               <Legend />
               <Line yAxisId="left" type="monotone" dataKey="churn" name="Churn (%)" stroke="hsl(var(--destructive))" strokeWidth={2} dot={{ r: 4 }} />
-              <Line yAxisId="right" type="monotone" dataKey="newStores" name="Novas Lojas" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 4 }} />
-              <Line yAxisId="right" type="monotone" dataKey="cancelled" name="Cancelamentos" stroke="hsl(var(--muted-foreground))" strokeWidth={2} strokeDasharray="5 5" dot={{ r: 3 }} />
-            </LineChart>
-          </ResponsiveContainer>
+                <Line yAxisId="right" type="monotone" dataKey="newStores" name="Novas Lojas" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 4 }} />
+                <Line yAxisId="right" type="monotone" dataKey="cancelled" name="Cancelamentos" stroke="hsl(var(--muted-foreground))" strokeWidth={2} strokeDasharray="5 5" dot={{ r: 3 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         </CardContent>
       </Card>
 
@@ -219,10 +225,11 @@ const kpis = [
             Lifetime Value (LTV) por Plano
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={260}>
-            <ComposedChart data={adminLtvByPlan}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+        <CardContent className="overflow-x-auto pb-4">
+          <div className="min-w-[600px] h-[260px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={adminLtvByPlan}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
               <XAxis dataKey="plan" className="text-xs fill-muted-foreground" />
               <YAxis yAxisId="left" className="text-xs fill-muted-foreground" tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`} />
               <YAxis yAxisId="right" orientation="right" className="text-xs fill-muted-foreground" tickFormatter={(v) => `${v}m`} />
@@ -237,10 +244,11 @@ const kpis = [
                 {adminLtvByPlan.map((entry: any, i: number) => (
                   <Cell key={i} fill={entry.color} />
                 ))}
-              </Bar>
-              <Line yAxisId="right" type="monotone" dataKey="avgMonths" name="Tempo Médio" stroke="hsl(var(--foreground))" strokeWidth={2} dot={{ r: 4 }} />
-            </ComposedChart>
-          </ResponsiveContainer>
+                </Bar>
+                <Line yAxisId="right" type="monotone" dataKey="avgMonths" name="Tempo Médio" stroke="hsl(var(--foreground))" strokeWidth={2} dot={{ r: 4 }} />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
           <div className="mt-3 flex flex-wrap gap-3">
             {adminLtvByPlan.map((p) => (
               <div key={p.plan} className="text-center">

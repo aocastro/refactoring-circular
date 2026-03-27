@@ -46,11 +46,11 @@ const Admin = () => {
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background">
         <AdminSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
-        <div className="flex flex-1 flex-col">
-          <header className="flex h-14 items-center justify-between border-b border-border px-4">
+        <div className="flex flex-1 flex-col overflow-hidden">
+          <header className="flex h-14 shrink-0 items-center justify-between border-b border-border px-4">
             <div className="flex items-center gap-4">
               <SidebarTrigger />
-              <Breadcrumb>
+              <Breadcrumb className="hidden md:flex">
                 <BreadcrumbList>
                   <BreadcrumbItem>
                     <span className="text-muted-foreground">Admin</span>
@@ -74,7 +74,7 @@ const Admin = () => {
             </div>
           </header>
 
-          <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
+          <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-6 lg:p-8 w-full">
             <ActiveComponent />
           </main>
         </div>
