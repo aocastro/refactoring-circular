@@ -66,9 +66,70 @@ mock.onGet('/api/admin/kpis').reply(() => [200, adminKpis]);
 mock.onGet('/api/admin/mrr-history').reply(() => [200, adminMrrHistory]);
 mock.onGet('/api/admin/churn-history').reply(() => [200, adminChurnHistory]);
 mock.onGet('/api/admin/ltv-by-plan').reply(() => [200, adminLtvByPlan]);
-mock.onGet('/api/admin/plans').reply(() => [200, adminPlans]);
-mock.onGet('/api/admin/stores').reply(() => [200, adminStores]);
-mock.onGet('/api/admin/users').reply(() => [200, adminUsers]);
+let mutableAdminPlans = [...adminPlans];
+let mutableAdminStores = [...adminStores];
+let mutableAdminUsers = [...adminUsers];
+
+mock.onGet('/api/admin/plans').reply(() => [200, mutableAdminPlans]);
+mock.onPost('/api/admin/plans').reply((config) => {
+  const newPlan = typeof config.data === 'string' ? JSON.parse(config.data) : config.data;
+  const planToAdd = {
+    ...newPlan,
+    id: Date.now(),
+    status: newPlan.status || 'ativo',
+    subscribers: 0,
+  };
+  mutableAdminPlans.push(planToAdd);
+  return [201, planToAdd];
+});
+mock.onPut(/\/api\/admin\/plans\/\d+/).reply((config) => {
+  const url = config.url || '';
+  const idStr = url.split('/').pop();
+  if (idStr) {
+    const id = parseInt(idStr, 10);
+    const updatedPlan = typeof config.data === 'string' ? JSON.parse(config.data) : config.data;
+    const index = mutableAdminPlans.findIndex(p => p.id === id);
+    if (index !== -1) {
+      mutableAdminPlans[index] = { ...mutableAdminPlans[index], ...updatedPlan };
+      return [200, mutableAdminPlans[index]];
+    }
+  }
+  return [404, { message: 'Plano não encontrado' }];
+});
+
+mock.onGet('/api/admin/stores').reply(() => [200, mutableAdminStores]);
+mock.onPut(/\/api\/admin\/stores\/\d+\/status/).reply((config) => {
+  const url = config.url || '';
+  const parts = url.split('/');
+  const idStr = parts[parts.length - 2];
+  if (idStr) {
+    const id = parseInt(idStr, 10);
+    const { status } = typeof config.data === 'string' ? JSON.parse(config.data) : config.data;
+    const index = mutableAdminStores.findIndex(s => s.id === id);
+    if (index !== -1) {
+      mutableAdminStores[index] = { ...mutableAdminStores[index], status };
+      return [200, mutableAdminStores[index]];
+    }
+  }
+  return [404, { message: 'Loja não encontrada' }];
+});
+
+mock.onGet('/api/admin/users').reply(() => [200, mutableAdminUsers]);
+mock.onPut(/\/api\/admin\/users\/\d+\/status/).reply((config) => {
+  const url = config.url || '';
+  const parts = url.split('/');
+  const idStr = parts[parts.length - 2];
+  if (idStr) {
+    const id = parseInt(idStr, 10);
+    const { status } = typeof config.data === 'string' ? JSON.parse(config.data) : config.data;
+    const index = mutableAdminUsers.findIndex(u => u.id === id);
+    if (index !== -1) {
+      mutableAdminUsers[index] = { ...mutableAdminUsers[index], status };
+      return [200, mutableAdminUsers[index]];
+    }
+  }
+  return [404, { message: 'Usuário não encontrado' }];
+});
 mock.onGet('/api/admin/financial').reply(() => [200, adminFinancial]);
 mock.onGet('/api/admin/revenue-by-plan').reply(() => [200, adminRevenueByPlan]);
 mock.onGet('/api/admin/monthly-revenue').reply(() => [200, adminMonthlyRevenue]);

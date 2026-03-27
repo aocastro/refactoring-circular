@@ -37,6 +37,16 @@ const AdminLojasContent = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [adminStores, setAdminStores] = useState<any>([]);
+
+  const fetchStores = async () => {
+    try {
+      const res = await api.get('/api/admin/stores');
+      setAdminStores(res.data);
+    } catch (err) {
+      console.error("Error fetching stores:", err);
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -50,6 +60,17 @@ const AdminLojasContent = () => {
     };
     fetchData();
   }, []);
+
+  const changeStoreStatus = async (id: number, status: string, message: string) => {
+    try {
+      await api.put(`/api/admin/stores/${id}/status`, { status });
+      toast.success(message);
+      fetchStores();
+    } catch (err) {
+      console.error("Error changing store status:", err);
+      toast.error("Erro ao alterar status da loja");
+    }
+  };
 
 
 
@@ -108,8 +129,9 @@ const AdminLojasContent = () => {
               <td className="px-4 py-3">
                 <div className="flex gap-1">
                   <Button variant="ghost" size="sm" onClick={() => setSelectedStore(store)} aria-label={`Ver loja ${store.name}`}><Eye className="h-4 w-4" /></Button>
-                  {store.status === "pendente" && <Button size="sm" variant="outline" onClick={() => toast.success(`${store.name} aprovada`)}>Aprovar</Button>}
-                  {store.status === "ativa" && <Button size="sm" variant="destructive" onClick={() => toast.success(`${store.name} suspensa`)}>Suspender</Button>}
+                  {store.status === "pendente" && <Button size="sm" variant="outline" onClick={() => changeStoreStatus(store.id, "ativa", `${store.name} aprovada`)}>Aprovar</Button>}
+                  {store.status === "ativa" && <Button size="sm" variant="destructive" onClick={() => changeStoreStatus(store.id, "suspensa", `${store.name} suspensa`)}>Suspender</Button>}
+                  {store.status === "suspensa" && <Button size="sm" variant="outline" onClick={() => changeStoreStatus(store.id, "ativa", `${store.name} reativada`)}>Reativar</Button>}
                   {store.storeUrl && (
                     <Button variant="ghost" size="sm" asChild aria-label={`Acessar site da loja ${store.name}`}>
                       <a href={store.storeUrl} target="_blank" rel="noopener noreferrer">

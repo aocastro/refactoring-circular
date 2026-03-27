@@ -42,6 +42,16 @@ const AdminUsuariosContent = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [adminUsers, setAdminUsers] = useState<any>([]);
+
+  const fetchUsers = async () => {
+    try {
+      const res = await api.get('/api/admin/users');
+      setAdminUsers(res.data);
+    } catch (err) {
+      console.error("Error fetching users:", err);
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -55,6 +65,17 @@ const AdminUsuariosContent = () => {
     };
     fetchData();
   }, []);
+
+  const changeUserStatus = async (id: number, status: string, message: string) => {
+    try {
+      await api.put(`/api/admin/users/${id}/status`, { status });
+      toast.success(message);
+      fetchUsers();
+    } catch (err) {
+      console.error("Error changing user status:", err);
+      toast.error("Erro ao alterar status do usuário");
+    }
+  };
 
 
 
@@ -112,9 +133,9 @@ const AdminUsuariosContent = () => {
               <td className="px-4 py-3"><Badge variant={statusVariant[user.status]}>{user.status}</Badge></td>
               <td className="px-4 py-3">
                 {user.status === "bloqueado" ? (
-                  <Button size="sm" variant="outline" onClick={() => toast.success(`${user.name} desbloqueado`)}>Desbloquear</Button>
+                  <Button size="sm" variant="outline" onClick={() => changeUserStatus(user.id, "ativo", `${user.name} desbloqueado`)}>Desbloquear</Button>
                 ) : user.role !== "admin" ? (
-                  <Button size="sm" variant="destructive" onClick={() => toast.success(`${user.name} bloqueado`)}>Bloquear</Button>
+                  <Button size="sm" variant="destructive" onClick={() => changeUserStatus(user.id, "bloqueado", `${user.name} bloqueado`)}>Bloquear</Button>
                 ) : null}
               </td>
             </tr>
