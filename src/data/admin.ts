@@ -67,17 +67,21 @@ export interface AdminStore {
   createdAt: string;
   revenue: number;
   products: number;
+  trialEnd?: string;
+  storeUrl?: string;
+  integrations?: string[];
+  clients?: number;
 }
 
 export const adminStores: AdminStore[] = [
-  { id: 1, name: "Fashion Store", owner: "Maria Silva", email: "maria@email.com", plan: "Growth", status: "ativa", createdAt: "2024-08-15", revenue: 12450, products: 89 },
-  { id: 2, name: "Vintage Corner", owner: "João Santos", email: "joao@email.com", plan: "Essential", status: "ativa", createdAt: "2024-09-02", revenue: 8900, products: 45 },
-  { id: 3, name: "Eco Brechó", owner: "Ana Paula", email: "ana@email.com", plan: "Starter", status: "ativa", createdAt: "2024-10-10", revenue: 3200, products: 32 },
-  { id: 4, name: "Reuse & Style", owner: "Carlos Lima", email: "carlos@email.com", plan: "Scale", status: "ativa", createdAt: "2024-07-20", revenue: 28700, products: 234 },
-  { id: 5, name: "Second Hand SP", owner: "Fernanda Alves", email: "fer@email.com", plan: "Growth", status: "suspensa", createdAt: "2024-11-05", revenue: 1500, products: 18 },
-  { id: 6, name: "Circular Shop", owner: "Pedro Costa", email: "pedro@email.com", plan: "Essential", status: "pendente", createdAt: "2025-01-12", revenue: 0, products: 5 },
-  { id: 7, name: "GreenWear", owner: "Lucia Mendes", email: "lucia@email.com", plan: "Starter", status: "ativa", createdAt: "2024-12-01", revenue: 4100, products: 67 },
-  { id: 8, name: "Brechó da Vila", owner: "Roberto Dias", email: "rob@email.com", plan: "Growth", status: "ativa", createdAt: "2024-06-18", revenue: 15800, products: 156 },
+  { id: 1, name: "Fashion Store", owner: "Maria Silva", email: "maria@email.com", plan: "Growth", status: "ativa", createdAt: "2024-08-15", revenue: 12450, products: 89, storeUrl: "https://fashionstore.ushar.com", integrations: ["PagBank", "Instagram"], clients: 1200 },
+  { id: 2, name: "Vintage Corner", owner: "João Santos", email: "joao@email.com", plan: "Essential", status: "ativa", createdAt: "2024-09-02", revenue: 8900, products: 45, storeUrl: "https://vintagecorner.ushar.com", integrations: ["PagBank", "Melhor Envio"], clients: 450 },
+  { id: 3, name: "Eco Brechó", owner: "Ana Paula", email: "ana@email.com", plan: "Starter", status: "ativa", createdAt: "2024-10-10", revenue: 3200, products: 32, storeUrl: "https://ecobrecho.ushar.com", integrations: [], clients: 85 },
+  { id: 4, name: "Reuse & Style", owner: "Carlos Lima", email: "carlos@email.com", plan: "Scale", status: "ativa", createdAt: "2024-07-20", revenue: 28700, products: 234, storeUrl: "https://reusestyle.ushar.com", integrations: ["PagBank", "Melhor Envio", "Instagram"], clients: 3400 },
+  { id: 5, name: "Second Hand SP", owner: "Fernanda Alves", email: "fer@email.com", plan: "Growth", status: "suspensa", createdAt: "2024-11-05", revenue: 1500, products: 18, storeUrl: "https://secondhandsp.ushar.com", integrations: ["PagBank"], clients: 120 },
+  { id: 6, name: "Circular Shop", owner: "Pedro Costa", email: "pedro@email.com", plan: "Essential", status: "pendente", createdAt: "2025-01-12", revenue: 0, products: 5, trialEnd: "2025-01-26", storeUrl: "https://circularshop.ushar.com", integrations: [], clients: 0 },
+  { id: 7, name: "GreenWear", owner: "Lucia Mendes", email: "lucia@email.com", plan: "Starter", status: "ativa", createdAt: "2024-12-01", revenue: 4100, products: 67, storeUrl: "https://greenwear.ushar.com", integrations: ["Melhor Envio"], clients: 210 },
+  { id: 8, name: "Brechó da Vila", owner: "Roberto Dias", email: "rob@email.com", plan: "Growth", status: "ativa", createdAt: "2024-06-18", revenue: 15800, products: 156, storeUrl: "https://brechodavila.ushar.com", integrations: ["PagBank", "Instagram"], clients: 890 },
 ];
 
 // ─── Usuários ───────────────────────────────────

@@ -1,12 +1,13 @@
 import api from "@/api/axios";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Store, CheckCircle, XCircle, Clock, Eye } from "lucide-react";
+import { Store, CheckCircle, XCircle, Clock, Eye, ExternalLink, ShieldCheck, Truck, Instagram, Activity } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import FilterToolbar from "@/components/shared/FilterToolbar";
 import DataTable from "@/components/shared/DataTable";
 import PaginationControls from "@/components/shared/PaginationControls";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { usePagination } from "@/hooks/use-pagination";
 import { useEffect } from "react";
 import { type AdminStore } from "@/data/admin";
@@ -68,7 +69,7 @@ const AdminLojasContent = () => {
 
   const { paginatedItems, totalPages, safePage, totalItems } = usePagination(filtered, 10, page);
 
-
+  const [selectedStore, setSelectedStore] = useState<AdminStore | null>(null);
 
   if (loadingData) return <div className="flex h-40 items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
@@ -106,9 +107,16 @@ const AdminLojasContent = () => {
               </td>
               <td className="px-4 py-3">
                 <div className="flex gap-1">
-                  <Button variant="ghost" size="sm" aria-label={`Ver loja ${store.name}`}><Eye className="h-4 w-4" /></Button>
+                  <Button variant="ghost" size="sm" onClick={() => setSelectedStore(store)} aria-label={`Ver loja ${store.name}`}><Eye className="h-4 w-4" /></Button>
                   {store.status === "pendente" && <Button size="sm" variant="outline" onClick={() => toast.success(`${store.name} aprovada`)}>Aprovar</Button>}
                   {store.status === "ativa" && <Button size="sm" variant="destructive" onClick={() => toast.success(`${store.name} suspensa`)}>Suspender</Button>}
+                  {store.storeUrl && (
+                    <Button variant="ghost" size="sm" asChild aria-label={`Acessar site da loja ${store.name}`}>
+                      <a href={store.storeUrl} target="_blank" rel="noopener noreferrer">
+                        <ExternalLink className="h-4 w-4" />
+                      </a>
+                    </Button>
+                  )}
                 </div>
               </td>
             </tr>
@@ -122,6 +130,78 @@ const AdminLojasContent = () => {
           onPageChange={setPage}
         />
       </motion.div>
+
+      <Dialog open={!!selectedStore} onOpenChange={(open) => !open && setSelectedStore(null)}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              <span>Painel de Acompanhamento: {selectedStore?.name}</span>
+              <Badge variant="outline" className="mr-4">{selectedStore?.plan}</Badge>
+            </DialogTitle>
+            <DialogDescription>
+              Proprietário: {selectedStore?.owner} | Email: {selectedStore?.email}
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedStore && (
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="rounded-lg border p-3">
+                  <div className="text-sm text-muted-foreground mb-1">Status da Loja</div>
+                  <div className="font-medium capitalize flex items-center gap-1.5">
+                    {getStatusIcon(selectedStore.status)} {selectedStore.status}
+                  </div>
+                </div>
+                <div className="rounded-lg border p-3">
+                  <div className="text-sm text-muted-foreground mb-1">Clientes Cadastrados</div>
+                  <div className="font-medium">{selectedStore.clients?.toLocaleString("pt-BR") || 0}</div>
+                </div>
+                {selectedStore.trialEnd && (
+                  <div className="rounded-lg border p-3 col-span-2 bg-primary/5 border-primary/20">
+                    <div className="text-sm text-primary font-medium mb-1">Período de Teste</div>
+                    <div className="text-sm">Vencimento: {selectedStore.trialEnd}</div>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <h4 className="text-sm font-medium mb-2 mt-2">Integrações Conectadas</h4>
+                <div className="flex flex-wrap gap-2">
+                  <Badge variant={selectedStore.integrations?.includes("PagBank") ? "default" : "secondary"}>
+                    <ShieldCheck className="h-3.5 w-3.5 mr-1" /> PagBank
+                  </Badge>
+                  <Badge variant={selectedStore.integrations?.includes("Melhor Envio") ? "default" : "secondary"}>
+                    <Truck className="h-3.5 w-3.5 mr-1" /> Melhor Envio
+                  </Badge>
+                  <Badge variant={selectedStore.integrations?.includes("Instagram") ? "default" : "secondary"}>
+                    <Instagram className="h-3.5 w-3.5 mr-1" /> Instagram
+                  </Badge>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="text-sm font-medium mb-2 mt-2 flex items-center gap-1">
+                  <Activity className="h-4 w-4" /> Log de Atividades (Recentes)
+                </h4>
+                <div className="space-y-2 border rounded-md p-3 text-sm h-32 overflow-y-auto">
+                  <div className="flex justify-between border-b pb-1 last:border-0">
+                    <span className="text-muted-foreground">Hoje, 10:23</span>
+                    <span>Novo produto cadastrado</span>
+                  </div>
+                  <div className="flex justify-between border-b pb-1 last:border-0">
+                    <span className="text-muted-foreground">Ontem, 15:45</span>
+                    <span>Venda realizada (R$ 150,00)</span>
+                  </div>
+                  <div className="flex justify-between border-b pb-1 last:border-0">
+                    <span className="text-muted-foreground">22/10, 09:10</span>
+                    <span>Integração com Instagram ativada</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
