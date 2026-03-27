@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import api from "@/api/axios";
 import { motion } from "framer-motion";
-import { Store, Users, DollarSign, Leaf, ArrowUpRight, ArrowDownRight, TrendingDown, Timer } from "lucide-react";
+import { Store, Users, DollarSign, Leaf, ArrowUpRight, ArrowDownRight, TrendingDown, Timer, Clock } from "lucide-react";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, BarChart, Bar, Legend, LineChart, Line, ComposedChart,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { differenceInDays, parseISO } from "date-fns";
 
 
 
@@ -22,6 +24,8 @@ const AdminDashboardContent = () => {
   const [adminChurnHistory, setAdminChurnHistory] = useState<any>([]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [adminLtvByPlan, setAdminLtvByPlan] = useState<any>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [freeTrialStores, setFreeTrialStores] = useState<any[]>([]);
   const [period, setPeriod] = useState("Mensal");
 
   useEffect(() => {
@@ -37,6 +41,12 @@ const AdminDashboardContent = () => {
         setAdminChurnHistory(res_adminChurnHistory.data);
         const res_adminLtvByPlan = await api.get('/api/admin/ltv-by-plan');
         setAdminLtvByPlan(res_adminLtvByPlan.data);
+
+        const res_adminStores = await api.get('/api/admin/stores');
+        const stores = res_adminStores.data;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const trialStores = stores.filter((s: any) => s.trialEnd);
+        setFreeTrialStores(trialStores);
       } catch (err) {
         console.error("Error fetching data:", err);
       } finally {
@@ -238,6 +248,47 @@ const kpis = [
                 <p className="text-xs font-semibold text-foreground">~{p.avgMonths} meses</p>
               </div>
             ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+
+    {/* Lojas em Período de Teste */}
+    <div className="grid grid-cols-1">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Clock className="h-4 w-4 text-primary" />
+            Lojas em Período de Teste (Free Trial)
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {freeTrialStores.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Nenhuma loja em período de teste no momento.</p>
+            ) : (
+              freeTrialStores.map((store) => {
+                const daysRemaining = differenceInDays(parseISO(store.trialEnd), new Date());
+                const isEndingSoon = daysRemaining <= 3;
+
+                return (
+                  <div key={store.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-lg border">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-sm">{store.name}</span>
+                        <Badge variant="outline" className="text-[10px]">{store.plan}</Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">{store.owner} • {store.email}</p>
+                    </div>
+                    <div className="mt-2 sm:mt-0 flex items-center gap-2">
+                      <Badge variant={isEndingSoon ? "destructive" : "secondary"}>
+                        {daysRemaining > 0 ? `${daysRemaining} dias restantes` : "Expirado"}
+                      </Badge>
+                    </div>
+                  </div>
+                );
+              })
+            )}
           </div>
         </CardContent>
       </Card>
