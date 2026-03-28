@@ -15,6 +15,8 @@ import AdminSuporteContent from "@/components/admin/AdminSuporteContent";
 import AdminNPSContent from "@/components/admin/AdminNPSContent";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { AccessibilityControls } from "@/components/layout/AccessibilityControls";
+import { ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const sectionComponents: Record<string, React.FC> = {
   dashboard: AdminDashboardContent,
@@ -50,10 +52,19 @@ const Admin = () => {
           <header className="flex h-14 shrink-0 items-center justify-between border-b border-border px-4">
             <div className="flex items-center gap-4">
               <SidebarTrigger />
+
+              {activeSection !== "dashboard" && (
+                <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setActiveSection("dashboard")} aria-label="Voltar">
+                  <ArrowLeft className="h-5 w-5" />
+                </Button>
+              )}
+
               <Breadcrumb className="hidden md:flex">
                 <BreadcrumbList>
                   <BreadcrumbItem>
-                    <span className="text-muted-foreground">Admin</span>
+                    <button onClick={() => setActiveSection("dashboard")} className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer flex items-center gap-1">
+                      Admin
+                    </button>
                   </BreadcrumbItem>
                   <BreadcrumbSeparator />
                   <BreadcrumbItem>
