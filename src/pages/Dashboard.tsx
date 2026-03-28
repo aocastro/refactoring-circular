@@ -2,6 +2,8 @@ import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import NotificationsDropdown from "@/components/dashboard/NotificationsDropdown";
 import { useTheme } from "@/hooks/use-theme";
@@ -44,13 +46,22 @@ const SectionFallback = () => (
   </div>
 );
 
-const AppHeader = ({ userName, sectionLabel }: { userName: string, sectionLabel: string }) => (
+const AppHeader = ({ userName, sectionLabel, onBack, showBack }: { userName: string, sectionLabel: string, onBack: () => void, showBack: boolean }) => (
   <header className="flex h-14 items-center gap-4 border-b border-border px-4" aria-label="Cabeçalho do dashboard">
     <SidebarTrigger aria-label="Abrir ou recolher barra lateral" />
+
+    {showBack && (
+      <Button variant="ghost" size="icon" className="sm:hidden" onClick={onBack} aria-label="Voltar">
+        <ArrowLeft className="h-5 w-5" />
+      </Button>
+    )}
+
     <Breadcrumb className="hidden sm:block">
       <BreadcrumbList>
         <BreadcrumbItem>
-          <span className="text-muted-foreground">Dashboard</span>
+          <button onClick={onBack} className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer flex items-center gap-1">
+            Dashboard
+          </button>
         </BreadcrumbItem>
         <BreadcrumbSeparator />
         <BreadcrumbItem>
@@ -141,7 +152,12 @@ const Dashboard = () => {
       <div className="flex min-h-screen w-full bg-background">
         <DashboardSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
         <div className="flex flex-1 flex-col">
-          <AppHeader userName={user.name} sectionLabel={currentSection.label} />
+          <AppHeader
+            userName={user.name}
+            sectionLabel={currentSection.label}
+            onBack={() => setActiveSection("dashboard")}
+            showBack={activeSection !== "dashboard"}
+          />
           <main id="main-content" className="flex-1 overflow-auto p-4 sm:p-6" tabIndex={-1} aria-live="polite">
             <section aria-labelledby="dashboard-section-heading">
               <h1 ref={sectionHeadingRef} id="dashboard-section-heading" tabIndex={-1} className="mb-4 font-display text-2xl font-bold text-foreground focus:outline-none">
