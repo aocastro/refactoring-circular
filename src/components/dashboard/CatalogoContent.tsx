@@ -22,6 +22,9 @@ import {
 import { productCategories, priceRanges } from "@/data/products";
 import { getStatusColor } from "@/lib/status-colors";
 import type { Product } from "@/types";
+import { ProductFormModal } from "./modals/ProductFormModal";
+import { BulkUploadModal } from "./modals/BulkUploadModal";
+import { PhotoUploadModal } from "./modals/PhotoUploadModal";
 
 const conditions = ["Todos", "Novo", "Excelente", "Bom", "Regular"];
 
@@ -168,19 +171,24 @@ const ProductDetail = ({ product, onBack, mockProducts }: { product: Product; on
 const CatalogoContent = () => {
   const [loadingData, setLoadingData] = useState(true);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [mockProducts, setMockProducts] = useState<any>([]);
+  const [mockProducts, setMockProducts] = useState<any[]>([]);
+
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
+  const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
+
+  const fetchData = async () => {
+    try {
+      const res_mockProducts = await api.get('/api/products');
+      setMockProducts(res_mockProducts.data);
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    } finally {
+      setLoadingData(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res_mockProducts = await api.get('/api/products');
-        setMockProducts(res_mockProducts.data);
-      } catch (err) {
-        console.error("Error fetching data:", err);
-      } finally {
-        setLoadingData(false);
-      }
-    };
     fetchData();
   }, []);
 
@@ -194,7 +202,10 @@ const CatalogoContent = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  const sizes: string[] = useMemo(() => ["Todos", ...Array.from(new Set(mockProducts.map((p: any) => String(p.size))))], [mockProducts]);
+  const sizes: string[] = useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return ["Todos", ...Array.from(new Set(mockProducts.map((p: any) => String(p.size))))];
+  }, [mockProducts]);
 
   const activeFilters = [category, condition, size, priceRange].filter((f) => f !== "Todos").length;
 
@@ -247,15 +258,15 @@ const CatalogoContent = () => {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>Opções de Cadastro</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer">
+            <DropdownMenuItem className="cursor-pointer" onClick={() => setIsProductModalOpen(true)}>
               <PackagePlus className="mr-2 h-4 w-4" />
               <span>Cadastro de Produto Único</span>
             </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer">
+            <DropdownMenuItem className="cursor-pointer" onClick={() => setIsBulkModalOpen(true)}>
               <FileSpreadsheet className="mr-2 h-4 w-4" />
               <span>Cadastro em Massa</span>
             </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer">
+            <DropdownMenuItem className="cursor-pointer" onClick={() => setIsPhotoModalOpen(true)}>
               <Camera className="mr-2 h-4 w-4" />
               <span>Cadastro por Foto</span>
             </DropdownMenuItem>
@@ -347,6 +358,23 @@ const CatalogoContent = () => {
           ))}
         </div>
       )}
+
+      {/* Modals */}
+      <ProductFormModal
+        open={isProductModalOpen}
+        onOpenChange={setIsProductModalOpen}
+        onSuccess={fetchData}
+      />
+      <BulkUploadModal
+        open={isBulkModalOpen}
+        onOpenChange={setIsBulkModalOpen}
+        onSuccess={fetchData}
+      />
+      <PhotoUploadModal
+        open={isPhotoModalOpen}
+        onOpenChange={setIsPhotoModalOpen}
+        onSuccess={fetchData}
+      />
     </div>
   );
 };
