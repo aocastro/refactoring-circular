@@ -8,35 +8,22 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash2, Plus } from "lucide-react";
+import { Trash2, Upload } from "lucide-react";
 import api from "@/api/axios";
 import { toast } from "sonner";
 import type { Product } from "@/types";
+import Papa from "papaparse";
+import * as xlsx from "xlsx";
 
-interface BulkUploadModalProps {
+interface ImportFileModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
 }
 
-export function BulkUploadModal({ open, onOpenChange, onSuccess }: BulkUploadModalProps) {
+export function ImportFileModal({ open, onOpenChange, onSuccess }: ImportFileModalProps) {
   const [loading, setLoading] = useState(false);
   const [rows, setRows] = useState<Partial<Product>[]>([]);
-
-  const addRow = () => {
-    setRows([
-      ...rows,
-      {
-        name: "",
-        sku: "",
-        price: 0,
-        stock: 1,
-        category: "Roupas",
-        size: "Único",
-        condition: "Novo",
-      },
-    ]);
-  };
 
   const removeRow = (index: number) => {
     setRows(rows.filter((_, i) => i !== index));
@@ -48,29 +35,114 @@ export function BulkUploadModal({ open, onOpenChange, onSuccess }: BulkUploadMod
     setRows(newRows);
   };
 
+  const processData = (data: any[]) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+    const parsedRows: Partial<Product>[] = [];
+    for (const row of data) {
+      // Use column names or fallback to indices if array
+      const isArray = Array.isArray(row);
+      const name = isArray ? row[0] : (row["Nome"] || row["name"]);
+      if (!name) continue;
+
+      const sku = isArray ? row[1] : (row["SKU"] || row["sku"]);
+      const priceRaw = isArray ? row[2] : (row["Preço"] || row["Preco"] || row["price"]);
+      let price = Number(priceRaw);
+      if (isNaN(price)) {
+        // try to parse comma
+        if (typeof priceRaw === 'string') {
+           price = Number(priceRaw.replace(',', '.'));
+        }
+      }
+
+      const stockRaw = isArray ? row[3] : (row["Estoque"] || row["stock"]);
+      const stock = Number(stockRaw) || 1;
+
+      const category = isArray ? row[4] : (row["Categoria"] || row["category"]);
+      const size = isArray ? row[5] : (row["Tamanho"] || row["size"]);
+      const condition = isArray ? row[6] : (row["Condição"] || row["Condicao"] || row["condition"]);
+      const supplier = isArray ? row[7] : (row["Fornecedor"] || row["supplier"]);
+      const brand = isArray ? row[8] : (row["Marca"] || row["brand"]);
+
+      parsedRows.push({
+        name: name || "",
+        sku: sku || "",
+        price: price || 0,
+        stock: stock || 1,
+        category: category || "Roupas",
+        size: size || "Único",
+        condition: (condition as Product["condition"]) || "Novo",
+        supplier: supplier || "",
+        brand: brand || "",
+      });
+    }
+    setRows(parsedRows);
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const extension = file.name.split('.').pop()?.toLowerCase();
+
+    if (extension === 'csv') {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const text = event.target?.result as string;
+        if (!text) return;
+
+        Papa.parse(text, {
+          header: true,
+          skipEmptyLines: true,
+          complete: (results) => {
+            processData(results.data);
+          },
+          error: (error) => {
+             console.error(error);
+             toast.error("Erro ao ler arquivo CSV.");
+          }
+        });
+      };
+      reader.readAsText(file, 'UTF-8');
+    } else if (extension === 'xlsx' || extension === 'xls') {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const data = event.target?.result;
+        if (!data) return;
+
+        const workbook = xlsx.read(data, { type: 'array' });
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+        const jsonData = xlsx.utils.sheet_to_json(worksheet);
+        processData(jsonData);
+      };
+      reader.readAsArrayBuffer(file);
+    } else {
+       toast.error("Formato de arquivo não suportado. Envie CSV ou Excel.");
+    }
+  };
+
   const handleSubmit = async () => {
     if (rows.length === 0) {
-      toast.error("Adicione pelo menos um produto.");
+      toast.error("Nenhum produto para importar.");
       return;
     }
 
     // Basic validation
     const isValid = rows.every((r) => r.name && r.sku && r.price !== undefined);
     if (!isValid) {
-      toast.error("Preencha todos os campos obrigatórios (Nome, SKU, Preço).");
+      toast.error("Verifique os dados importados. Preencha todos os campos obrigatórios (Nome, SKU, Preço).");
       return;
     }
 
     setLoading(true);
     try {
       await api.post("/api/products/bulk", rows);
-      toast.success(`${rows.length} produtos cadastrados com sucesso!`);
+      toast.success(`${rows.length} produtos importados com sucesso!`);
       onSuccess();
       onOpenChange(false);
       setRows([]);
     } catch (error) {
       console.error(error);
-      toast.error("Erro ao cadastrar produtos em massa.");
+      toast.error("Erro ao importar produtos.");
     } finally {
       setLoading(false);
     }
@@ -80,17 +152,25 @@ export function BulkUploadModal({ open, onOpenChange, onSuccess }: BulkUploadMod
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-5xl bg-background border-border text-foreground overflow-hidden flex flex-col max-h-[90vh]">
         <DialogHeader>
-          <DialogTitle>Cadastro em Massa</DialogTitle>
+          <DialogTitle>Importar Arquivo (CSV / Excel)</DialogTitle>
           <DialogDescription>
-            Adicione produtos manualmente preenchendo as linhas abaixo.
+            Faça upload de uma planilha para importar os produtos. A planilha deve conter as colunas: Nome, SKU, Preço, Estoque, Categoria, Tamanho, Condição.
           </DialogDescription>
         </DialogHeader>
 
         <div className="flex gap-2 mb-4">
-          <Button onClick={addRow} variant="outline" size="sm">
-            <Plus className="w-4 h-4 mr-2" />
-            Adicionar Linha
-          </Button>
+          <div className="relative w-full max-w-sm">
+            <Input
+              type="file"
+              accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              onChange={handleFileUpload}
+            />
+            <Button variant="outline" size="sm" className="w-full">
+              <Upload className="w-4 h-4 mr-2" />
+              Selecionar Arquivo (CSV ou Excel)
+            </Button>
+          </div>
         </div>
 
         <div className="overflow-auto border border-border rounded-md flex-1">
@@ -174,7 +254,7 @@ export function BulkUploadModal({ open, onOpenChange, onSuccess }: BulkUploadMod
               {rows.length === 0 && (
                 <tr>
                   <td colSpan={7} className="text-center py-8 text-muted-foreground">
-                    Nenhuma linha adicionada. Clique em "Adicionar Linha" para começar.
+                    Nenhum arquivo importado. Selecione um arquivo acima.
                   </td>
                 </tr>
               )}
@@ -192,7 +272,7 @@ export function BulkUploadModal({ open, onOpenChange, onSuccess }: BulkUploadMod
             Cancelar
           </Button>
           <Button onClick={handleSubmit} disabled={loading || rows.length === 0}>
-            {loading ? "Salvando..." : "Salvar Produtos"}
+            {loading ? "Importando..." : "Importar Produtos"}
           </Button>
         </div>
       </DialogContent>
