@@ -25,6 +25,7 @@ import type { Product } from "@/types";
 import { ProductFormModal } from "./modals/ProductFormModal";
 import { BulkUploadModal } from "./modals/BulkUploadModal";
 import { PhotoUploadModal } from "./modals/PhotoUploadModal";
+import { ImportFileModal } from "./modals/ImportFileModal";
 
 const conditions = ["Todos", "Novo", "Excelente", "Bom", "Regular"];
 
@@ -176,6 +177,7 @@ const CatalogoContent = () => {
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -265,6 +267,10 @@ const CatalogoContent = () => {
             <DropdownMenuItem className="cursor-pointer" onClick={() => setIsBulkModalOpen(true)}>
               <FileSpreadsheet className="mr-2 h-4 w-4" />
               <span>Cadastro em Massa</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="cursor-pointer" onClick={() => setIsImportModalOpen(true)}>
+              <FileSpreadsheet className="mr-2 h-4 w-4" />
+              <span>Importar Arquivo (CSV/Excel)</span>
             </DropdownMenuItem>
             <DropdownMenuItem className="cursor-pointer" onClick={() => setIsPhotoModalOpen(true)}>
               <Camera className="mr-2 h-4 w-4" />
@@ -368,6 +374,11 @@ const CatalogoContent = () => {
       <BulkUploadModal
         open={isBulkModalOpen}
         onOpenChange={setIsBulkModalOpen}
+        onSuccess={fetchData}
+      />
+      <ImportFileModal
+        open={isImportModalOpen}
+        onOpenChange={setIsImportModalOpen}
         onSuccess={fetchData}
       />
       <PhotoUploadModal

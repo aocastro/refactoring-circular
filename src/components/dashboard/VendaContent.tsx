@@ -17,6 +17,10 @@ import FilterToolbar from "@/components/shared/FilterToolbar";
 import { productCategories, productStatuses, priceRanges } from "@/data/products";
 import { getStatusColor } from "@/lib/status-colors";
 import type { KpiItem } from "@/types";
+import { ProductFormModal } from "./modals/ProductFormModal";
+import { BulkUploadModal } from "./modals/BulkUploadModal";
+import { ImportFileModal } from "./modals/ImportFileModal";
+import { PhotoUploadModal } from "./modals/PhotoUploadModal";
 
 const VendaContent = () => {
   const [loadingData, setLoadingData] = useState(true);
@@ -25,19 +29,26 @@ const VendaContent = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [mockPDVSales, setMockPDVSales] = useState<any>([]);
+
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
+
+  const fetchData = async () => {
+    try {
+      const res_mockProducts = await api.get('/api/products');
+      setMockProducts(res_mockProducts.data);
+      const res_mockPDVSales = await api.get('/api/products/pdv-sales');
+      setMockPDVSales(res_mockPDVSales.data);
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    } finally {
+      setLoadingData(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res_mockProducts = await api.get('/api/products');
-        setMockProducts(res_mockProducts.data);
-        const res_mockPDVSales = await api.get('/api/products/pdv-sales');
-        setMockPDVSales(res_mockPDVSales.data);
-      } catch (err) {
-        console.error("Error fetching data:", err);
-      } finally {
-        setLoadingData(false);
-      }
-    };
     fetchData();
   }, []);
 
@@ -110,15 +121,19 @@ const VendaContent = () => {
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuLabel>Opções de Cadastro</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="cursor-pointer">
+                  <DropdownMenuItem className="cursor-pointer" onClick={() => setIsProductModalOpen(true)}>
                     <PackagePlus className="mr-2 h-4 w-4" />
                     <span>Cadastro de Produto Único</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer">
+                  <DropdownMenuItem className="cursor-pointer" onClick={() => setIsBulkModalOpen(true)}>
                     <FileSpreadsheet className="mr-2 h-4 w-4" />
                     <span>Cadastro em Massa</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer">
+                  <DropdownMenuItem className="cursor-pointer" onClick={() => setIsImportModalOpen(true)}>
+                    <FileSpreadsheet className="mr-2 h-4 w-4" />
+                    <span>Importar Arquivo (CSV/Excel)</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer" onClick={() => setIsPhotoModalOpen(true)}>
                     <Camera className="mr-2 h-4 w-4" />
                     <span>Cadastro por Foto</span>
                   </DropdownMenuItem>
@@ -262,6 +277,26 @@ const VendaContent = () => {
           </div>
         </TabsContent>
       </Tabs>
+      <ProductFormModal
+        open={isProductModalOpen}
+        onOpenChange={setIsProductModalOpen}
+        onSuccess={fetchData}
+      />
+      <BulkUploadModal
+        open={isBulkModalOpen}
+        onOpenChange={setIsBulkModalOpen}
+        onSuccess={fetchData}
+      />
+      <ImportFileModal
+        open={isImportModalOpen}
+        onOpenChange={setIsImportModalOpen}
+        onSuccess={fetchData}
+      />
+      <PhotoUploadModal
+        open={isPhotoModalOpen}
+        onOpenChange={setIsPhotoModalOpen}
+        onSuccess={fetchData}
+      />
     </section>
   );
 };
