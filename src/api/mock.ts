@@ -155,8 +155,39 @@ mock.onGet('/api/financeiro/cash-flow').reply(() => [200, cashFlowData]);
 mock.onGet('/api/financeiro/payment-methods').reply(() => [200, paymentMethods]);
 mock.onGet('/api/financeiro/recent-payments').reply(() => [200, recentPayments]);
 mock.onGet('/api/financeiro/esg-monthly').reply(() => [200, esgMonthly]);
+let mutableMockProducts = [...mockProducts];
+
 mock.onGet('/api/notifications').reply(() => [200, mockNotifications]);
-mock.onGet('/api/products').reply(() => [200, mockProducts]);
+mock.onGet('/api/products').reply(() => [200, mutableMockProducts]);
+
+mock.onPost('/api/products').reply((config) => {
+  const newProduct = typeof config.data === 'string' ? JSON.parse(config.data) : config.data;
+  const productToAdd = {
+    ...newProduct,
+    id: Date.now(),
+    status: newProduct.status || 'Disponível',
+    image: newProduct.image || '📦',
+    createdAt: newProduct.createdAt || new Date().toISOString(),
+  };
+  mutableMockProducts.unshift(productToAdd);
+  return [201, productToAdd];
+});
+
+mock.onPost('/api/products/bulk').reply((config) => {
+  const newProductsArray = typeof config.data === 'string' ? JSON.parse(config.data) : config.data;
+  if (!Array.isArray(newProductsArray)) return [400, { message: 'Data must be an array' }];
+
+  const productsToAdd = newProductsArray.map((p, index) => ({
+    ...p,
+    id: Date.now() + index,
+    status: p.status || 'Disponível',
+    image: p.image || '📦',
+    createdAt: p.createdAt || new Date().toISOString(),
+  }));
+  mutableMockProducts = [...productsToAdd, ...mutableMockProducts];
+  return [201, productsToAdd];
+});
+
 mock.onGet('/api/products/pdv-sales').reply(() => [200, mockPDVSales]);
 mock.onGet('/api/store').reply(() => [200, mockStore]);
 mock.onGet('/api/store/products').reply(() => [200, storeProducts]);

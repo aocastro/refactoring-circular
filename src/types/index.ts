@@ -5,6 +5,7 @@ export interface KpiItem {
   label: string;
   value: string | number;
   change?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   icon: any; // Allow string names from mock API
   positive?: boolean;
   period?: string;
@@ -25,6 +26,10 @@ export interface Product {
   price: number;
   status: ProductStatus;
   image: string;
+  stock?: number;
+  supplier?: string;
+  brand?: string;
+  createdAt?: string;
 }
 
 // ─── PDV Sales ───────────────────────────────────
