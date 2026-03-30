@@ -23,6 +23,7 @@ const CriarLoja = lazy(() => import("./pages/CriarLoja"));
 const PDVPage = lazy(() => import("./pages/PDVPage"));
 const Admin = lazy(() => import("./pages/Admin"));
 const AdminLogin = lazy(() => import("./pages/AdminLogin"));
+const LinktreePublic = lazy(() => import("./pages/LinktreePublic"));
 
 const queryClient = new QueryClient();
 
@@ -54,6 +55,7 @@ const App = () => (
                   <Route path="/consignante/painel" element={<ConsignantePainel />} />
                   <Route path="/loja/:slug" element={<Loja />} />
                   <Route path="/loja/:slug/p/:id" element={<ProdutoLoja />} />
+                  <Route path="/links/:slug" element={<LinktreePublic />} />
                   <Route path="/checkout" element={<Checkout />} />
                   <Route path="/criar-loja" element={<CriarLoja />} />
                   <Route path="/pdv/:id" element={<PDVPage />} />

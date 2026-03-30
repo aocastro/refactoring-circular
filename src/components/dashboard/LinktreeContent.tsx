@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, Reorder } from "framer-motion";
-import { Link2, Plus, GripVertical, ExternalLink, Trash2, TrendingUp, MousePointerClick, Pencil, Smartphone } from "lucide-react";
+import { Link2, Plus, GripVertical, ExternalLink, Trash2, TrendingUp, MousePointerClick, Pencil, Smartphone, Save, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import KpiCard from "@/components/shared/KpiCard";
 import { toast } from "sonner";
+import axios from "axios";
 
 interface LinkItem {
   id: number;
@@ -17,16 +18,16 @@ interface LinkItem {
   ativo: boolean;
 }
 
-const initialLinks: LinkItem[] = [
-  { id: 1, titulo: "Loja Online", url: "https://fashionstore.com", cliques: 1240, ativo: true },
-  { id: 2, titulo: "Instagram", url: "https://instagram.com/fashionstore", cliques: 890, ativo: true },
-  { id: 3, titulo: "WhatsApp", url: "https://wa.me/5511999999999", cliques: 567, ativo: true },
-  { id: 4, titulo: "Blog", url: "https://fashionstore.com/blog", cliques: 234, ativo: true },
-  { id: 5, titulo: "Promoções", url: "https://fashionstore.com/promos", cliques: 456, ativo: false },
-];
+const getStoreSlug = (): string => {
+  try {
+    const config = JSON.parse(localStorage.getItem("storeConfig") || "{}");
+    return config.slug || "fashion-store";
+  } catch { return "fashion-store"; }
+};
 
 const LinktreeContent = () => {
-  const [links, setLinks] = useState<LinkItem[]>(initialLinks);
+  const storeSlug = getStoreSlug();
+  const [links, setLinks] = useState<LinkItem[]>([]);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState({ titulo: "", url: "" });
@@ -36,6 +37,44 @@ const LinktreeContent = () => {
   const [backgroundColor, setBackgroundColor] = useState<string>("#f3f4f6");
   const [buttonColor, setButtonColor] = useState<string>("#ffffff");
   const [buttonTextColor, setButtonTextColor] = useState<string>("#000000");
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchLinktree = async () => {
+      try {
+        const response = await axios.get(`/api/linktree/${storeSlug}`);
+        const data = response.data;
+        setLinks(data.links || []);
+        setProfileImage(data.profileImage || "");
+        setBackgroundImage(data.backgroundImage || "");
+        setBackgroundColor(data.backgroundColor || "#f3f4f6");
+        setButtonColor(data.buttonColor || "#ffffff");
+        setButtonTextColor(data.buttonTextColor || "#000000");
+      } catch (error) {
+        console.error("Erro ao buscar linktree", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchLinktree();
+  }, [storeSlug]);
+
+  const handlePublish = async () => {
+    try {
+      const data = {
+        links,
+        profileImage,
+        backgroundImage,
+        backgroundColor,
+        buttonColor,
+        buttonTextColor
+      };
+      await axios.put(`/api/linktree/${storeSlug}`, data);
+      toast.success("Linktree publicado com sucesso!");
+    } catch (error) {
+      toast.error("Erro ao publicar Linktree.");
+    }
+  };
 
   const totalCliques = links.reduce((a, l) => a + l.cliques, 0);
   const activeLinks = links.filter((l) => l.ativo).length;
@@ -96,14 +135,22 @@ const LinktreeContent = () => {
 
   return (
     <section aria-label="Gestão de links" className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold font-display text-foreground">Meu Linktree</h2>
           <p className="text-muted-foreground text-sm">Gerencie seus links compartilháveis</p>
         </div>
-        <Button size="sm" className="bg-gradient-primary text-primary-foreground" onClick={() => setShowAddDialog(true)}>
-          <Plus className="h-4 w-4 mr-2" />Novo Link
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button size="sm" variant="outline" onClick={() => window.open(`/links/${storeSlug}`, "_blank")}>
+            <Eye className="h-4 w-4 mr-2" />Ver Linktree
+          </Button>
+          <Button size="sm" variant="secondary" onClick={handlePublish}>
+            <Save className="h-4 w-4 mr-2" />Publicar
+          </Button>
+          <Button size="sm" className="bg-gradient-primary text-primary-foreground" onClick={() => setShowAddDialog(true)}>
+            <Plus className="h-4 w-4 mr-2" />Novo Link
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">

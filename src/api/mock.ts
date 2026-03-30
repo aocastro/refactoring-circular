@@ -11,10 +11,12 @@ import { mockNotifications } from '../data/notifications';
 import { mockProducts, mockPDVSales } from '../data/products';
 import { mockStore, storeProducts } from '../data/store';
 import { mockTickets, adminSuporteKpis, adminTicketsVolume, adminTicketsByCategory } from '../data/suporte';
+import { initialLinktrees } from '../data/linktree';
 
 const mock = new MockAdapter(axios, { delayResponse: 500 });
 
 let subStocks = [...initialSubStocks];
+let linktrees = [...initialLinktrees];
 
 // Mock GET /api/subestoques
 mock.onGet('/api/subestoques').reply(() => {
@@ -195,5 +197,49 @@ mock.onGet('/api/suporte/tickets').reply(() => [200, mockTickets]);
 mock.onGet('/api/suporte/admin-kpis').reply(() => [200, adminSuporteKpis]);
 mock.onGet('/api/suporte/admin-tickets-volume').reply(() => [200, adminTicketsVolume]);
 mock.onGet('/api/suporte/admin-tickets-by-category').reply(() => [200, adminTicketsByCategory]);
+
+// Mock GET /api/linktree/:slug
+mock.onGet(/\/api\/linktree\/[a-zA-Z0-9-]+/).reply((config) => {
+  const url = config.url || '';
+  const slug = url.split('/').pop();
+  if (slug) {
+    const linktree = linktrees.find(lt => lt.slug === slug);
+    if (linktree) {
+      return [200, linktree];
+    }
+    // Return empty state if not found, let frontend handle it
+    return [200, {
+      id: Date.now(),
+      slug: slug,
+      links: [],
+      profileImage: "",
+      backgroundImage: "",
+      backgroundColor: "#f3f4f6",
+      buttonColor: "#ffffff",
+      buttonTextColor: "#000000"
+    }];
+  }
+  return [404];
+});
+
+// Mock PUT /api/linktree/:slug
+mock.onPut(/\/api\/linktree\/[a-zA-Z0-9-]+/).reply((config) => {
+  const url = config.url || '';
+  const slug = url.split('/').pop();
+  if (slug) {
+    const data = typeof config.data === 'string' ? JSON.parse(config.data) : config.data;
+    const index = linktrees.findIndex(lt => lt.slug === slug);
+    if (index !== -1) {
+      linktrees[index] = { ...linktrees[index], ...data, slug: slug }; // Ensure slug remains
+      return [200, linktrees[index]];
+    } else {
+      // If doesn't exist, create it
+      const newLinktree = { ...data, slug: slug, id: Date.now() };
+      linktrees.push(newLinktree);
+      return [200, newLinktree];
+    }
+  }
+  return [400];
+});
 
 export default mock;
