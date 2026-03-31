@@ -17,19 +17,121 @@ export type ProductStatus = "Disponível" | "Reservado" | "Vendido" | "sacolinha
 export type ProductCondition = "Novo" | "Excelente" | "Bom" | "Regular";
 
 export interface Product {
-  id: number;
-  name: string;
-  sku: string;
-  category: string;
-  size: string;
-  condition: ProductCondition;
-  price: number;
-  status: ProductStatus;
-  image: string;
+  id?: number;
+  codProduto?: number;
+  nome: string;
+  codigoInterno?: string;
+  codigoDeBarras?: string;
+  codControleInterno?: string;
+  sku?: string;
+  hasVariacoes: number;
+  isVariacao: number;
+  produtoBaseId?: number;
+  modoCadastroDimensoes?: string;
+  pesoLiquido?: number;
+  larguraLiquido?: number;
+  alturaLiquido?: number;
+  comprimentoLiquido?: number;
+  pesoEmbalado?: number;
+  larguraEmbalado?: number;
+  alturaEmbalado?: number;
+  comprimentoEmbalado?: number;
+  descricao?: string;
+  linkVideo?: string;
+  genero?: string;
+  diferenciarGenero?: number;
+  faixaEtaria?: string;
+  estado?: string;
+  tamanho?: string;
+  estilo?: string;
+  cor?: string;
+  venderOnline?: number;
+  venderPdv?: number;
+  precoCusto?: number;
+  precoPromocional?: number;
+  margemDesejada?: number;
+  precoVenda?: number;
+  estoqueMinimo?: number;
+  estoqueMaximo?: number;
+  estoqueAtual: number;
+  fornecedorId?: number;
+  ncm?: string;
+  entrega?: number;
+  retirada?: number;
+  locaisRetirada?: string;
+  tipoEntrega?: number;
+  distanciaMaxima?: number;
+  valorAte5km?: number;
+  valor5a10km?: number;
+  valorMais10km?: number;
+  categoriaId?: number;
+  subcategoriaId?: number;
+  marcaId?: number;
+  mesmaLocalizacaoLoja?: number;
+  cep?: string;
+  logradouro?: string;
+  numero?: string;
+  complemento?: string;
+  bairro?: string;
+  cidade?: string;
+  uf?: string;
+  status?: number;
+  lojaId?: number;
+  isConsignado?: number;
+  usuConsignadoId?: number;
+  comissaoLojaConsignadoDinheiro?: number;
+  comissaoLojaConsignadoCreditos?: number;
+  pendenteConsignado?: number;
+  prazoPagamentoConsignado?: string;
+  sharehubId?: number;
+  departamentoId?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  deletedAt?: string;
+  pais?: string;
+  moeda?: string;
+
+  // Legacy fields mapped for compatibility
+  name?: string;
+  category?: string;
+  size?: string;
+  condition?: ProductCondition | string;
+  price?: number;
+  image?: string;
   stock?: number;
   supplier?: string;
   brand?: string;
-  createdAt?: string;
+}
+
+export interface Categoria {
+  id: number;
+  nome: string;
+}
+
+export interface Subcategoria {
+  id: number;
+  categoriaId: number;
+  nome: string;
+}
+
+export interface Marca {
+  id: number;
+  nome: string;
+}
+
+export interface Fornecedor {
+  id: number;
+  nome: string;
+}
+
+export interface Departamento {
+  id: number;
+  nome: string;
+}
+
+export interface TipoEntrega {
+  id: number;
+  nome: string;
 }
 
 // ─── PDV Sales ───────────────────────────────────

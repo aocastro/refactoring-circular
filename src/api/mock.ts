@@ -197,3 +197,47 @@ mock.onGet('/api/suporte/admin-tickets-volume').reply(() => [200, adminTicketsVo
 mock.onGet('/api/suporte/admin-tickets-by-category').reply(() => [200, adminTicketsByCategory]);
 
 export default mock;
+
+// --- Mocks for Dynamic Options in Product Registration ---
+export const mockCategorias = [
+  { id: 1, nome: 'Roupas' },
+  { id: 2, nome: 'Calçados' },
+  { id: 3, nome: 'Acessórios' }
+];
+
+export const mockSubcategorias = [
+  { id: 1, categoriaId: 1, nome: 'Camisetas' },
+  { id: 2, categoriaId: 1, nome: 'Calças' },
+  { id: 3, categoriaId: 2, nome: 'Tênis' }
+];
+
+export const mockMarcas = [
+  { id: 1, nome: 'Nike' },
+  { id: 2, nome: 'Adidas' },
+  { id: 3, nome: 'Zara' }
+];
+
+export const mockFornecedores = [
+  { id: 1, nome: 'Fornecedor A' },
+  { id: 2, nome: 'Fornecedor B' }
+];
+
+export const mockDepartamentos = [
+  { id: 1, nome: 'Masculino' },
+  { id: 2, nome: 'Feminino' },
+  { id: 3, nome: 'Unissex' }
+];
+
+export const mockTiposEntrega = [
+  { id: 1, nome: 'Correios (PAC)' },
+  { id: 2, nome: 'Correios (Sedex)' },
+  { id: 3, nome: 'Transportadora Local' },
+  { id: 4, nome: 'Motoboy' }
+];
+
+mock.onGet('/api/categorias').reply(() => [200, mockCategorias]);
+mock.onGet('/api/subcategorias').reply(() => [200, mockSubcategorias]);
+mock.onGet('/api/marcas').reply(() => [200, mockMarcas]);
+mock.onGet('/api/fornecedores').reply(() => [200, mockFornecedores]);
+mock.onGet('/api/departamentos').reply(() => [200, mockDepartamentos]);
+mock.onGet('/api/tipos-entrega').reply(() => [200, mockTiposEntrega]);

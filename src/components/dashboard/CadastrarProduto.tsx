@@ -5,9 +5,12 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
-import { ArrowLeft, Save, Upload, Plus, Trash2 } from 'lucide-react';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { ArrowLeft, Save, Upload, Plus, Trash2, Check, ChevronsUpDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { Product } from '@/types';
+import { Product, Categoria, Subcategoria, Marca, Fornecedor, Departamento, TipoEntrega } from '@/types';
 import axios from 'axios';
 
 interface CadastrarProdutoProps {
@@ -37,6 +40,47 @@ export default function CadastrarProduto({ onBack, onSuccess }: CadastrarProduto
   });
   const [loading, setLoading] = useState(false);
   const [images, setImages] = useState<File[]>([]);
+
+  // Dados dinâmicos
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
+  const [subcategorias, setSubcategorias] = useState<Subcategoria[]>([]);
+  const [marcas, setMarcas] = useState<Marca[]>([]);
+  const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
+  const [departamentos, setDepartamentos] = useState<Departamento[]>([]);
+  const [tiposEntrega, setTiposEntrega] = useState<TipoEntrega[]>([]);
+
+  // Popover open states
+  const [openCategoria, setOpenCategoria] = useState(false);
+  const [openSubcategoria, setOpenSubcategoria] = useState(false);
+  const [openMarca, setOpenMarca] = useState(false);
+  const [openFornecedor, setOpenFornecedor] = useState(false);
+  const [openDepartamento, setOpenDepartamento] = useState(false);
+  const [openTipoEntrega, setOpenTipoEntrega] = useState(false);
+
+  useEffect(() => {
+    // Fetch dynamic options
+    const fetchOptions = async () => {
+      try {
+        const [resCat, resSub, resMar, resFor, resDep, resTip] = await Promise.all([
+          axios.get('/api/categorias'),
+          axios.get('/api/subcategorias'),
+          axios.get('/api/marcas'),
+          axios.get('/api/fornecedores'),
+          axios.get('/api/departamentos'),
+          axios.get('/api/tipos-entrega'),
+        ]);
+        setCategorias(resCat.data);
+        setSubcategorias(resSub.data);
+        setMarcas(resMar.data);
+        setFornecedores(resFor.data);
+        setDepartamentos(resDep.data);
+        setTiposEntrega(resTip.data);
+      } catch (err) {
+        console.error("Erro ao carregar dados dinâmicos", err);
+      }
+    };
+    fetchOptions();
+  }, []);
 
   useEffect(() => {
     const draft = localStorage.getItem(STORAGE_KEY);
@@ -166,6 +210,15 @@ export default function CadastrarProduto({ onBack, onSuccess }: CadastrarProduto
                 className="min-h-[120px]"
               />
             </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <Label>Link do Vídeo</Label>
+              <Input
+                value={formData.linkVideo || ''}
+                onChange={e => setFormData({ ...formData, linkVideo: e.target.value })}
+                placeholder="Ex: https://youtube.com/..."
+              />
+            </div>
           </div>
         </section>
 
@@ -176,14 +229,90 @@ export default function CadastrarProduto({ onBack, onSuccess }: CadastrarProduto
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="space-y-2">
-              <Label>Categoria ID</Label>
-              <Input type="number" value={formData.categoriaId ?? ''} onChange={e => setFormData({ ...formData, categoriaId: isNaN(parseInt(e.target.value)) ? undefined : parseInt(e.target.value) })} />
+            <div className="space-y-2 flex flex-col">
+              <Label>Categoria</Label>
+              <Popover open={openCategoria} onOpenChange={setOpenCategoria}>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" role="combobox" aria-expanded={openCategoria} className="justify-between">
+                    {formData.categoriaId ? categorias.find(c => c.id === formData.categoriaId)?.nome : "Selecione..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="p-0">
+                  <Command>
+                    <CommandInput placeholder="Buscar categoria..." />
+                    <CommandList>
+                      <CommandEmpty>Nenhuma categoria encontrada.</CommandEmpty>
+                      <CommandGroup>
+                        {categorias.map(categoria => (
+                          <CommandItem key={categoria.id} value={categoria.nome} onSelect={() => { setFormData({ ...formData, categoriaId: categoria.id }); setOpenCategoria(false); }}>
+                            <Check className={cn("mr-2 h-4 w-4", formData.categoriaId === categoria.id ? "opacity-100" : "opacity-0")} />
+                            {categoria.nome}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
-            <div className="space-y-2">
-              <Label>Marca ID</Label>
-              <Input type="number" value={formData.marcaId ?? ''} onChange={e => setFormData({ ...formData, marcaId: isNaN(parseInt(e.target.value)) ? undefined : parseInt(e.target.value) })} />
+
+            <div className="space-y-2 flex flex-col">
+              <Label>Subcategoria</Label>
+              <Popover open={openSubcategoria} onOpenChange={setOpenSubcategoria}>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" role="combobox" aria-expanded={openSubcategoria} className="justify-between" disabled={!formData.categoriaId}>
+                    {formData.subcategoriaId ? subcategorias.find(c => c.id === formData.subcategoriaId)?.nome : "Selecione..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="p-0">
+                  <Command>
+                    <CommandInput placeholder="Buscar subcategoria..." />
+                    <CommandList>
+                      <CommandEmpty>Nenhuma subcategoria encontrada.</CommandEmpty>
+                      <CommandGroup>
+                        {subcategorias.filter(s => s.categoriaId === formData.categoriaId).map(sub => (
+                          <CommandItem key={sub.id} value={sub.nome} onSelect={() => { setFormData({ ...formData, subcategoriaId: sub.id }); setOpenSubcategoria(false); }}>
+                            <Check className={cn("mr-2 h-4 w-4", formData.subcategoriaId === sub.id ? "opacity-100" : "opacity-0")} />
+                            {sub.nome}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
+
+            <div className="space-y-2 flex flex-col">
+              <Label>Marca</Label>
+              <Popover open={openMarca} onOpenChange={setOpenMarca}>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" role="combobox" aria-expanded={openMarca} className="justify-between">
+                    {formData.marcaId ? marcas.find(m => m.id === formData.marcaId)?.nome : "Selecione..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="p-0">
+                  <Command>
+                    <CommandInput placeholder="Buscar marca..." />
+                    <CommandList>
+                      <CommandEmpty>Nenhuma marca encontrada.</CommandEmpty>
+                      <CommandGroup>
+                        {marcas.map(marca => (
+                          <CommandItem key={marca.id} value={marca.nome} onSelect={() => { setFormData({ ...formData, marcaId: marca.id }); setOpenMarca(false); }}>
+                            <Check className={cn("mr-2 h-4 w-4", formData.marcaId === marca.id ? "opacity-100" : "opacity-0")} />
+                            {marca.nome}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            </div>
+
             <div className="space-y-2">
               <Label>Condição / Estado</Label>
               <Select value={formData.estado || ''} onValueChange={(v) => setFormData({ ...formData, estado: v })}>
@@ -205,6 +334,34 @@ export default function CadastrarProduto({ onBack, onSuccess }: CadastrarProduto
               <Label>Cor</Label>
               <Input value={formData.cor || ''} onChange={e => setFormData({ ...formData, cor: e.target.value })} />
             </div>
+            <div className="space-y-2 flex flex-col">
+              <Label>Departamento</Label>
+              <Popover open={openDepartamento} onOpenChange={setOpenDepartamento}>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" role="combobox" aria-expanded={openDepartamento} className="justify-between">
+                    {formData.departamentoId ? departamentos.find(d => d.id === formData.departamentoId)?.nome : "Selecione..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="p-0">
+                  <Command>
+                    <CommandInput placeholder="Buscar departamento..." />
+                    <CommandList>
+                      <CommandEmpty>Nenhum departamento encontrado.</CommandEmpty>
+                      <CommandGroup>
+                        {departamentos.map(dep => (
+                          <CommandItem key={dep.id} value={dep.nome} onSelect={() => { setFormData({ ...formData, departamentoId: dep.id }); setOpenDepartamento(false); }}>
+                            <Check className={cn("mr-2 h-4 w-4", formData.departamentoId === dep.id ? "opacity-100" : "opacity-0")} />
+                            {dep.nome}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            </div>
+
             <div className="space-y-2">
               <Label>Gênero</Label>
               <Input value={formData.genero || ''} onChange={e => setFormData({ ...formData, genero: e.target.value })} />
@@ -236,12 +393,43 @@ export default function CadastrarProduto({ onBack, onSuccess }: CadastrarProduto
               <Input type="number" step="0.01" value={formData.precoPromocional ?? ''} onChange={e => setFormData({ ...formData, precoPromocional: isNaN(parseFloat(e.target.value)) ? undefined : parseFloat(e.target.value) })} />
             </div>
             <div className="space-y-2">
+              <Label>Estoque Mínimo</Label>
+              <Input type="number" value={formData.estoqueMinimo ?? ''} onChange={e => setFormData({ ...formData, estoqueMinimo: isNaN(parseInt(e.target.value)) ? undefined : parseInt(e.target.value) })} />
+            </div>
+            <div className="space-y-2">
+              <Label>Estoque Máximo</Label>
+              <Input type="number" value={formData.estoqueMaximo ?? ''} onChange={e => setFormData({ ...formData, estoqueMaximo: isNaN(parseInt(e.target.value)) ? undefined : parseInt(e.target.value) })} />
+            </div>
+            <div className="space-y-2">
               <Label>Estoque Atual *</Label>
               <Input type="number" value={formData.estoqueAtual ?? ''} onChange={e => setFormData({ ...formData, estoqueAtual: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value) })} required />
             </div>
-            <div className="space-y-2">
-              <Label>Fornecedor ID</Label>
-              <Input type="number" value={formData.fornecedorId ?? ''} onChange={e => setFormData({ ...formData, fornecedorId: isNaN(parseInt(e.target.value)) ? undefined : parseInt(e.target.value) })} />
+            <div className="space-y-2 flex flex-col">
+              <Label>Fornecedor</Label>
+              <Popover open={openFornecedor} onOpenChange={setOpenFornecedor}>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" role="combobox" aria-expanded={openFornecedor} className="justify-between">
+                    {formData.fornecedorId ? fornecedores.find(f => f.id === formData.fornecedorId)?.nome : "Selecione..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="p-0">
+                  <Command>
+                    <CommandInput placeholder="Buscar fornecedor..." />
+                    <CommandList>
+                      <CommandEmpty>Nenhum fornecedor encontrado.</CommandEmpty>
+                      <CommandGroup>
+                        {fornecedores.map(fornecedor => (
+                          <CommandItem key={fornecedor.id} value={fornecedor.nome} onSelect={() => { setFormData({ ...formData, fornecedorId: fornecedor.id }); setOpenFornecedor(false); }}>
+                            <Check className={cn("mr-2 h-4 w-4", formData.fornecedorId === fornecedor.id ? "opacity-100" : "opacity-0")} />
+                            {fornecedor.nome}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
         </section>
@@ -291,6 +479,138 @@ export default function CadastrarProduto({ onBack, onSuccess }: CadastrarProduto
               <Input type="number" step="0.01" value={formData.comprimentoEmbalado ?? ''} onChange={e => setFormData({ ...formData, comprimentoEmbalado: isNaN(parseFloat(e.target.value)) ? undefined : parseFloat(e.target.value) })} />
             </div>
           </div>
+        </section>
+
+        {/* Seção: Logística / Entrega */}
+        <section className="space-y-6">
+          <div className="border-b pb-4">
+            <h3 className="text-lg font-semibold text-foreground">Logística e Entrega</h3>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2 flex flex-col">
+              <Label>Tipo de Entrega</Label>
+              <Popover open={openTipoEntrega} onOpenChange={setOpenTipoEntrega}>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" role="combobox" aria-expanded={openTipoEntrega} className="justify-between">
+                    {formData.tipoEntrega ? tiposEntrega.find(t => t.id === formData.tipoEntrega)?.nome : "Selecione..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="p-0">
+                  <Command>
+                    <CommandInput placeholder="Buscar tipo..." />
+                    <CommandList>
+                      <CommandEmpty>Nenhum tipo encontrado.</CommandEmpty>
+                      <CommandGroup>
+                        {tiposEntrega.map(tipo => (
+                          <CommandItem key={tipo.id} value={tipo.nome} onSelect={() => { setFormData({ ...formData, tipoEntrega: tipo.id }); setOpenTipoEntrega(false); }}>
+                            <Check className={cn("mr-2 h-4 w-4", formData.tipoEntrega === tipo.id ? "opacity-100" : "opacity-0")} />
+                            {tipo.nome}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            <div className="flex items-center space-x-2 mt-8">
+              <Switch
+                checked={formData.entrega === 1}
+                onCheckedChange={(c) => setFormData({ ...formData, entrega: c ? 1 : 0 })}
+                id="entrega"
+              />
+              <Label htmlFor="entrega">Disponível para Entrega?</Label>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Switch
+                checked={formData.retirada === 1}
+                onCheckedChange={(c) => setFormData({ ...formData, retirada: c ? 1 : 0 })}
+                id="retirada"
+              />
+              <Label htmlFor="retirada">Disponível para Retirada?</Label>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Distância Máxima (km)</Label>
+              <Input type="number" value={formData.distanciaMaxima ?? ''} onChange={e => setFormData({ ...formData, distanciaMaxima: isNaN(parseInt(e.target.value)) ? undefined : parseInt(e.target.value) })} />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Valor Frete até 5km (R$)</Label>
+              <Input type="number" step="0.01" value={formData.valorAte5km ?? ''} onChange={e => setFormData({ ...formData, valorAte5km: isNaN(parseFloat(e.target.value)) ? undefined : parseFloat(e.target.value) })} />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Valor Frete 5 a 10km (R$)</Label>
+              <Input type="number" step="0.01" value={formData.valor5a10km ?? ''} onChange={e => setFormData({ ...formData, valor5a10km: isNaN(parseFloat(e.target.value)) ? undefined : parseFloat(e.target.value) })} />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Valor Frete +10km (R$)</Label>
+              <Input type="number" step="0.01" value={formData.valorMais10km ?? ''} onChange={e => setFormData({ ...formData, valorMais10km: isNaN(parseFloat(e.target.value)) ? undefined : parseFloat(e.target.value) })} />
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <Label>Locais de Retirada</Label>
+              <Textarea
+                value={formData.locaisRetirada || ''}
+                onChange={e => setFormData({ ...formData, locaisRetirada: e.target.value })}
+                placeholder="Ex: Loja Centro, Galpão Zona Norte..."
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Seção: Endereço do Produto / Estoque (se diferente da loja) */}
+        <section className="space-y-6">
+          <div className="border-b pb-4">
+            <h3 className="text-lg font-semibold text-foreground">Endereço de Estoque / Localização</h3>
+          </div>
+          <div className="flex items-center space-x-2 mb-4">
+            <Switch
+              checked={formData.mesmaLocalizacaoLoja === 1}
+              onCheckedChange={(c) => setFormData({ ...formData, mesmaLocalizacaoLoja: c ? 1 : 0 })}
+              id="mesma-local"
+            />
+            <Label htmlFor="mesma-local">Mesma localização da loja?</Label>
+          </div>
+
+          {formData.mesmaLocalizacaoLoja === 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-4 border rounded-md bg-secondary/10">
+              <div className="space-y-2">
+                <Label>CEP</Label>
+                <Input value={formData.cep || ''} onChange={e => setFormData({ ...formData, cep: e.target.value })} />
+              </div>
+              <div className="space-y-2 md:col-span-2">
+                <Label>Logradouro</Label>
+                <Input value={formData.logradouro || ''} onChange={e => setFormData({ ...formData, logradouro: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label>Número</Label>
+                <Input value={formData.numero || ''} onChange={e => setFormData({ ...formData, numero: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label>Complemento</Label>
+                <Input value={formData.complemento || ''} onChange={e => setFormData({ ...formData, complemento: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label>Bairro</Label>
+                <Input value={formData.bairro || ''} onChange={e => setFormData({ ...formData, bairro: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label>Cidade</Label>
+                <Input value={formData.cidade || ''} onChange={e => setFormData({ ...formData, cidade: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label>UF</Label>
+                <Input value={formData.uf || ''} onChange={e => setFormData({ ...formData, uf: e.target.value })} />
+              </div>
+            </div>
+          )}
         </section>
 
         {/* Seção: Consignação */}

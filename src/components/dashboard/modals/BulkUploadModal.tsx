@@ -55,9 +55,9 @@ export function BulkUploadModal({ open, onOpenChange, onSuccess }: BulkUploadMod
     }
 
     // Basic validation
-    const isValid = rows.every((r) => r.name && r.sku && r.price !== undefined);
+    const isValid = rows.every((r) => r.name && r.price !== undefined);
     if (!isValid) {
-      toast.error("Preencha todos os campos obrigatórios (Nome, SKU, Preço).");
+      toast.error("Preencha todos os campos obrigatórios (Nome, Preço).");
       return;
     }
 
@@ -97,9 +97,9 @@ export function BulkUploadModal({ open, onOpenChange, onSuccess }: BulkUploadMod
           <table className="w-full text-sm text-left">
             <thead className="text-xs uppercase bg-secondary text-muted-foreground sticky top-0 z-10">
               <tr>
-                <th className="px-3 py-2">Nome</th>
+                <th className="px-3 py-2">Nome *</th>
                 <th className="px-3 py-2">SKU</th>
-                <th className="px-3 py-2">Preço</th>
+                <th className="px-3 py-2">Preço *</th>
                 <th className="px-3 py-2">Estoque</th>
                 <th className="px-3 py-2">Categoria</th>
                 <th className="px-3 py-2">Tamanho</th>
