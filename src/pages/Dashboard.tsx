@@ -20,7 +20,7 @@ const MyAccountContent = lazy(() => import("@/components/dashboard/MyAccountCont
 const VendaContent = lazy(() => import("@/components/dashboard/VendaContent"));
 const ConsignacaoContent = lazy(() => import("@/components/dashboard/ConsignacaoContent"));
 const CatalogoContent = lazy(() => import("@/components/dashboard/CatalogoContent"));
-const SmartLockContent = lazy(() => import("@/components/dashboard/SmartLockContent"));
+const SmartLookContent = lazy(() => import("@/components/dashboard/SmartLookContent"));
 const PedidosContent = lazy(() => import("@/components/dashboard/PedidosContent"));
 const SubestoquesContent = lazy(() => import("@/components/dashboard/SubestoquesContent"));
 const SacolinhasContent = lazy(() => import("@/components/dashboard/SacolinhasContent"));
@@ -107,7 +107,7 @@ const Dashboard = () => {
       "config-entrega": { label: "Configurações de entrega", content: <ConfiguracoesContent defaultTab="entrega" /> },
       venda: { label: "Venda", content: <VendaContent /> },
       "venda-produtos": { label: "Produtos", content: <CatalogoContent /> },
-      "venda-smartlock": { label: "SmartLock", content: <SmartLockContent /> },
+      "venda-smartlook": { label: "SmartLook", content: <SmartLookContent /> },
       "venda-pedidos": { label: "Pedidos da Loja Online", content: <PedidosContent /> },
       "venda-subestoques": { label: "Subestoques", content: <SubestoquesContent /> },
       "venda-sacolinhas": { label: "Sacolinhas", content: <SacolinhasContent /> },

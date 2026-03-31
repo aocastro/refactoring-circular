@@ -58,7 +58,7 @@ const menuItems: MenuItem[] = [
   { id: "configuracoes", title: "Configurações", icon: Settings },
   { id: "venda", title: "Venda", icon: ShoppingCart, children: [
     { id: "venda-produtos", title: "Produtos" },
-    { id: "venda-smartlock", title: "SmartLock" },
+    { id: "venda-smartlook", title: "SmartLook" },
     { id: "venda-pedidos", title: "Pedidos da Loja Online" },
     { id: "venda-subestoques", title: "Subestoques" },
     { id: "venda-sacolinhas", title: "Sacolinhas" },
