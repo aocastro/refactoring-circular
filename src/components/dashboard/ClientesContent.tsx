@@ -15,10 +15,10 @@ import { toast } from "sonner";
 
 const ClientesContent = () => {
   const [loadingData, setLoadingData] = useState(true);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [initialClientes, setInitialClientes] = useState<any>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [mockPurchaseHistory, setMockPurchaseHistory] = useState<any>([]);
   useEffect(() => {

@@ -22,15 +22,19 @@ import {
 import { productCategories, priceRanges } from "@/data/products";
 import { getStatusColor } from "@/lib/status-colors";
 import type { Product } from "@/types";
-import { ProductFormModal } from "./modals/ProductFormModal";
 import { BulkUploadModal } from "./modals/BulkUploadModal";
 import { PhotoUploadModal } from "./modals/PhotoUploadModal";
 import { ImportFileModal } from "./modals/ImportFileModal";
 import { ExpressProductModal } from "./modals/ExpressProductModal";
 
+interface CatalogoContentProps {
+  onSectionChange?: (section: string) => void;
+  onEditProduct?: (id: string | number) => void;
+}
+
 const conditions = ["Todos", "Novo", "Excelente", "Bom", "Regular"];
 
-const ProductCard = ({ product, index, onSelect }: { product: Product; index: number; onSelect: (p: Product) => void }) => (
+const ProductCard = ({ product, index, onSelect, onEdit }: { product: Product; index: number; onSelect: (p: Product) => void; onEdit?: (id: string | number) => void }) => (
   <motion.div
     initial={{ opacity: 0, y: 16 }}
     animate={{ opacity: 1, y: 0 }}
@@ -63,11 +67,17 @@ const ProductCard = ({ product, index, onSelect }: { product: Product; index: nu
           R$ {product.price.toFixed(2).replace(".", ",")}
         </p>
       </div>
+      {/* Remove previous logic or add specific edit button below if we want */}
     </button>
+    <div className="mt-2 flex gap-2">
+      <Button size="sm" variant="outline" className="flex-1 text-xs" onClick={() => onEdit?.(product.id)}>
+        <Edit className="h-3 w-3 mr-1" /> Editar
+      </Button>
+    </div>
   </motion.div>
 );
 
-const ProductDetail = ({ product, onBack, mockProducts }: { product: Product; onBack: () => void; mockProducts: any[] }) => {
+const ProductDetail = ({ product, onBack, mockProducts, onEdit }: { product: Product; onBack: () => void; mockProducts: any[]; onEdit?: (id: string | number) => void }) => {
   const related = mockProducts
     .filter((p) => p.category === product.category && p.id !== product.id && p.status === "Disponível")
     .slice(0, 4);
@@ -132,7 +142,7 @@ const ProductDetail = ({ product, onBack, mockProducts }: { product: Product; on
           </p>
 
           <div className="flex gap-3 mt-2">
-            <Button size="sm" variant="outline" className="border-border">
+            <Button size="sm" variant="outline" className="border-border" onClick={() => onEdit?.(product.id)}>
               <Edit className="h-4 w-4 mr-2" />
               Editar
             </Button>
@@ -170,12 +180,11 @@ const ProductDetail = ({ product, onBack, mockProducts }: { product: Product; on
   );
 };
 
-const CatalogoContent = () => {
+const CatalogoContent = ({ onSectionChange, onEditProduct }: CatalogoContentProps) => {
   const [loadingData, setLoadingData] = useState(true);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [mockProducts, setMockProducts] = useState<any[]>([]);
 
-  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
@@ -238,7 +247,7 @@ const CatalogoContent = () => {
   };
 
   if (selectedProduct) {
-    return <ProductDetail product={selectedProduct} onBack={() => setSelectedProduct(null)} mockProducts={mockProducts} />;
+    return <ProductDetail product={selectedProduct} onBack={() => setSelectedProduct(null)} mockProducts={mockProducts} onEdit={onEditProduct} />;
   }
 
 
@@ -262,7 +271,7 @@ const CatalogoContent = () => {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>Opções de Cadastro</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer" onClick={() => setIsProductModalOpen(true)}>
+            <DropdownMenuItem className="cursor-pointer" onClick={() => onSectionChange?.("venda-produtos-novo")}>
               <PackagePlus className="mr-2 h-4 w-4" />
               <span>Cadastro de Produto Único</span>
             </DropdownMenuItem>
@@ -366,17 +375,12 @@ const CatalogoContent = () => {
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {filtered.map((product, i) => (
-            <ProductCard key={product.id} product={product} index={i} onSelect={setSelectedProduct} />
+            <ProductCard key={product.id} product={product} index={i} onSelect={setSelectedProduct} onEdit={onEditProduct} />
           ))}
         </div>
       )}
 
       {/* Modals */}
-      <ProductFormModal
-        open={isProductModalOpen}
-        onOpenChange={setIsProductModalOpen}
-        onSuccess={fetchData}
-      />
       <BulkUploadModal
         open={isBulkModalOpen}
         onOpenChange={setIsBulkModalOpen}

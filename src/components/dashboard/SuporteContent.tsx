@@ -30,7 +30,7 @@ const columns = [
 
 const SuporteContent = () => {
   const [loadingData, setLoadingData] = useState(true);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [mockTickets, setMockTickets] = useState<any>([]);
   useEffect(() => {

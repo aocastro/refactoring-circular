@@ -64,16 +64,16 @@ interface Props {
 
 const RelatoriosContent = ({ defaultTab = "vendas" }: Props) => {
   const [loadingData, setLoadingData] = useState(true);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [cashFlowData, setcashFlowData] = useState<any>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [paymentMethods, setpaymentMethods] = useState<any>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [recentPayments, setrecentPayments] = useState<any>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [esgMonthly, setesgMonthly] = useState<any>([]);
   useEffect(() => {

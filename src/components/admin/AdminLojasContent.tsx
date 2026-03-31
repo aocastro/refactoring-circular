@@ -34,7 +34,7 @@ const columns = [
 
 const AdminLojasContent = () => {
   const [loadingData, setLoadingData] = useState(true);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [adminStores, setAdminStores] = useState<any>([]);
 

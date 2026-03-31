@@ -17,21 +17,24 @@ import FilterToolbar from "@/components/shared/FilterToolbar";
 import { productCategories, productStatuses, priceRanges } from "@/data/products";
 import { getStatusColor } from "@/lib/status-colors";
 import type { KpiItem } from "@/types";
-import { ProductFormModal } from "./modals/ProductFormModal";
 import { BulkUploadModal } from "./modals/BulkUploadModal";
 import { ImportFileModal } from "./modals/ImportFileModal";
 import { PhotoUploadModal } from "./modals/PhotoUploadModal";
 import { ExpressProductModal } from "./modals/ExpressProductModal";
 
-const VendaContent = () => {
+interface VendaContentProps {
+  onSectionChange?: (section: string) => void;
+  onEditProduct?: (id: string | number) => void;
+}
+
+const VendaContent = ({ onSectionChange, onEditProduct }: VendaContentProps) => {
   const [loadingData, setLoadingData] = useState(true);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [mockProducts, setMockProducts] = useState<any>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [mockPDVSales, setMockPDVSales] = useState<any>([]);
 
-  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isExpressModalOpen, setIsExpressModalOpen] = useState(false);
@@ -123,7 +126,7 @@ const VendaContent = () => {
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuLabel>Opções de Cadastro</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="cursor-pointer" onClick={() => setIsProductModalOpen(true)}>
+                  <DropdownMenuItem className="cursor-pointer" onClick={() => onSectionChange?.("venda-produtos-novo")}>
                     <PackagePlus className="mr-2 h-4 w-4" />
                     <span>Cadastro de Produto Único</span>
                   </DropdownMenuItem>
@@ -205,7 +208,7 @@ const VendaContent = () => {
                             <button className="p-1.5 rounded-md hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors">
                               <Eye className="h-3.5 w-3.5" />
                             </button>
-                            <button className="p-1.5 rounded-md hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors">
+                            <button className="p-1.5 rounded-md hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors" onClick={() => onEditProduct?.(product.id)}>
                               <Edit className="h-3.5 w-3.5" />
                             </button>
                             <button className="p-1.5 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors">
@@ -283,11 +286,6 @@ const VendaContent = () => {
           </div>
         </TabsContent>
       </Tabs>
-      <ProductFormModal
-        open={isProductModalOpen}
-        onOpenChange={setIsProductModalOpen}
-        onSuccess={fetchData}
-      />
       <BulkUploadModal
         open={isBulkModalOpen}
         onOpenChange={setIsBulkModalOpen}

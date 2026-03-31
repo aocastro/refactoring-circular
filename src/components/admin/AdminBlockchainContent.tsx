@@ -29,10 +29,10 @@ const columns = [
 
 const AdminBlockchainContent = () => {
   const [loadingData, setLoadingData] = useState(true);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [blockchainStats, setBlockchainStats] = useState<any>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [blockchainTransactions, setBlockchainTransactions] = useState<any>([]);
   useEffect(() => {
