@@ -11,6 +11,8 @@ import AccessibilityToolbar from "@/components/layout/AccessibilityToolbar";
 
 const Index = lazy(() => import("./pages/Index"));
 const Login = lazy(() => import("./pages/Login"));
+const Register = lazy(() => import("./pages/Register"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Planos = lazy(() => import("./pages/Planos"));
 const ConsignanteLogin = lazy(() => import("./pages/ConsignanteLogin"));
@@ -49,6 +51,8 @@ const App = () => (
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/planos" element={<Planos />} />
                   <Route path="/consignante" element={<ConsignanteLogin />} />

@@ -6,49 +6,41 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import AuthLayout from "@/components/layout/AuthLayout";
 
-const MOCK_USER = {
-  email: "maria_demo@uorak.com",
-  password: "Senha@123",
-  name: "Maria",
-};
-
-const Login = () => {
+const Register = () => {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [acceptTerms, setAcceptTerms] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!acceptTerms) {
+      toast({
+        title: "Termos não aceitos",
+        description: "Você precisa aceitar os termos de uso para criar uma conta.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
 
     setTimeout(() => {
-      // Check demo user first
-      if (email === MOCK_USER.email && password === MOCK_USER.password) {
-        localStorage.setItem("user", JSON.stringify({ name: MOCK_USER.name, email: MOCK_USER.email }));
-        navigate("/dashboard");
-        setLoading(false);
-        return;
-      }
-
-      // Check registered users (from store creation wizard)
+      // Create user and log them in
       const registeredUsers = JSON.parse(localStorage.getItem("registeredUsers") || "[]");
-      const matchedUser = registeredUsers.find(
-        (u: { email: string; password: string }) => u.email === email && u.password === password
-      );
+      const newUser = { name, email, password };
+      localStorage.setItem("registeredUsers", JSON.stringify([...registeredUsers, newUser]));
+      localStorage.setItem("user", JSON.stringify({ name: newUser.name, email: newUser.email }));
 
-      if (matchedUser) {
-        localStorage.setItem("user", JSON.stringify({ name: matchedUser.name, email: matchedUser.email }));
-        navigate("/dashboard");
-      } else {
-        toast({
-          title: "Erro no login",
-          description: "E-mail ou senha incorretos.",
-          variant: "destructive",
-        });
-      }
+      toast({
+        title: "Conta criada com sucesso!",
+        description: "Bem-vindo(a) ao Circular u-Shar.",
+      });
+      navigate("/dashboard");
       setLoading(false);
     }, 800);
   };
@@ -56,25 +48,43 @@ const Login = () => {
   return (
     <AuthLayout>
       <header className="mb-8 text-center sm:text-left">
-        <h1 id="login-heading" className="mb-2 text-2xl font-bold text-gray-900 dark:text-gray-50">
-          Bem vindo(a) ao Circular u-Shar
+        <h1 id="register-heading" className="mb-2 text-2xl font-bold text-gray-900 dark:text-gray-50">
+          Crie sua conta
         </h1>
-        <p id="login-subtitle" className="text-sm text-gray-500 dark:text-gray-400">
-          Acesse a sua conta ou cadastre-se.
+        <p id="register-subtitle" className="text-sm text-gray-500 dark:text-gray-400">
+          Comece a gerenciar o seu brechó de forma fácil.
         </p>
       </header>
 
       <div className="bg-white dark:bg-slate-950">
-        <form onSubmit={handleLogin} className="space-y-6" aria-describedby="demo-credentials">
+        <form onSubmit={handleRegister} className="space-y-6">
           <div className="space-y-1">
-            <label htmlFor="login-email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              E-mail ou Usuário
+            <label htmlFor="register-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Nome Completo
             </label>
             <div className="relative">
               <Input
-                id="login-email"
+                id="register-name"
                 type="text"
-                placeholder="E-mail ou Usuário"
+                placeholder="Nome Completo"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="border-0 border-b-2 border-gray-200 dark:border-gray-800 bg-transparent px-0 py-2 rounded-none focus-visible:ring-0 focus-visible:border-[#4C1D95] dark:focus-visible:border-purple-400 transition-colors shadow-none text-gray-900 dark:text-gray-50 placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                autoComplete="name"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <label htmlFor="register-email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              E-mail
+            </label>
+            <div className="relative">
+              <Input
+                id="register-email"
+                type="email"
+                placeholder="E-mail"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="border-0 border-b-2 border-gray-200 dark:border-gray-800 bg-transparent px-0 py-2 rounded-none focus-visible:ring-0 focus-visible:border-[#4C1D95] dark:focus-visible:border-purple-400 transition-colors shadow-none text-gray-900 dark:text-gray-50 placeholder:text-gray-400 dark:placeholder:text-gray-500"
@@ -85,18 +95,18 @@ const Login = () => {
           </div>
 
           <div className="space-y-1">
-            <label htmlFor="login-password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label htmlFor="register-password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               Senha
             </label>
             <div className="relative">
               <Input
-                id="login-password"
+                id="register-password"
                 type={showPassword ? "text" : "password"}
                 placeholder="Senha"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="border-0 border-b-2 border-gray-200 dark:border-gray-800 bg-transparent px-0 py-2 rounded-none focus-visible:ring-0 focus-visible:border-[#4C1D95] dark:focus-visible:border-purple-400 transition-colors shadow-none pr-10 text-gray-900 dark:text-gray-50 placeholder:text-gray-400 dark:placeholder:text-gray-500"
-                autoComplete="current-password"
+                autoComplete="new-password"
                 required
               />
               <button
@@ -105,37 +115,56 @@ const Login = () => {
                 className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
                 aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
                 aria-pressed={showPassword}
-                aria-controls="login-password"
+                aria-controls="register-password"
               >
                 {showPassword ? <EyeOff className="h-5 w-5" aria-hidden="true" /> : <Eye className="h-5 w-5" aria-hidden="true" />}
               </button>
             </div>
-            <div className="flex justify-end pt-1">
-              <Link to="/forgot-password" className="text-sm font-medium text-[#4C1D95] dark:text-purple-400 hover:underline" aria-label="Recuperar senha">
-                Esqueceu sua senha?
-              </Link>
+          </div>
+
+          <div className="flex items-start pt-2">
+            <div className="flex h-5 items-center">
+              <input
+                id="terms"
+                type="checkbox"
+                checked={acceptTerms}
+                onChange={(e) => setAcceptTerms(e.target.checked)}
+                className="h-4 w-4 rounded border-gray-300 text-[#4C1D95] focus:ring-[#4C1D95] dark:border-gray-700 dark:bg-slate-900"
+              />
+            </div>
+            <div className="ml-3 text-sm">
+              <label htmlFor="terms" className="text-gray-500 dark:text-gray-400">
+                Eu concordo com os{" "}
+                <a href="#" className="font-medium text-[#4C1D95] dark:text-purple-400 hover:underline">
+                  Termos de Uso
+                </a>{" "}
+                e{" "}
+                <a href="#" className="font-medium text-[#4C1D95] dark:text-purple-400 hover:underline">
+                  Política de Privacidade
+                </a>.
+              </label>
             </div>
           </div>
 
           <Button type="submit" disabled={loading} className="w-full rounded-full bg-[#4C1D95] dark:bg-purple-600 py-6 text-white hover:bg-[#3b1575] dark:hover:bg-purple-700 transition-colors text-base font-semibold" aria-busy={loading}>
-            {loading ? "Entrando..." : "Entrar"}
+            {loading ? "Criando conta..." : "Criar Conta"}
           </Button>
         </form>
 
         <div className="mt-6 text-center text-sm">
-          <span className="text-gray-500 dark:text-gray-400">Ainda não possui uma conta? </span>
-          <Link to="/register" className="font-semibold text-[#4C1D95] dark:text-purple-400 hover:underline">
-            Cadastre-se
+          <span className="text-gray-500 dark:text-gray-400">Já possui uma conta? </span>
+          <Link to="/login" className="font-semibold text-[#4C1D95] dark:text-purple-400 hover:underline">
+            Entrar
           </Link>
         </div>
 
         <div className="my-8 flex items-center gap-3" aria-hidden="true">
           <div className="h-px flex-1 bg-gray-200 dark:bg-gray-800" />
-          <span className="text-sm text-gray-500 dark:text-gray-400 bg-white dark:bg-slate-950 px-2">Ou continue com</span>
+          <span className="text-sm text-gray-500 dark:text-gray-400 bg-white dark:bg-slate-950 px-2">Ou registre-se com</span>
           <div className="h-px flex-1 bg-gray-200 dark:bg-gray-800" />
         </div>
 
-        <div className="space-y-4" aria-label="Outras opções de entrada">
+        <div className="space-y-4" aria-label="Outras opções de registro">
           <Button variant="outline" className="w-full bg-white dark:bg-slate-950 gap-3 rounded-full border border-gray-300 dark:border-gray-800 py-6 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-900 hover:text-gray-900 dark:hover:text-gray-100" type="button" aria-label="Entrar com Google">
             <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
@@ -153,22 +182,8 @@ const Login = () => {
           </Button>
         </div>
       </div>
-
-      <button
-        type="button"
-        onClick={() => {
-          setEmail(MOCK_USER.email);
-          setPassword(MOCK_USER.password);
-        }}
-        className="mt-4 w-full cursor-pointer rounded-lg border border-border bg-secondary/50 p-3 transition-colors hover:bg-secondary"
-        aria-describedby="demo-credentials"
-      >
-        <p id="demo-credentials" className="text-center text-xs text-muted-foreground">
-          <strong className="text-foreground">Demo:</strong> maria_demo@uorak.com / Senha@123
-        </p>
-      </button>
     </AuthLayout>
   );
 };
 
-export default Login;
+export default Register;
