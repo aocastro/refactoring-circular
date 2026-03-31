@@ -20,10 +20,10 @@ const Loja = () => {
   const { totalItems, setIsOpen } = useCart();
 
   const [loadingData, setLoadingData] = useState(true);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [mockStore, setmockStore] = useState<any>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [storeProducts, setstoreProducts] = useState<any>([]);
 

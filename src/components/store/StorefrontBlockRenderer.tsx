@@ -13,7 +13,7 @@ const formatPrice = (price: number) => `R$ ${price.toFixed(2).replace(".", ",")}
 
 const StorefrontBlockRenderer = ({ block, slug }: Props) => {
   const [loadingData, setLoadingData] = useState(true);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [storeProducts, setstoreProducts] = useState<any>([]);
   useEffect(() => {

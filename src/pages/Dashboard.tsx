@@ -20,6 +20,7 @@ const MyAccountContent = lazy(() => import("@/components/dashboard/MyAccountCont
 const VendaContent = lazy(() => import("@/components/dashboard/VendaContent"));
 const ConsignacaoContent = lazy(() => import("@/components/dashboard/ConsignacaoContent"));
 const CatalogoContent = lazy(() => import("@/components/dashboard/CatalogoContent"));
+const CadastrarProduto = lazy(() => import("@/components/dashboard/CadastrarProduto"));
 const SmartLookContent = lazy(() => import("@/components/dashboard/SmartLookContent"));
 const PedidosContent = lazy(() => import("@/components/dashboard/PedidosContent"));
 const SubestoquesContent = lazy(() => import("@/components/dashboard/SubestoquesContent"));
@@ -84,6 +85,7 @@ const AppHeader = ({ userName, sectionLabel, onBack, showBack }: { userName: str
 const Dashboard = () => {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState("dashboard");
+  const [editingProductId, setEditingProductId] = useState<string | number | null>(null);
   const [user, setUser] = useState<{ name: string; email: string } | null>(null);
   const { theme, toggleTheme } = useTheme();
   const sectionHeadingRef = useRef<HTMLHeadingElement>(null);
@@ -105,13 +107,15 @@ const Dashboard = () => {
       "config-geral": { label: "Configurações gerais", content: <ConfiguracoesContent defaultTab="geral" /> },
       "config-pagamento": { label: "Configurações de pagamento", content: <ConfiguracoesContent defaultTab="pagamento" /> },
       "config-entrega": { label: "Configurações de entrega", content: <ConfiguracoesContent defaultTab="entrega" /> },
-      venda: { label: "Venda", content: <VendaContent /> },
-      "venda-produtos": { label: "Produtos", content: <CatalogoContent /> },
+      venda: { label: "Venda", content: <VendaContent onSectionChange={setActiveSection} onEditProduct={(id) => { setEditingProductId(id); setActiveSection("venda-produtos-editar"); }} /> },
+      "venda-produtos": { label: "Produtos", content: <CatalogoContent onSectionChange={setActiveSection} onEditProduct={(id) => { setEditingProductId(id); setActiveSection("venda-produtos-editar"); }} /> },
+      "venda-produtos-novo": { label: "Novo Produto", content: <CadastrarProduto onBack={() => setActiveSection("venda-produtos")} onSuccess={() => setActiveSection("venda-produtos")} /> },
+      "venda-produtos-editar": { label: "Editar Produto", content: <CadastrarProduto onBack={() => setActiveSection("venda-produtos")} onSuccess={() => setActiveSection("venda-produtos")} productId={editingProductId || undefined} /> },
       "venda-smartlook": { label: "SmartLook", content: <SmartLookContent /> },
       "venda-pedidos": { label: "Pedidos da Loja Online", content: <PedidosContent /> },
       "venda-subestoques": { label: "Subestoques", content: <SubestoquesContent /> },
       "venda-sacolinhas": { label: "Sacolinhas", content: <SacolinhasContent /> },
-      "venda-catalogo": { label: "Catálogo", content: <CatalogoContent /> },
+      "venda-catalogo": { label: "Catálogo", content: <CatalogoContent onSectionChange={setActiveSection} onEditProduct={(id) => { setEditingProductId(id); setActiveSection("venda-produtos-editar"); }} /> },
       servicos: { label: "Serviços", content: <ServicosContent defaultTab="agendamentos" /> },
       "servicos-agendamentos": { label: "Agendamentos", content: <ServicosContent defaultTab="agendamentos" /> },
       "servicos-lista": { label: "Lista de serviços", content: <ServicosContent defaultTab="lista" /> },
@@ -134,7 +138,7 @@ const Dashboard = () => {
       "minha-loja": { label: "Minha Loja", content: <MinhaLojaContent /> },
       suporte: { label: "Suporte", content: <SuporteContent /> },
     }),
-    [user],
+    [user, editingProductId],
   );
 
   const currentSection = sectionMap[activeSection] ?? sectionMap.dashboard;

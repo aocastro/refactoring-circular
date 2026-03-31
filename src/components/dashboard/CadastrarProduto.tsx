@@ -9,15 +9,18 @@ import { ArrowLeft, Save, Upload, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Product } from '@/types';
 import axios from 'axios';
+import api from '@/api/axios';
 
 interface CadastrarProdutoProps {
   onBack: () => void;
   onSuccess: () => void;
+  productId?: string | number;
 }
 
 const STORAGE_KEY = 'draft_cadastrar_produto';
 
-export default function CadastrarProduto({ onBack, onSuccess }: CadastrarProdutoProps) {
+export default function CadastrarProduto({ onBack, onSuccess, productId }: CadastrarProdutoProps) {
+  const isEditing = !!productId;
   const [formData, setFormData] = useState<Partial<Product>>({
     status: 1, // Ativo by default
     hasVariacoes: 0,
@@ -39,25 +42,42 @@ export default function CadastrarProduto({ onBack, onSuccess }: CadastrarProduto
   const [images, setImages] = useState<File[]>([]);
 
   useEffect(() => {
-    const draft = localStorage.getItem(STORAGE_KEY);
-    if (draft) {
-      try {
-        setFormData(JSON.parse(draft));
-        toast.info('Rascunho recuperado com sucesso.');
-      } catch (e) {
-        console.error('Erro ao recuperar rascunho', e);
+    if (isEditing) {
+      const fetchProduct = async () => {
+        try {
+          const res = await api.get(`/api/products/${productId}`);
+          if (res.data) {
+            setFormData(res.data);
+          }
+        } catch (error) {
+          console.error("Error fetching product for edit:", error);
+          toast.error("Erro ao carregar os dados do produto.");
+        }
+      };
+      fetchProduct();
+    } else {
+      const draft = localStorage.getItem(STORAGE_KEY);
+      if (draft) {
+        try {
+          setFormData(JSON.parse(draft));
+          toast.info('Rascunho recuperado com sucesso.');
+        } catch (e) {
+          console.error('Erro ao recuperar rascunho', e);
+        }
       }
     }
-  }, []);
+  }, [isEditing, productId]);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
-  }, [formData]);
+    if (!isEditing) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+    }
+  }, [formData, isEditing]);
 
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
 
-    if (!formData.nome) {
+    if (!formData.nome && !formData.name) {
       toast.error('O nome do produto é obrigatório.');
       return;
     }
@@ -66,17 +86,22 @@ export default function CadastrarProduto({ onBack, onSuccess }: CadastrarProduto
     try {
       const payload = {
         ...formData,
-        createdAt: new Date().toISOString()
       };
 
-      await axios.post('/api/products', payload);
+      if (!isEditing) {
+        payload.createdAt = new Date().toISOString();
+        await api.post('/api/products', payload);
+        toast.success('Produto salvo com sucesso!');
+        localStorage.removeItem(STORAGE_KEY);
+      } else {
+        await api.put(`/api/products/${productId}`, payload);
+        toast.success('Produto atualizado com sucesso!');
+      }
 
-      toast.success('Produto salvo com sucesso!');
-      localStorage.removeItem(STORAGE_KEY);
       onSuccess();
     } catch (error) {
       console.error(error);
-      toast.error('Erro ao salvar produto.');
+      toast.error(isEditing ? 'Erro ao atualizar produto.' : 'Erro ao salvar produto.');
     } finally {
       setLoading(false);
     }
@@ -95,7 +120,7 @@ export default function CadastrarProduto({ onBack, onSuccess }: CadastrarProduto
           <Button variant="ghost" size="icon" onClick={onBack}>
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <h2 className="text-2xl font-bold tracking-tight">Novo Produto</h2>
+          <h2 className="text-2xl font-bold tracking-tight">{isEditing ? 'Editar Produto' : 'Novo Produto'}</h2>
         </div>
         <div className="flex space-x-2">
           <Button type="button" variant="outline" onClick={onBack}>Cancelar</Button>
@@ -119,8 +144,8 @@ export default function CadastrarProduto({ onBack, onSuccess }: CadastrarProduto
             <div className="space-y-2 md:col-span-2">
               <Label>Nome do Produto *</Label>
               <Input
-                value={formData.nome || ''}
-                onChange={e => setFormData({ ...formData, nome: e.target.value })}
+                value={formData.nome || formData.name || ''}
+                onChange={e => setFormData({ ...formData, nome: e.target.value, name: e.target.value })}
                 placeholder="Ex: Camiseta Básica..."
                 required
               />

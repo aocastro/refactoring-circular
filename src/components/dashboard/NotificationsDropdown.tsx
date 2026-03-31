@@ -22,7 +22,7 @@ const typeStyles: Record<NotificationType, string> = {
 
 const NotificationsDropdown = () => {
   const [loadingData, setLoadingData] = useState(true);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [mockNotifications, setMockNotifications] = useState<any[]>([]);
   const [notifications, setNotifications] = useState<AppNotification[]>(mockNotifications);

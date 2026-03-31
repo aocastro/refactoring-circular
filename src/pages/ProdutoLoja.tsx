@@ -18,10 +18,10 @@ const ProdutoLoja = () => {
   const { toast } = useToast();
 
   const [loadingData, setLoadingData] = useState(true);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [mockStore, setmockStore] = useState<any>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [storeProducts, setstoreProducts] = useState<any>([]);
   useEffect(() => {

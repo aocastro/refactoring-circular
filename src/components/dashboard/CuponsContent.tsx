@@ -15,10 +15,10 @@ import { useToast } from "@/hooks/use-toast";
 
 const CuponsContent = () => {
   const [loadingData, setLoadingData] = useState(true);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [mockCupons, setMockCupons] = useState<any>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [mockClientes, setMockClientes] = useState<any>([]);
   useEffect(() => {

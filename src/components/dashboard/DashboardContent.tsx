@@ -26,19 +26,19 @@ interface DashboardContentProps {
 
 const DashboardContent = ({ onSectionChange }: DashboardContentProps) => {
   const [loadingData, setLoadingData] = useState(true);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [dashboardKpisByPeriod, setdashboardKpisByPeriod] = useState<any>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [revenueData, setrevenueData] = useState<any>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [salesByCategory, setsalesByCategory] = useState<any>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [recentSales, setrecentSales] = useState<any>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [abcProductsData, setabcProductsData] = useState<any>([]);
   const [trialDays, setTrialDays] = useState<number | null>(null);

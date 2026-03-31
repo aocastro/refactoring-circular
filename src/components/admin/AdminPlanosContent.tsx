@@ -13,7 +13,7 @@ import { toast } from "sonner";
 
 const AdminPlanosContent = () => {
   const [loadingData, setLoadingData] = useState(true);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [adminPlans, setAdminPlans] = useState<any>([]);
   useEffect(() => {

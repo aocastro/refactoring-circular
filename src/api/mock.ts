@@ -16,7 +16,7 @@ import { initialLinktrees } from '../data/linktree';
 const mock = new MockAdapter(axios, { delayResponse: 500 });
 
 let subStocks = [...initialSubStocks];
-let linktrees = [...initialLinktrees];
+const linktrees = [...initialLinktrees];
 
 // Mock GET /api/subestoques
 mock.onGet('/api/subestoques').reply(() => {
@@ -68,9 +68,9 @@ mock.onGet('/api/admin/kpis').reply(() => [200, adminKpis]);
 mock.onGet('/api/admin/mrr-history').reply(() => [200, adminMrrHistory]);
 mock.onGet('/api/admin/churn-history').reply(() => [200, adminChurnHistory]);
 mock.onGet('/api/admin/ltv-by-plan').reply(() => [200, adminLtvByPlan]);
-let mutableAdminPlans = [...adminPlans];
-let mutableAdminStores = [...adminStores];
-let mutableAdminUsers = [...adminUsers];
+const mutableAdminPlans = [...adminPlans];
+const mutableAdminStores = [...adminStores];
+const mutableAdminUsers = [...adminUsers];
 
 mock.onGet('/api/admin/plans').reply(() => [200, mutableAdminPlans]);
 mock.onPost('/api/admin/plans').reply((config) => {
