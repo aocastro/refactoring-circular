@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ArrowLeft, Save, Plus, Trash2 } from 'lucide-react';
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { ArrowLeft, Save, Plus, Trash2, Settings2 } from 'lucide-react';
 import { toast } from 'sonner';
 import api from '@/api/axios';
 
@@ -54,8 +55,19 @@ export default function BulkUploadContent({ onBack, onSuccess }: BulkUploadConte
     }
   ]);
   const [loading, setLoading] = useState(false);
+  const [visibleColumns, setVisibleColumns] = useState<string[]>(columns.map(c => c.key));
 
   const tableRef = useRef<HTMLTableElement>(null);
+
+  const toggleColumnVisibility = (key: string) => {
+    setVisibleColumns(prev =>
+      prev.includes(key)
+        ? prev.filter(k => k !== key)
+        : [...prev, key]
+    );
+  };
+
+  const visibleColumnsData = columns.filter(col => visibleColumns.includes(col.key));
 
   const addRow = () => {
     setRows([
@@ -179,11 +191,35 @@ export default function BulkUploadContent({ onBack, onSuccess }: BulkUploadConte
         </div>
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex items-center justify-between gap-2">
         <Button onClick={addRow} variant="outline" size="sm">
           <Plus className="w-4 h-4 mr-2" />
           Adicionar Linha
         </Button>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm" className="ml-auto flex">
+              <Settings2 className="mr-2 h-4 w-4" />
+              Colunas
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-[200px] max-h-[400px] overflow-y-auto">
+            {columns.map((column) => {
+              return (
+                <DropdownMenuCheckboxItem
+                  key={column.key}
+                  className="capitalize"
+                  checked={visibleColumns.includes(column.key)}
+                  onCheckedChange={() => toggleColumnVisibility(column.key)}
+                  onSelect={(e) => e.preventDefault()}
+                >
+                  {column.label.replace(' *', '')}
+                </DropdownMenuCheckboxItem>
+              );
+            })}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <div className="overflow-auto border border-border rounded-md flex-1">
@@ -191,7 +227,7 @@ export default function BulkUploadContent({ onBack, onSuccess }: BulkUploadConte
           <thead className="text-xs uppercase bg-secondary text-muted-foreground sticky top-0 z-10">
             <tr>
               <th className="px-2 py-2 border-b border-border bg-secondary min-w-[50px] sticky left-0 z-20"></th>
-              {columns.map((col, index) => (
+              {visibleColumnsData.map((col) => (
                 <th key={col.key} className="px-2 py-2 border-b border-r border-border bg-secondary" style={{ minWidth: col.width }}>
                   {col.label}
                 </th>
@@ -211,28 +247,31 @@ export default function BulkUploadContent({ onBack, onSuccess }: BulkUploadConte
                     <Trash2 className="w-3 h-3" />
                   </Button>
                 </td>
-                {columns.map((col, colIndex) => (
-                  <td key={col.key} className="p-0 border-r border-border">
-                    <Input
-                      data-row={rowIndex}
-                      data-col={colIndex}
-                      type={col.type === 'number' ? 'number' : 'text'}
-                      value={row[col.key] !== undefined ? row[col.key] : ""}
-                      onChange={(e) => {
-                        const val = col.type === 'number' ? (e.target.value === '' ? '' : Number(e.target.value)) : e.target.value;
-                        handleRowChange(rowIndex, col.key, val);
-                      }}
-                      onKeyDown={(e) => handleKeyDown(e, rowIndex, colIndex)}
-                      className="h-8 w-full border-0 rounded-none focus-visible:ring-1 focus-visible:ring-primary focus-visible:ring-inset bg-transparent px-2"
-                      placeholder={col.required ? 'Obrigatório' : ''}
-                    />
-                  </td>
-                ))}
+                {visibleColumnsData.map((col) => {
+                  const colIndex = columns.findIndex(c => c.key === col.key);
+                  return (
+                    <td key={col.key} className="p-0 border-r border-border">
+                      <Input
+                        data-row={rowIndex}
+                        data-col={colIndex}
+                        type={col.type === 'number' ? 'number' : 'text'}
+                        value={row[col.key] !== undefined ? row[col.key] : ""}
+                        onChange={(e) => {
+                          const val = col.type === 'number' ? (e.target.value === '' ? '' : Number(e.target.value)) : e.target.value;
+                          handleRowChange(rowIndex, col.key, val);
+                        }}
+                        onKeyDown={(e) => handleKeyDown(e, rowIndex, colIndex)}
+                        className="h-8 w-full border-0 rounded-none focus-visible:ring-1 focus-visible:ring-primary focus-visible:ring-inset bg-transparent px-2"
+                        placeholder={col.required ? 'Obrigatório' : ''}
+                      />
+                    </td>
+                  );
+                })}
               </tr>
             ))}
             {rows.length === 0 && (
               <tr>
-                <td colSpan={columns.length + 1} className="text-center py-8 text-muted-foreground">
+                <td colSpan={visibleColumnsData.length + 1} className="text-center py-8 text-muted-foreground">
                   Nenhuma linha adicionada. Clique em "Adicionar Linha" para começar.
                 </td>
               </tr>
