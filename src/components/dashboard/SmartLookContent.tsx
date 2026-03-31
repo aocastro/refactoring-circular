@@ -10,7 +10,7 @@ import KpiCard from "@/components/shared/KpiCard";
 import FilterToolbar from "@/components/shared/FilterToolbar";
 import type { KpiItem } from "@/types";
 
-interface SmartLockItem {
+interface SmartLookItem {
   id: number;
   product: string;
   sku: string;
@@ -20,7 +20,7 @@ interface SmartLockItem {
   location: string;
 }
 
-const initialLocks: SmartLockItem[] = [
+const initialLocks: SmartLookItem[] = [
   { id: 1, product: "Vestido Floral Vintage", sku: "VFV-001", lockType: "Trava Magnética", status: "Ativo", assignedAt: "10/03/2026", location: "Arara A1" },
   { id: 2, product: "Jaqueta Jeans Upcycled", sku: "JJU-002", lockType: "Tag RF", status: "Ativo", assignedAt: "09/03/2026", location: "Arara B2" },
   { id: 3, product: "Bolsa de Couro Retrô", sku: "BCR-003", lockType: "Cabo de Aço", status: "Liberado", assignedAt: "08/03/2026", location: "Vitrine" },
@@ -37,7 +37,7 @@ const lockStatusColor = (s: string) => {
   }
 };
 
-const SmartLockContent = () => {
+const SmartLookContent = () => {
   const [locks, setLocks] = useState(initialLocks);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("Todos");
@@ -63,7 +63,7 @@ const SmartLockContent = () => {
       id: Date.now(),
       product: form.product,
       sku: form.sku,
-      lockType: form.lockType as SmartLockItem["lockType"],
+      lockType: form.lockType as SmartLookItem["lockType"],
       status: "Ativo",
       assignedAt: new Date().toLocaleDateString("pt-BR"),
       location: form.location,
@@ -79,7 +79,7 @@ const SmartLockContent = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold font-display text-foreground">SmartLock</h1>
+        <h1 className="text-2xl font-bold font-display text-foreground">SmartLook</h1>
         <p className="text-muted-foreground text-sm">Gerencie travas e etiquetas de segurança dos produtos</p>
       </div>
 
@@ -163,4 +163,4 @@ const SmartLockContent = () => {
   );
 };
 
-export default SmartLockContent;
+export default SmartLookContent;
