@@ -21,6 +21,7 @@ const VendaContent = lazy(() => import("@/components/dashboard/VendaContent"));
 const ConsignacaoContent = lazy(() => import("@/components/dashboard/ConsignacaoContent"));
 const CatalogoContent = lazy(() => import("@/components/dashboard/CatalogoContent"));
 const CadastrarProduto = lazy(() => import("@/components/dashboard/CadastrarProduto"));
+const BulkUploadContent = lazy(() => import("@/components/dashboard/BulkUploadContent"));
 const SmartLookContent = lazy(() => import("@/components/dashboard/SmartLookContent"));
 const PedidosContent = lazy(() => import("@/components/dashboard/PedidosContent"));
 const SubestoquesContent = lazy(() => import("@/components/dashboard/SubestoquesContent"));
@@ -111,6 +112,7 @@ const Dashboard = () => {
       "venda-produtos": { label: "Produtos", content: <CatalogoContent onSectionChange={setActiveSection} onEditProduct={(id) => { setEditingProductId(id); setActiveSection("venda-produtos-editar"); }} /> },
       "venda-produtos-novo": { label: "Novo Produto", content: <CadastrarProduto onBack={() => setActiveSection("venda-produtos")} onSuccess={() => setActiveSection("venda-produtos")} /> },
       "venda-produtos-editar": { label: "Editar Produto", content: <CadastrarProduto onBack={() => setActiveSection("venda-produtos")} onSuccess={() => setActiveSection("venda-produtos")} productId={editingProductId || undefined} /> },
+      "venda-produtos-bulk": { label: "Cadastro em Massa", content: <BulkUploadContent onBack={() => setActiveSection("venda-produtos")} onSuccess={() => setActiveSection("venda-produtos")} /> },
       "venda-smartlook": { label: "SmartLook", content: <SmartLookContent /> },
       "venda-pedidos": { label: "Pedidos da Loja Online", content: <PedidosContent /> },
       "venda-subestoques": { label: "Subestoques", content: <SubestoquesContent /> },

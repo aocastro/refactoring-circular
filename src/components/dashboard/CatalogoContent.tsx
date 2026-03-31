@@ -22,7 +22,6 @@ import {
 import { productCategories, priceRanges } from "@/data/products";
 import { getStatusColor } from "@/lib/status-colors";
 import type { Product } from "@/types";
-import { BulkUploadModal } from "./modals/BulkUploadModal";
 import { PhotoUploadModal } from "./modals/PhotoUploadModal";
 import { ImportFileModal } from "./modals/ImportFileModal";
 import { ExpressProductModal } from "./modals/ExpressProductModal";
@@ -185,7 +184,6 @@ const CatalogoContent = ({ onSectionChange, onEditProduct }: CatalogoContentProp
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [mockProducts, setMockProducts] = useState<any[]>([]);
 
-  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isExpressModalOpen, setIsExpressModalOpen] = useState(false);
@@ -275,7 +273,7 @@ const CatalogoContent = ({ onSectionChange, onEditProduct }: CatalogoContentProp
               <PackagePlus className="mr-2 h-4 w-4" />
               <span>Cadastro de Produto Único</span>
             </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer" onClick={() => setIsBulkModalOpen(true)}>
+            <DropdownMenuItem className="cursor-pointer" onClick={() => onSectionChange?.("venda-produtos-bulk")}>
               <FileSpreadsheet className="mr-2 h-4 w-4" />
               <span>Cadastro em Massa</span>
             </DropdownMenuItem>
@@ -381,11 +379,6 @@ const CatalogoContent = ({ onSectionChange, onEditProduct }: CatalogoContentProp
       )}
 
       {/* Modals */}
-      <BulkUploadModal
-        open={isBulkModalOpen}
-        onOpenChange={setIsBulkModalOpen}
-        onSuccess={fetchData}
-      />
       <ExpressProductModal
         open={isExpressModalOpen}
         onOpenChange={setIsExpressModalOpen}

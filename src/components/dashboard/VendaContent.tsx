@@ -17,7 +17,6 @@ import FilterToolbar from "@/components/shared/FilterToolbar";
 import { productCategories, productStatuses, priceRanges } from "@/data/products";
 import { getStatusColor } from "@/lib/status-colors";
 import type { KpiItem } from "@/types";
-import { BulkUploadModal } from "./modals/BulkUploadModal";
 import { ImportFileModal } from "./modals/ImportFileModal";
 import { PhotoUploadModal } from "./modals/PhotoUploadModal";
 import { ExpressProductModal } from "./modals/ExpressProductModal";
@@ -35,7 +34,6 @@ const VendaContent = ({ onSectionChange, onEditProduct }: VendaContentProps) => 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [mockPDVSales, setMockPDVSales] = useState<any>([]);
 
-  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isExpressModalOpen, setIsExpressModalOpen] = useState(false);
   const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
@@ -130,7 +128,7 @@ const VendaContent = ({ onSectionChange, onEditProduct }: VendaContentProps) => 
                     <PackagePlus className="mr-2 h-4 w-4" />
                     <span>Cadastro de Produto Único</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer" onClick={() => setIsBulkModalOpen(true)}>
+                  <DropdownMenuItem className="cursor-pointer" onClick={() => onSectionChange?.("venda-produtos-bulk")}>
                     <FileSpreadsheet className="mr-2 h-4 w-4" />
                     <span>Cadastro em Massa</span>
                   </DropdownMenuItem>
@@ -286,11 +284,6 @@ const VendaContent = ({ onSectionChange, onEditProduct }: VendaContentProps) => 
           </div>
         </TabsContent>
       </Tabs>
-      <BulkUploadModal
-        open={isBulkModalOpen}
-        onOpenChange={setIsBulkModalOpen}
-        onSuccess={fetchData}
-      />
       <ExpressProductModal
         open={isExpressModalOpen}
         onOpenChange={setIsExpressModalOpen}
