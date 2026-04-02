@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Package, Clock, CheckCircle, XCircle, Truck, Eye, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -51,18 +51,22 @@ const PedidosContent = () => {
   const [statusFilter, setStatusFilter] = useState("Todos");
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
-  const filtered = orders.filter((o) => {
-    const matchSearch = o.code.toLowerCase().includes(search.toLowerCase()) || o.customer.toLowerCase().includes(search.toLowerCase());
-    const matchStatus = statusFilter === "Todos" || o.status === statusFilter;
-    return matchSearch && matchStatus;
-  });
+  // ⚡ Bolt: Memoize filtered array to prevent unnecessary O(n) re-evaluations during unrelated re-renders
+  const filtered = useMemo(() => {
+    return orders.filter((o) => {
+      const matchSearch = o.code.toLowerCase().includes(search.toLowerCase()) || o.customer.toLowerCase().includes(search.toLowerCase());
+      const matchStatus = statusFilter === "Todos" || o.status === statusFilter;
+      return matchSearch && matchStatus;
+    });
+  }, [orders, search, statusFilter]);
 
-  const kpis: KpiItem[] = [
+  // ⚡ Bolt: Memoize KPIs to avoid redundant recalculations of aggregate data on every render
+  const kpis: KpiItem[] = useMemo(() => [
     { label: "Total Pedidos", value: orders.length, icon: Package },
     { label: "Pendentes", value: orders.filter((o) => o.status === "Pendente").length, icon: Clock },
     { label: "Entregues", value: orders.filter((o) => o.status === "Entregue").length, icon: CheckCircle },
     { label: "Cancelados", value: orders.filter((o) => o.status === "Cancelado").length, icon: XCircle },
-  ];
+  ], [orders]);
 
   const advanceStatus = (id: number) => {
     setOrders((prev) => prev.map((o) => {
