@@ -1,0 +1,3 @@
+## 2025-04-02 - Icon-only Button Accessibility
+**Learning:** Icon-only buttons (like the copy button in CuponsContent) often lack screen reader context, relying purely on visual cues. Redundant icon announcements can also confuse users.
+**Action:** Always add descriptive `aria-label` and `title` (for tooltips) to icon-only buttons, and apply `aria-hidden="true"` to the inner SVG icons to prevent redundant or confusing screen reader announcements.
