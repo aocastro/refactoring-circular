@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import KpiCard from "@/components/shared/KpiCard";
 import { toast } from "sonner";
 import axios from "axios";
+import { sanitizeUrl } from "@/lib/utils";
 
 interface LinkItem {
   id: number;
@@ -262,7 +263,7 @@ const LinktreeContent = () => {
 
               <div className="w-full flex flex-col gap-3">
                 {links.filter(l => l.ativo).map(link => (
-                  <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer"
+                  <a key={link.id} href={sanitizeUrl(link.url)} target="_blank" rel="noopener noreferrer"
                      className="w-full py-3 px-4 rounded-xl shadow-sm text-center text-sm font-medium hover:scale-105 transition-transform duration-200"
                      style={{
                        backgroundColor: buttonColor,
