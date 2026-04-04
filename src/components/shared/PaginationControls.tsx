@@ -21,7 +21,7 @@ const PaginationControls = ({ currentPage, totalPages, totalItems, itemsPerPage,
         {start}–{end} de {totalItems}
       </p>
       <div className="flex items-center gap-1">
-        <Button variant="outline" size="icon" className="h-8 w-8 border-border" disabled={currentPage === 1} onClick={() => onPageChange(currentPage - 1)}>
+        <Button variant="outline" size="icon" className="h-8 w-8 border-border" disabled={currentPage === 1} onClick={() => onPageChange(currentPage - 1)} aria-label="Página anterior">
           <ChevronLeft className="h-4 w-4" />
         </Button>
         {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
@@ -31,11 +31,12 @@ const PaginationControls = ({ currentPage, totalPages, totalItems, itemsPerPage,
             size="icon"
             className={`h-8 w-8 ${p !== currentPage ? "border-border" : ""}`}
             onClick={() => onPageChange(p)}
+            aria-label={`Ir para a página ${p}`}
           >
             {p}
           </Button>
         ))}
-        <Button variant="outline" size="icon" className="h-8 w-8 border-border" disabled={currentPage === totalPages} onClick={() => onPageChange(currentPage + 1)}>
+        <Button variant="outline" size="icon" className="h-8 w-8 border-border" disabled={currentPage === totalPages} onClick={() => onPageChange(currentPage + 1)} aria-label="Página seguinte">
           <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
