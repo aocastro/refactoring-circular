@@ -71,13 +71,29 @@ const VendaContent = ({ onSectionChange, onEditProduct }: VendaContentProps) => 
       const matchPrice = p.price >= priceRange.min && p.price <= priceRange.max;
       return matchSearch && matchCategory && matchStatus && matchPrice;
     });
-  }, [search, categoryFilter, statusFilter, priceFilter]);
+  }, [search, categoryFilter, statusFilter, priceFilter, mockProducts]);
+
+  // ⚡ Bolt Performance Optimization:
+  // Combined 3 O(n) filter calls into a single O(n) reduce pass wrapped in useMemo
+  // This reduces the number of iterations over mockProducts from 3x to 1x
+  const counts = useMemo(() => {
+    return mockProducts.reduce(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (acc: { disponiveis: number; reservados: number; vendidos: number }, p: any) => {
+        if (p.status === "Disponível") acc.disponiveis++;
+        else if (p.status === "Reservado") acc.reservados++;
+        else if (p.status === "Vendido") acc.vendidos++;
+        return acc;
+      },
+      { disponiveis: 0, reservados: 0, vendidos: 0 }
+    );
+  }, [mockProducts]);
 
   const summaryKpis: KpiItem[] = [
     { label: "Total", value: mockProducts.length, icon: Package },
-    { label: "Disponíveis", value: mockProducts.filter((p) => p.status === "Disponível").length, icon: Tag },
-    { label: "Reservados", value: mockProducts.filter((p) => p.status === "Reservado").length, icon: Eye },
-    { label: "Vendidos", value: mockProducts.filter((p) => p.status === "Vendido").length, icon: ShoppingCart },
+    { label: "Disponíveis", value: counts.disponiveis, icon: Tag },
+    { label: "Reservados", value: counts.reservados, icon: Eye },
+    { label: "Vendidos", value: counts.vendidos, icon: ShoppingCart },
   ];
 
 
