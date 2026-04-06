@@ -51,6 +51,22 @@ const PedidosContent = () => {
   const [statusFilter, setStatusFilter] = useState("Todos");
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
+  // ⚡ Bolt: Memoize filtered array to prevent unnecessary O(n) re-evaluations during unrelated re-renders
+  const filtered = useMemo(() => {
+    return orders.filter((o) => {
+      const matchSearch = o.code.toLowerCase().includes(search.toLowerCase()) || o.customer.toLowerCase().includes(search.toLowerCase());
+      const matchStatus = statusFilter === "Todos" || o.status === statusFilter;
+      return matchSearch && matchStatus;
+    });
+  }, [orders, search, statusFilter]);
+
+  // ⚡ Bolt: Memoize KPIs to avoid redundant recalculations of aggregate data on every render
+  const kpis: KpiItem[] = useMemo(() => [
+    { label: "Total Pedidos", value: orders.length, icon: Package },
+    { label: "Pendentes", value: orders.filter((o) => o.status === "Pendente").length, icon: Clock },
+    { label: "Entregues", value: orders.filter((o) => o.status === "Entregue").length, icon: CheckCircle },
+    { label: "Cancelados", value: orders.filter((o) => o.status === "Cancelado").length, icon: XCircle },
+  ], [orders]);
   // ⚡ Bolt: Memoized filtered array to prevent unnecessary re-renders when other state changes
   const filtered = useMemo(() => orders.filter((o) => {
     const matchSearch = o.code.toLowerCase().includes(search.toLowerCase()) || o.customer.toLowerCase().includes(search.toLowerCase());
