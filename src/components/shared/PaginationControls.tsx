@@ -37,6 +37,7 @@ const PaginationControls = ({ currentPage, totalPages, totalItems, itemsPerPage,
             {p}
           </Button>
         ))}
+        <Button variant="outline" size="icon" className="h-8 w-8 border-border" disabled={currentPage === totalPages} onClick={() => onPageChange(currentPage + 1)} aria-label="Página seguinte">
         <Button variant="outline" size="icon" className="h-8 w-8 border-border" disabled={currentPage === totalPages} onClick={() => onPageChange(currentPage + 1)} aria-label="Próxima página">
           <ChevronRight className="h-4 w-4" />
         </Button>
