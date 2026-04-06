@@ -16,8 +16,8 @@ const PaginationControls = ({ currentPage, totalPages, totalItems, itemsPerPage,
   const end = Math.min(currentPage * itemsPerPage, totalItems);
 
   return (
-    <div className="flex items-center justify-between pt-2">
-      <p className="text-xs text-muted-foreground">
+    <div className="flex items-center justify-between pt-2" aria-label="Navegação de páginas">
+      <p className="text-xs text-muted-foreground" aria-live="polite">
         {start}–{end} de {totalItems}
       </p>
       <div className="flex items-center gap-1">
@@ -32,11 +32,13 @@ const PaginationControls = ({ currentPage, totalPages, totalItems, itemsPerPage,
             className={`h-8 w-8 ${p !== currentPage ? "border-border" : ""}`}
             onClick={() => onPageChange(p)}
             aria-label={`Ir para a página ${p}`}
+            aria-current={p === currentPage ? "page" : undefined}
           >
             {p}
           </Button>
         ))}
         <Button variant="outline" size="icon" className="h-8 w-8 border-border" disabled={currentPage === totalPages} onClick={() => onPageChange(currentPage + 1)} aria-label="Página seguinte">
+        <Button variant="outline" size="icon" className="h-8 w-8 border-border" disabled={currentPage === totalPages} onClick={() => onPageChange(currentPage + 1)} aria-label="Próxima página">
           <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
