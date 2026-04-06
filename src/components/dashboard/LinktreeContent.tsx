@@ -223,7 +223,7 @@ const LinktreeContent = () => {
                 <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => openEdit(link)}>
                   <Pencil className="h-3.5 w-3.5" />
                 </Button>
-                <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => window.open(link.url, "_blank")}>
+                <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => window.open(sanitizeUrl(link.url), "_blank")}>
                   <ExternalLink className="h-3.5 w-3.5" />
                 </Button>
                 <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0 text-destructive" onClick={() => handleDelete(link.id)}>
