@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { Smartphone } from "lucide-react";
 import { LinkItem, LinktreeConfig } from "@/data/linktree";
+import { sanitizeUrl } from "@/lib/utils";
 
 const LinktreePublic = () => {
   const { slug } = useParams();
@@ -68,7 +69,7 @@ const LinktreePublic = () => {
           {data.links && data.links.filter(l => l.ativo).map(link => (
             <a
               key={link.id}
-              href={link.url}
+              href={sanitizeUrl(link.url)}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full py-4 px-6 rounded-2xl shadow-md text-center text-base font-semibold hover:-translate-y-1 hover:shadow-lg transition-all duration-300"
