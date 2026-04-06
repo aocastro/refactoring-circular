@@ -176,8 +176,8 @@ const CuponsContent = () => {
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center text-accent">{getTypeIcon(cupom.type)}</div>
                 <div>
-                  <button onClick={() => copyCode(cupom.code)} className="flex items-center gap-1 text-foreground font-mono font-bold text-sm hover:text-primary transition-colors">
-                    {cupom.code} <Copy className="h-3 w-3 text-muted-foreground" />
+                  <button onClick={() => copyCode(cupom.code)} className="flex items-center gap-1 text-foreground font-mono font-bold text-sm hover:text-primary transition-colors" aria-label={`Copiar código do cupom: ${cupom.code}`} title="Copiar código">
+                    {cupom.code} <Copy className="h-3 w-3 text-muted-foreground" aria-hidden="true" />
                   </button>
                   <p className="text-xs text-muted-foreground">{cupom.description}</p>
                 </div>
