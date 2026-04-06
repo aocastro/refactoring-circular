@@ -137,8 +137,8 @@ const FornecedoresContent = () => {
                 </div>
               </div>
               <div className="flex items-center gap-1">
-                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(f)}><Edit className="h-3.5 w-3.5" /></Button>
-                <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => handleDelete(f.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
+                <Button variant="ghost" size="icon" className="h-7 w-7" aria-label={`Editar fornecedor ${f.nome}`} title="Editar fornecedor" onClick={() => openEdit(f)}><Edit className="h-3.5 w-3.5" /></Button>
+                <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" aria-label={`Excluir fornecedor ${f.nome}`} title="Excluir fornecedor" onClick={() => handleDelete(f.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
               </div>
             </div>
             <div className="space-y-1.5 text-xs text-muted-foreground">
