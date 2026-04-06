@@ -47,15 +47,29 @@ const DashboardContent = ({ onSectionChange }: DashboardContentProps) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res_dashboardKpisByPeriod = await api.get('/api/dashboard/kpis-by-period');
+        // ⚡ Bolt: Grouped independent API calls and parallelized them using Promise.all()
+        // to prevent network waterfall effects and speed up initial component render.
+        // Bolt ⚡ Optimization: Parallelize independent API calls to prevent network waterfall
+        const [
+          res_dashboardKpisByPeriod,
+          res_revenueData,
+          res_salesByCategory,
+          res_recentSales,
+          res_abcProductsData
+          res_abcProductsData,
+        ] = await Promise.all([
+          api.get('/api/dashboard/kpis-by-period'),
+          api.get('/api/dashboard/revenue-data'),
+          api.get('/api/dashboard/sales-by-category'),
+          api.get('/api/dashboard/recent-sales'),
+          api.get('/api/dashboard/abc-products')
+          api.get('/api/dashboard/abc-products'),
+        ]);
+
         setdashboardKpisByPeriod(res_dashboardKpisByPeriod.data);
-        const res_revenueData = await api.get('/api/dashboard/revenue-data');
         setrevenueData(res_revenueData.data);
-        const res_salesByCategory = await api.get('/api/dashboard/sales-by-category');
         setsalesByCategory(res_salesByCategory.data);
-        const res_recentSales = await api.get('/api/dashboard/recent-sales');
         setrecentSales(res_recentSales.data);
-        const res_abcProductsData = await api.get('/api/dashboard/abc-products');
         setabcProductsData(res_abcProductsData.data);
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -135,7 +149,9 @@ const DashboardContent = ({ onSectionChange }: DashboardContentProps) => {
 
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
         {dashboardKpisByPeriod[selectedPeriod]?.map((kpi: any, i: number) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const IconComponent = typeof kpi.icon === 'string' ? (Icons as any)[kpi.icon] : kpi.icon;
           return (
             <KpiCard
