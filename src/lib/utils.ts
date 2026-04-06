@@ -6,6 +6,8 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
+ * Sanitizes a URL by removing dangerous protocols (javascript:, vbscript:, data:).
+ * Returns '#' if the URL is deemed unsafe.
  * Sanitizes URLs to prevent XSS attacks.
  * Disallows javascript:, vbscript:, data: and other potentially harmful protocols.
  */
@@ -42,6 +44,16 @@ export function sanitizeUrl(url: string): string {
 export function sanitizeUrl(url?: string): string {
   if (!url) return "#";
   try {
+    const parsedUrl = new URL(url, "http://localhost"); // fallback base for relative urls
+    if (["javascript:", "vbscript:", "data:"].includes(parsedUrl.protocol)) {
+      return "#";
+    }
+    return url;
+  } catch (e) {
+    // If URL parsing fails, default to a safe value or return the original if it's a simple path
+    // For safety, we can just do a regex check as fallback
+    const invalidProtocolRegex = /^(javascript|vbscript|data):/i;
+    if (invalidProtocolRegex.test(url.trim())) {
     const parsedUrl = new URL(url, window.location.origin);
     if (parsedUrl.protocol === "javascript:" || parsedUrl.protocol === "vbscript:" || parsedUrl.protocol === "data:") {
       return "about:blank";
