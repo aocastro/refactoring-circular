@@ -12,6 +12,7 @@ import { usePagination } from "@/hooks/use-pagination";
 import { useEffect } from "react";
 import { type AdminStore } from "@/data/admin";
 import { toast } from "sonner";
+import { sanitizeUrl } from "@/lib/utils";
 
 const getStatusIcon = (status: string) => {
   switch (status) {
@@ -134,7 +135,7 @@ const AdminLojasContent = () => {
                   {store.status === "suspensa" && <Button size="sm" variant="outline" onClick={() => changeStoreStatus(store.id, "ativa", `${store.name} reativada`)}>Reativar</Button>}
                   {store.storeUrl && (
                     <Button variant="ghost" size="sm" asChild aria-label={`Acessar site da loja ${store.name}`}>
-                      <a href={store.storeUrl} target="_blank" rel="noopener noreferrer">
+                      <a href={sanitizeUrl(store.storeUrl)} target="_blank" rel="noopener noreferrer">
                         <ExternalLink className="h-4 w-4" />
                       </a>
                     </Button>
