@@ -55,14 +55,12 @@ const DashboardContent = ({ onSectionChange }: DashboardContentProps) => {
           res_revenueData,
           res_salesByCategory,
           res_recentSales,
-          res_abcProductsData
           res_abcProductsData,
         ] = await Promise.all([
           api.get('/api/dashboard/kpis-by-period'),
           api.get('/api/dashboard/revenue-data'),
           api.get('/api/dashboard/sales-by-category'),
           api.get('/api/dashboard/recent-sales'),
-          api.get('/api/dashboard/abc-products')
           api.get('/api/dashboard/abc-products'),
         ]);
 
