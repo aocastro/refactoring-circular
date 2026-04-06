@@ -1,0 +1,3 @@
+## 2024-03-20 - [A11y: Pagination Controls]
+**Learning:** Found an accessibility issue pattern specific to this app's components: icon-only buttons in pagination controls (`src/components/shared/PaginationControls.tsx`) lacked `aria-label`s, making them difficult to navigate for screen reader users. The numbered page buttons also lacked `aria-current` to indicate the currently active page.
+**Action:** Always ensure pagination controls and similar navigation components include descriptive `aria-label`s for icon-only buttons and `aria-current="page"` for the active item to support screen reader navigation.
