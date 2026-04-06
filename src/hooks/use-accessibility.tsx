@@ -78,6 +78,7 @@ export const AccessibilityProvider = ({ children }: { children: ReactNode }) => 
   return <AccessibilityContext.Provider value={value}>{children}</AccessibilityContext.Provider>;
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAccessibility() {
   const context = useContext(AccessibilityContext);
 

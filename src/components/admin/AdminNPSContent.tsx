@@ -47,9 +47,9 @@ const AdminNPSContent = () => {
   const [statusFilter, setStatusFilter] = useState("Todos");
 
   const [loadingData, setLoadingData] = useState(true);
-  const [adminNpsStats, setAdminNpsStats] = useState<any>({});
-  const [adminNpsHistory, setAdminNpsHistory] = useState<any>([]);
-  const [adminNpsResponses, setAdminNpsResponses] = useState<any>([]);
+  const [adminNpsStats, setAdminNpsStats] = useState<Record<string, unknown>>({});
+  const [adminNpsHistory, setAdminNpsHistory] = useState<Record<string, unknown>[]>([]);
+  const [adminNpsResponses, setAdminNpsResponses] = useState<NPSResponse[]>([]);
 
   useEffect(() => {
     let mounted = true;

@@ -79,10 +79,8 @@ const PDVPage = () => {
   const [lastSale, setLastSale] = useState<RegisteredSale | null>(null);
 
   const [loadingData, setLoadingData] = useState(true);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [storeProducts, setStoreProducts] = useState<any>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [mockClientes, setMockClientes] = useState<any>([]);
+  const [storeProducts, setStoreProducts] = useState<Record<string, unknown>[]>([]);
+  const [mockClientes, setMockClientes] = useState<Record<string, unknown>[]>([]);
 
   useEffect(() => {
     let mounted = true;
@@ -111,13 +109,13 @@ const PDVPage = () => {
   const remaining = cartTotalWithDiscount - paidSoFar;
 
   const filteredProducts = useMemo(() => {
-    if (!search) return storeProducts.filter((p) => p.status === "Disponível").slice(0, 20);
+    if (!search) return storeProducts.filter((p: Record<string, unknown>) => p.status === "Disponível").slice(0, 20);
     return storeProducts
-      .filter((p) => p.status === "Disponível" && (p.name.toLowerCase().includes(search.toLowerCase()) || p.sku.toLowerCase().includes(search.toLowerCase())))
+      .filter((p: Record<string, unknown>) => p.status === "Disponível" && (String(p.name).toLowerCase().includes(search.toLowerCase()) || String(p.sku).toLowerCase().includes(search.toLowerCase())))
       .slice(0, 20);
-  }, [search]);
+  }, [storeProducts, search]);
 
-  const addToCart = useCallback((product: typeof storeProducts[0]) => {
+  const addToCart = useCallback((product: Record<string, unknown>) => {
     setCart((prev) => {
       const existing = prev.find((i) => i.id === product.id);
       if (existing) return prev.map((i) => i.id === product.id ? { ...i, quantity: i.quantity + 1 } : i);
@@ -251,12 +249,12 @@ const PDVPage = () => {
 
   const filteredClients = useMemo(() => {
     if (!customerInput) return [];
-    return mockClientes.filter((c) =>
-      c.name.toLowerCase().includes(customerInput.toLowerCase()) ||
-      c.phone.includes(customerInput) ||
-      c.email.toLowerCase().includes(customerInput.toLowerCase())
+    return mockClientes.filter((c: Record<string, unknown>) =>
+      String(c.name).toLowerCase().includes(customerInput.toLowerCase()) ||
+      String(c.phone).includes(customerInput) ||
+      String(c.email).toLowerCase().includes(customerInput.toLowerCase())
     ).slice(0, 5);
-  }, [customerInput]);
+  }, [mockClientes, customerInput]);
 
   // Click outside to close customer dropdown
   useEffect(() => {

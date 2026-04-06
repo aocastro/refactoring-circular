@@ -31,8 +31,8 @@ const bagStatusColor = (s: BagStatus) => {
 
 const SacolinhasContent = () => {
   const [loadingData, setLoadingData] = useState(true);
-  const [mockProducts, setMockProducts] = useState<any[]>([]);
-  const [mockClientes, setMockClientes] = useState<any[]>([]);
+  const [mockProducts, setMockProducts] = useState<Product[]>([]);
+  const [mockClientes, setMockClientes] = useState<Record<string, unknown>[]>([]);
   useEffect(() => {
     let mounted = true;
     const fetchData = async () => {
@@ -76,12 +76,12 @@ const SacolinhasContent = () => {
 
   const filteredClients = useMemo(() => {
     if (!customerInput || selectedCustomer) return [];
-    return mockClientes.filter((c) =>
-      c.name.toLowerCase().includes(customerInput.toLowerCase()) ||
-      c.phone.includes(customerInput) ||
-      c.email.toLowerCase().includes(customerInput.toLowerCase())
+    return mockClientes.filter((c: Record<string, unknown>) =>
+      String(c.name).toLowerCase().includes(customerInput.toLowerCase()) ||
+      String(c.phone).includes(customerInput) ||
+      String(c.email).toLowerCase().includes(customerInput.toLowerCase())
     ).slice(0, 5);
-  }, [customerInput, selectedCustomer]);
+  }, [mockClientes, customerInput, selectedCustomer]);
 
   useEffect(() => {
     const fetchData = async () => {

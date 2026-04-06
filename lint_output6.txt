@@ -1,0 +1,30 @@
+
+> vite_react_shadcn_ts@0.0.0 lint /app
+> eslint .
+
+
+/app/src/components/dashboard/DashboardContent.tsx
+   30:85  error    Unexpected any. Specify a different type                                                               @typescript-eslint/no-explicit-any
+   31:65  error    Unexpected any. Specify a different type                                                               @typescript-eslint/no-explicit-any
+   32:73  error    Unexpected any. Specify a different type                                                               @typescript-eslint/no-explicit-any
+   33:65  error    Unexpected any. Specify a different type                                                               @typescript-eslint/no-explicit-any
+   34:73  error    Unexpected any. Specify a different type                                                               @typescript-eslint/no-explicit-any
+  141:10  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  143:89  error    Unexpected any. Specify a different type                                                               @typescript-eslint/no-explicit-any
+
+/app/src/components/dashboard/SacolinhasContent.tsx
+  35:67  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  79:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/app/src/pages/PDVPage.tsx
+   82:69  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   83:67  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  112:65  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  114:34  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  118:58  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  252:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 15 problems (14 errors, 1 warning)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+
+ ELIFECYCLE  Command failed with exit code 1.
