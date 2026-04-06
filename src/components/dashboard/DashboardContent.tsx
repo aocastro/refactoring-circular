@@ -47,18 +47,22 @@ const DashboardContent = ({ onSectionChange }: DashboardContentProps) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // ⚡ Bolt: Grouped independent API calls and parallelized them using Promise.all()
+        // to prevent network waterfall effects and speed up initial component render.
         // Bolt ⚡ Optimization: Parallelize independent API calls to prevent network waterfall
         const [
           res_dashboardKpisByPeriod,
           res_revenueData,
           res_salesByCategory,
           res_recentSales,
+          res_abcProductsData
           res_abcProductsData,
         ] = await Promise.all([
           api.get('/api/dashboard/kpis-by-period'),
           api.get('/api/dashboard/revenue-data'),
           api.get('/api/dashboard/sales-by-category'),
           api.get('/api/dashboard/recent-sales'),
+          api.get('/api/dashboard/abc-products')
           api.get('/api/dashboard/abc-products'),
         ]);
 
