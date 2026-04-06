@@ -171,7 +171,7 @@ export default function BulkUploadContent({ onBack, onSuccess }: BulkUploadConte
   };
 
   return (
-    <div className="flex flex-col h-full bg-background animate-fade-in space-y-4">
+    <div className="flex flex-col h-[calc(100vh-220px)] min-h-[500px] w-full bg-background animate-fade-in space-y-4">
       <div className="flex items-center justify-between sticky top-0 bg-background z-20 py-4 border-b">
         <div className="flex items-center space-x-4">
           <Button variant="ghost" size="icon" onClick={onBack}>
