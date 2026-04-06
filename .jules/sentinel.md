@@ -1,0 +1,4 @@
+## 2024-05-18 - Prevent XSS via Unsanitized `href` attributes
+**Vulnerability:** User-supplied URLs (e.g., from Linktree configurations) were being rendered directly into the `href` attributes of `<a>` tags in `LinktreeContent`, `LinktreePublic`, and `AdminLojasContent`.
+**Learning:** This is a classic Cross-Site Scripting (XSS) vulnerability. If a malicious user supplies a URL like `javascript:alert(1)`, it will execute when clicked. This pattern is common when displaying user-configured links or external references.
+**Prevention:** Always sanitize user-supplied URLs before placing them in `href` attributes. A `sanitizeUrl` utility function was added to `src/lib/utils.ts` to ensure only safe protocols (http, https, mailto, tel) or relative paths are allowed, falling back to `about:blank` for dangerous protocols like `javascript:`, `vbscript:`, and `data:`. This function must be used universally for external links.
