@@ -76,9 +76,9 @@ const ProductCard = ({ product, index, onSelect, onEdit }: { product: Product; i
   </motion.div>
 );
 
-const ProductDetail = ({ product, onBack, mockProducts, onEdit }: { product: Product; onBack: () => void; mockProducts: any[]; onEdit?: (id: string | number) => void }) => {
+const ProductDetail = ({ product, onBack, mockProducts, onEdit }: { product: Product; onBack: () => void; mockProducts: Product[]; onEdit?: (id: string | number) => void }) => {
   const related = mockProducts
-    .filter((p) => p.category === product.category && p.id !== product.id && p.status === "Disponível")
+    .filter((p: Product) => p.category === product.category && p.id !== product.id && p.status === "Disponível")
     .slice(0, 4);
 
   return (
@@ -181,8 +181,7 @@ const ProductDetail = ({ product, onBack, mockProducts, onEdit }: { product: Pro
 
 const CatalogoContent = ({ onSectionChange, onEditProduct }: CatalogoContentProps) => {
   const [loadingData, setLoadingData] = useState(true);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [mockProducts, setMockProducts] = useState<any[]>([]);
+  const [mockProducts, setMockProducts] = useState<Product[]>([]);
 
   const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
@@ -214,8 +213,7 @@ const CatalogoContent = ({ onSectionChange, onEditProduct }: CatalogoContentProp
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const sizes: string[] = useMemo(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return ["Todos", ...Array.from(new Set(mockProducts.map((p: any) => String(p.size))))];
+    return ["Todos", ...Array.from(new Set(mockProducts.map((p: Product) => String(p.size))))];
   }, [mockProducts]);
 
   const activeFilters = [category, condition, size, priceRange].filter((f) => f !== "Todos").length;
@@ -234,7 +232,7 @@ const CatalogoContent = ({ onSectionChange, onEditProduct }: CatalogoContentProp
       const matchPrice = p.price >= range.min && p.price <= range.max;
       return matchSearch && matchCategory && matchCondition && matchSize && matchPrice;
     });
-  }, [search, category, condition, size, priceRange]);
+  }, [mockProducts, search, category, condition, size, priceRange]);
 
   const clearFilters = () => {
     setCategory("Todos");

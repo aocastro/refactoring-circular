@@ -28,4 +28,5 @@ const Toaster = React.forwardRef<HTMLElement, ToasterProps>(({ ...props }, ref) 
 
 Toaster.displayName = "SonnerToaster";
 
+// eslint-disable-next-line react-refresh/only-export-components
 export { Toaster, toast };

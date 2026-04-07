@@ -38,6 +38,7 @@ const ADDABLE_BLOCKS: { type: EditorBlock["type"]; label: string }[] = [
 ];
 
 /** Gera os blocos padrão com as cores/fontes do tema escolhido */
+// eslint-disable-next-line react-refresh/only-export-components
 export function buildDefaultBlocksFromTheme(theme: TemplateTheme | null): EditorBlock[] {
   if (!theme) return DEFAULT_BLOCKS;
 

@@ -16,11 +16,8 @@ import { useToast } from "@/hooks/use-toast";
 const CuponsContent = () => {
   const [loadingData, setLoadingData] = useState(true);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [mockCupons, setMockCupons] = useState<any>([]);
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [mockClientes, setMockClientes] = useState<any>([]);
+  const [mockCupons, setMockCupons] = useState<Cupom[]>([]);
+  const [mockClientes, setMockClientes] = useState<Record<string, unknown>[]>([]);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -47,12 +44,12 @@ const CuponsContent = () => {
   const { toast } = useToast();
 
   const filtered = useMemo(() => {
-    return mockCupons.filter((c) => {
+    return mockCupons.filter((c: Cupom) => {
       const matchSearch = search === "" || c.code.toLowerCase().includes(search.toLowerCase()) || c.description.toLowerCase().includes(search.toLowerCase());
       const matchStatus = statusFilter === "Todos" || c.status === statusFilter;
       return matchSearch && matchStatus;
     });
-  }, [search, statusFilter]);
+  }, [mockCupons, search, statusFilter]);
 
   const ativos = mockCupons.filter((c) => c.status === "Ativo").length;
   const totalUsage = mockCupons.reduce((a, c) => a + c.usageCount, 0);
@@ -95,36 +92,36 @@ const CuponsContent = () => {
 
   const origins = useMemo(() => {
     const caps = new Set<string>();
-    mockClientes.forEach(c => {
-      const parts = c.name.split(" ");
+    mockClientes.forEach((c: Record<string, unknown>) => {
+      const parts = String(c.name).split(" ");
       if (parts.length > 1) caps.add(parts[parts.length - 1]);
     });
     return Array.from(caps);
-  }, []);
+  }, [mockClientes]);
 
   const recipientCount = useMemo(() => {
     if (targetType === "todos") return mockClientes.length;
     if (targetType === "origin" && targetValue) {
-      return mockClientes.filter(c => c.name.endsWith(targetValue)).length;
+      return mockClientes.filter((c: Record<string, unknown>) => String(c.name).endsWith(targetValue)).length;
     }
     if (targetType === "birthday" && targetValue) {
       // Simplificado: targetValue = mês (1-12)
-      return mockClientes.filter(c => {
+      return mockClientes.filter((c: Record<string, unknown>) => {
         if (!c.birthDate) return false;
-        const month = parseInt(c.birthDate.split("/")[1]);
+        const month = parseInt(String(c.birthDate).split("/")[1]);
         return month === parseInt(targetValue);
       }).length;
     }
     if (targetType === "inactive" && targetValue) {
       const months = parseInt(targetValue);
-      return mockClientes.filter(c => {
-        const lastDate = c.lastPurchase === "-" ? new Date(0) : new Date(c.lastPurchase.split("/").reverse().join("-"));
+      return mockClientes.filter((c: Record<string, unknown>) => {
+        const lastDate = c.lastPurchase === "-" ? new Date(0) : new Date(String(c.lastPurchase).split("/").reverse().join("-"));
         const diffMonths = (new Date("2026-03-23").getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24 * 30);
         return diffMonths >= months;
       }).length;
     }
     return 0;
-  }, [targetType, targetValue]);
+  }, [mockClientes, targetType, targetValue]);
 
 
 

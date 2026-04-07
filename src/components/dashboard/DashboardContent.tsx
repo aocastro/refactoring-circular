@@ -27,20 +27,11 @@ interface DashboardContentProps {
 const DashboardContent = ({ onSectionChange }: DashboardContentProps) => {
   const [loadingData, setLoadingData] = useState(true);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [dashboardKpisByPeriod, setdashboardKpisByPeriod] = useState<any>([]);
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [revenueData, setrevenueData] = useState<any>([]);
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [salesByCategory, setsalesByCategory] = useState<any>([]);
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [recentSales, setrecentSales] = useState<any>([]);
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [abcProductsData, setabcProductsData] = useState<any>([]);
+  const [dashboardKpisByPeriod, setdashboardKpisByPeriod] = useState<Record<string, unknown>>({});
+  const [revenueData, setrevenueData] = useState<Record<string, unknown>[]>([]);
+  const [salesByCategory, setsalesByCategory] = useState<Record<string, unknown>[]>([]);
+  const [recentSales, setrecentSales] = useState<Record<string, unknown>[]>([]);
+  const [abcProductsData, setabcProductsData] = useState<Record<string, unknown>[]>([]);
   const [trialDays, setTrialDays] = useState<number | null>(null);
   const [selectedPeriod, setSelectedPeriod] = useState<DashboardPeriod>("hoje");
 
@@ -147,10 +138,8 @@ const DashboardContent = ({ onSectionChange }: DashboardContentProps) => {
 
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-        {dashboardKpisByPeriod[selectedPeriod]?.map((kpi: any, i: number) => {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const IconComponent = typeof kpi.icon === 'string' ? (Icons as any)[kpi.icon] : kpi.icon;
+        {(dashboardKpisByPeriod[selectedPeriod] as Record<string, unknown>[])?.map((kpi: Record<string, unknown>, i: number) => {
+          const IconComponent = typeof kpi.icon === 'string' ? (Icons as Record<string, unknown>)[kpi.icon] : kpi.icon;
           return (
             <KpiCard
               key={kpi.label}
