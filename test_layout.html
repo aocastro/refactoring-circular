@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="flex min-h-screen w-full bg-slate-100">
+  <!-- sidebar -->
+  <div class="w-64 bg-slate-800 flex-shrink-0"></div>
+
+  <!-- main layout -->
+  <div class="flex flex-1 flex-col overflow-hidden"> <!-- overflow-hidden on flex-1 usually needed -->
+    <!-- header -->
+    <header class="h-14 bg-white border-b flex-shrink-0"></header>
+
+    <!-- main area -->
+    <main class="flex-1 overflow-auto p-6">
+      <section>
+        <h1>Cadastro em Massa</h1>
+        <div> <!-- motion.div -->
+
+          <!-- BulkUploadContent -->
+          <div class="flex flex-col h-[500px] w-full bg-white space-y-4">
+
+            <div class="flex justify-between">Header controls</div>
+
+            <div class="overflow-auto border flex-1">
+              <table class="w-max text-sm">
+                <thead><tr>
+                   <th class="w-[300px]">Col 1</th><th class="w-[300px]">Col 2</th><th class="w-[300px]">Col 3</th><th class="w-[300px]">Col 4</th><th class="w-[300px]">Col 5</th>
+                </tr></thead>
+                <tbody>
+                   <tr><td>Data 1</td><td>Data 2</td><td>Data 3</td><td>Data 4</td><td>Data 5</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+          <!-- End BulkUploadContent -->
+
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

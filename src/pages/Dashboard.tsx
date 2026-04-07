@@ -157,7 +157,7 @@ const Dashboard = () => {
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background">
         <DashboardSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
-        <div className="flex flex-1 flex-col">
+        <div className="flex flex-1 flex-col overflow-hidden">
           <AppHeader
             userName={user.name}
             sectionLabel={currentSection.label}

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="flex min-h-screen w-full bg-slate-100">
+  <div class="w-64 bg-slate-800 flex-shrink-0"></div>
+
+  <div class="flex flex-1 flex-col"> <!-- without min-w-0 or overflow-hidden -->
+    <header class="h-14 bg-white border-b flex-shrink-0">Header</header>
+
+    <main class="flex-1 overflow-auto p-6">
+      <div style="width: 2000px; background: red; height: 100px;">Wide content</div>
+    </main>
+  </div>
+</body>
+</html>
