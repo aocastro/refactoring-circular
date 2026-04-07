@@ -20,7 +20,7 @@ const MyAccountContent = ({ user }: MyAccountContentProps) => {
   const trialDays = isTrial ? Math.ceil((storeConfig.trialEndsAt - Date.now()) / (1000 * 60 * 60 * 24)) : 0;
 
   return (
-    <div className="max-w-2xl space-y-6">
+    <div className="max-w-4xl space-y-6">
       <header>
         <h2 className="font-display text-2xl font-bold text-foreground">Minha Conta</h2>
         <p className="text-sm text-muted-foreground">Gerencie suas informações pessoais com estrutura semântica e campos somente leitura.</p>
@@ -88,49 +88,51 @@ const MyAccountContent = ({ user }: MyAccountContentProps) => {
         </div>
       </motion.section>
 
-      <motion.section
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="rounded-xl border border-border bg-card p-6"
-        aria-labelledby="account-plan-heading"
-      >
-        <h3 id="account-plan-heading" className="mb-4 font-semibold text-foreground">Plano Atual</h3>
-        <div className={`flex items-center justify-between rounded-lg border p-4 ${isTrial ? "border-primary/30 bg-primary/5" : "border-border bg-secondary/50"}`}>
-          <div>
-            <p className="font-display font-bold text-foreground">{storeConfig?.planName || "Growth"}</p>
-            {isTrial ? (
-              <p className="text-sm text-muted-foreground">Período de teste • {trialDays} dia(s) restantes</p>
-            ) : (
-              <p className="text-sm text-muted-foreground">R$ 149,90/mês • Próximo pagamento: 15/01/2026</p>
-            )}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <motion.section
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="rounded-xl border border-border bg-card p-6 flex flex-col"
+          aria-labelledby="account-plan-heading"
+        >
+          <h3 id="account-plan-heading" className="mb-4 font-semibold text-foreground">Plano Atual</h3>
+          <div className={`flex flex-1 flex-col gap-4 sm:flex-row sm:items-center justify-between rounded-lg border p-4 ${isTrial ? "border-primary/30 bg-primary/5" : "border-border bg-secondary/50"}`}>
+            <div>
+              <p className="font-display font-bold text-foreground">{storeConfig?.planName || "Growth"}</p>
+              {isTrial ? (
+                <p className="text-sm text-muted-foreground">Período de teste • {trialDays} dia(s) restantes</p>
+              ) : (
+                <p className="text-sm text-muted-foreground">R$ 149,90/mês<br />Próximo pagamento: 15/01/2026</p>
+              )}
+            </div>
+            <span className={`self-start sm:self-auto rounded-full px-2 py-1 text-xs font-medium ${isTrial ? "bg-primary/20 text-primary" : "bg-success/10 text-success"}`}>
+              {isTrial ? "Em Teste" : "Ativo"}
+            </span>
           </div>
-          <span className={`rounded-full px-2 py-1 text-xs font-medium ${isTrial ? "bg-primary/20 text-primary" : "bg-success/10 text-success"}`}>
-            {isTrial ? "Em Teste" : "Ativo"}
-          </span>
-        </div>
-      </motion.section>
+        </motion.section>
 
-      <motion.section
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="rounded-xl border border-border bg-card p-6"
-        aria-labelledby="account-payment-heading"
-      >
-        <h3 id="account-payment-heading" className="mb-4 font-semibold text-foreground">Método de Pagamento</h3>
-        <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-border rounded-xl bg-secondary/20">
-          <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center mb-3">
-            <CreditCard className="h-6 w-6 text-muted-foreground" />
+        <motion.section
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="rounded-xl border border-border bg-card p-6 flex flex-col"
+          aria-labelledby="account-payment-heading"
+        >
+          <h3 id="account-payment-heading" className="mb-4 font-semibold text-foreground">Método de Pagamento</h3>
+          <div className="flex flex-1 flex-col items-center justify-center p-6 border-2 border-dashed border-border rounded-xl bg-secondary/20">
+            <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center mb-3">
+              <CreditCard className="h-6 w-6 text-muted-foreground" />
+            </div>
+            <p className="text-sm font-medium text-foreground mb-1 text-center">Nenhum cartão cadastrado</p>
+            <p className="text-xs text-muted-foreground mb-4 text-center">Adicione um método de pagamento para evitar interrupções.</p>
+            <Button variant="outline" className="gap-2 rounded-lg border-primary text-primary hover:bg-primary/5">
+              <Plus className="h-4 w-4" />
+              Adicionar Cartão
+            </Button>
           </div>
-          <p className="text-sm font-medium text-foreground mb-1">Nenhum cartão cadastrado</p>
-          <p className="text-xs text-muted-foreground mb-4 text-center">Adicione um método de pagamento para evitar interrupções após o trial.</p>
-          <Button variant="outline" className="gap-2 rounded-lg border-primary text-primary hover:bg-primary/5">
-            <Plus className="h-4 w-4" />
-            Adicionar Cartão
-          </Button>
-        </div>
-      </motion.section>
+        </motion.section>
+      </div>
     </div>
   );
 };
