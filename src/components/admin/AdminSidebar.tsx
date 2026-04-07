@@ -9,6 +9,8 @@ import {
   LogOut,
   FileText,
   MessageSquare,
+  Award,
+  Tags,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import logo from "@/assets/logo.png";
@@ -30,6 +32,8 @@ const menuItems = [
   { id: "lojas", title: "Gestão de Lojas", icon: Store },
   { id: "financeiro", title: "Financeiro", icon: DollarSign },
   { id: "usuarios", title: "Usuários", icon: Users },
+  { id: "marcas", title: "Gestão de Marcas", icon: Award },
+  { id: "categorias", title: "Gestão de Categorias", icon: Tags },
   { id: "esg", title: "Impacto Ambiental", icon: Leaf },
   { id: "blockchain", title: "Blockchain", icon: Link2 },
   { id: "auditoria", title: "Auditoria", icon: FileText },
