@@ -1,14 +1,28 @@
 export interface Cliente {
   id: number;
-  name: string;
+  name: string; // Nome *
+  sobrenome?: string;
   email: string;
-  phone: string;
+  phone: string; // Celular
+  origem?: string;
+  cpf?: string;
+  aniversarioDiaMes?: string;
+  aniversarioAno?: string;
+  pais?: string;
+  cep?: string;
+  logradouro?: string;
+  numero?: string;
+  complemento?: string;
+  bairro?: string;
+  cidade?: string;
+  uf?: string;
+
   totalPurchases: number;
   totalSpent: number;
   lastPurchase: string;
   since: string;
   status: "Ativo" | "Inativo";
-  birthDate?: string;
+  birthDate?: string; // Legacy
 }
 
 export interface PurchaseHistory {
