@@ -8,6 +8,8 @@ import AdminPlanosContent from "@/components/admin/AdminPlanosContent";
 import AdminLojasContent from "@/components/admin/AdminLojasContent";
 import AdminFinanceiroContent from "@/components/admin/AdminFinanceiroContent";
 import AdminUsuariosContent from "@/components/admin/AdminUsuariosContent";
+import AdminMarcasContent from "@/components/admin/AdminMarcasContent";
+import AdminCategoriasContent from "@/components/admin/AdminCategoriasContent";
 import AdminESGContent from "@/components/admin/AdminESGContent";
 import AdminBlockchainContent from "@/components/admin/AdminBlockchainContent";
 import AdminAuditContent from "@/components/admin/AdminAuditContent";
@@ -24,6 +26,8 @@ const sectionComponents: Record<string, React.FC> = {
   lojas: AdminLojasContent,
   financeiro: AdminFinanceiroContent,
   usuarios: AdminUsuariosContent,
+  marcas: AdminMarcasContent,
+  categorias: AdminCategoriasContent,
   esg: AdminESGContent,
   blockchain: AdminBlockchainContent,
   auditoria: AdminAuditContent,

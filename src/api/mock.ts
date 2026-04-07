@@ -12,11 +12,64 @@ import { mockProducts, mockPDVSales } from '../data/products';
 import { mockStore, storeProducts } from '../data/store';
 import { mockTickets, adminSuporteKpis, adminTicketsVolume, adminTicketsByCategory } from '../data/suporte';
 import { initialLinktrees } from '../data/linktree';
+import { initialMarcas, initialCategorias } from '../data/marcasCategorias';
 
 const mock = new MockAdapter(axios, { delayResponse: 500 });
 
 let subStocks = [...initialSubStocks];
 const linktrees = [...initialLinktrees];
+let marcasList = [...initialMarcas];
+let categoriasList = [...initialCategorias];
+
+// --- Marcas ---
+mock.onGet('/api/marcas').reply(() => [200, marcasList.filter(m => m.status === 'Ativo')]);
+mock.onGet('/api/admin/marcas').reply(() => [200, marcasList]);
+mock.onPost('/api/admin/marcas').reply((config) => {
+  const data = typeof config.data === 'string' ? JSON.parse(config.data) : config.data;
+  const newMarca = {
+    id: marcasList.length ? Math.max(...marcasList.map(m => m.id)) + 1 : 1,
+    nome: data.nome,
+    status: data.status || 'Ativo',
+  };
+  marcasList.push(newMarca);
+  return [201, newMarca];
+});
+mock.onPut(/\/api\/admin\/marcas\/\d+/).reply((config) => {
+  const id = parseInt(config.url!.split('/').pop()!);
+  const data = typeof config.data === 'string' ? JSON.parse(config.data) : config.data;
+  marcasList = marcasList.map(m => m.id === id ? { ...m, ...data } : m);
+  return [200, marcasList.find(m => m.id === id)];
+});
+mock.onDelete(/\/api\/admin\/marcas\/\d+/).reply((config) => {
+  const id = parseInt(config.url!.split('/').pop()!);
+  marcasList = marcasList.filter(m => m.id !== id);
+  return [200, { success: true }];
+});
+
+// --- Categorias ---
+mock.onGet('/api/categorias').reply(() => [200, categoriasList.filter(c => c.status === 'Ativo')]);
+mock.onGet('/api/admin/categorias').reply(() => [200, categoriasList]);
+mock.onPost('/api/admin/categorias').reply((config) => {
+  const data = typeof config.data === 'string' ? JSON.parse(config.data) : config.data;
+  const newCategoria = {
+    id: categoriasList.length ? Math.max(...categoriasList.map(c => c.id)) + 1 : 1,
+    nome: data.nome,
+    status: data.status || 'Ativo',
+  };
+  categoriasList.push(newCategoria);
+  return [201, newCategoria];
+});
+mock.onPut(/\/api\/admin\/categorias\/\d+/).reply((config) => {
+  const id = parseInt(config.url!.split('/').pop()!);
+  const data = typeof config.data === 'string' ? JSON.parse(config.data) : config.data;
+  categoriasList = categoriasList.map(c => c.id === id ? { ...c, ...data } : c);
+  return [200, categoriasList.find(c => c.id === id)];
+});
+mock.onDelete(/\/api\/admin\/categorias\/\d+/).reply((config) => {
+  const id = parseInt(config.url!.split('/').pop()!);
+  categoriasList = categoriasList.filter(c => c.id !== id);
+  return [200, { success: true }];
+});
 
 // Mock GET /api/subestoques
 mock.onGet('/api/subestoques').reply(() => {

@@ -40,6 +40,8 @@ export default function CadastrarProduto({ onBack, onSuccess, productId }: Cadas
   });
   const [loading, setLoading] = useState(false);
   const [images, setImages] = useState<File[]>([]);
+  const [categorias, setCategorias] = useState<{ id: number; nome: string }[]>([]);
+  const [marcas, setMarcas] = useState<{ id: number; nome: string }[]>([]);
 
   useEffect(() => {
     if (isEditing) {
@@ -66,6 +68,20 @@ export default function CadastrarProduto({ onBack, onSuccess, productId }: Cadas
         }
       }
     }
+
+    const fetchOptions = async () => {
+      try {
+        const [catsRes, marcasRes] = await Promise.all([
+          api.get('/api/categorias'),
+          api.get('/api/marcas'),
+        ]);
+        setCategorias(catsRes.data);
+        setMarcas(marcasRes.data);
+      } catch (error) {
+        console.error("Error fetching options:", error);
+      }
+    };
+    fetchOptions();
   }, [isEditing, productId]);
 
   useEffect(() => {
@@ -202,12 +218,26 @@ export default function CadastrarProduto({ onBack, onSuccess, productId }: Cadas
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="space-y-2">
-              <Label>Categoria ID</Label>
-              <Input type="number" value={formData.categoriaId ?? ''} onChange={e => setFormData({ ...formData, categoriaId: isNaN(parseInt(e.target.value)) ? undefined : parseInt(e.target.value) })} />
+              <Label>Categoria</Label>
+              <Select value={formData.categoriaId?.toString() || ''} onValueChange={(v) => setFormData({ ...formData, categoriaId: parseInt(v) })}>
+                <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                <SelectContent>
+                  {categorias.map(c => (
+                    <SelectItem key={c.id} value={c.id.toString()}>{c.nome}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
-              <Label>Marca ID</Label>
-              <Input type="number" value={formData.marcaId ?? ''} onChange={e => setFormData({ ...formData, marcaId: isNaN(parseInt(e.target.value)) ? undefined : parseInt(e.target.value) })} />
+              <Label>Marca</Label>
+              <Select value={formData.marcaId?.toString() || ''} onValueChange={(v) => setFormData({ ...formData, marcaId: parseInt(v) })}>
+                <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                <SelectContent>
+                  {marcas.map(m => (
+                    <SelectItem key={m.id} value={m.id.toString()}>{m.nome}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label>Condição / Estado</Label>
