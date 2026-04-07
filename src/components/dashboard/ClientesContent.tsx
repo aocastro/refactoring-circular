@@ -46,7 +46,24 @@ const ClientesContent = () => {
   const [inactivityFilter, setInactivityFilter] = useState("Todos");
   const [selectedCliente, setSelectedCliente] = useState<Cliente | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "", phone: "", cpf: "" });
+  const [form, setForm] = useState({
+    name: "",
+    sobrenome: "",
+    email: "",
+    phone: "",
+    origem: "",
+    cpf: "",
+    aniversarioDiaMes: "",
+    aniversarioAno: "",
+    pais: "Brasil",
+    cep: "",
+    logradouro: "",
+    numero: "",
+    complemento: "",
+    bairro: "",
+    cidade: "",
+    uf: "",
+  });
 
   const filtered = useMemo(() => {
     return clientes.filter((c) => {
@@ -104,8 +121,22 @@ const ClientesContent = () => {
     const newCliente: Cliente = {
       id: Date.now(),
       name: form.name,
+      sobrenome: form.sobrenome,
       email: form.email,
       phone: form.phone || "(00) 00000-0000",
+      origem: form.origem,
+      cpf: form.cpf,
+      aniversarioDiaMes: form.aniversarioDiaMes,
+      aniversarioAno: form.aniversarioAno,
+      pais: form.pais,
+      cep: form.cep,
+      logradouro: form.logradouro,
+      numero: form.numero,
+      complemento: form.complemento,
+      bairro: form.bairro,
+      cidade: form.cidade,
+      uf: form.uf,
+
       totalPurchases: 0,
       totalSpent: 0,
       lastPurchase: "-",
@@ -113,7 +144,24 @@ const ClientesContent = () => {
       status: "Ativo",
     };
     setClientes((prev) => [newCliente, ...prev]);
-    setForm({ name: "", email: "", phone: "", cpf: "" });
+    setForm({
+      name: "",
+      sobrenome: "",
+      email: "",
+      phone: "",
+      origem: "",
+      cpf: "",
+      aniversarioDiaMes: "",
+      aniversarioAno: "",
+      pais: "Brasil",
+      cep: "",
+      logradouro: "",
+      numero: "",
+      complemento: "",
+      bairro: "",
+      cidade: "",
+      uf: "",
+    });
     setShowAddDialog(false);
     toast.success(`Cliente ${form.name} cadastrado com sucesso!`);
   };
@@ -228,14 +276,103 @@ const ClientesContent = () => {
 
       {/* Add Cliente Dialog */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent className="max-w-md">
-          <DialogHeader><DialogTitle className="font-display">Novo Cliente</DialogTitle></DialogHeader>
-          <div className="space-y-4">
-            <div><Label>Nome *</Label><Input placeholder="Nome completo" value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} className="mt-1 bg-secondary border-border" /></div>
-            <div><Label>E-mail *</Label><Input type="email" placeholder="email@exemplo.com" value={form.email} onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))} className="mt-1 bg-secondary border-border" /></div>
-            <div><Label>Telefone</Label><Input placeholder="(11) 99999-9999" value={form.phone} onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))} className="mt-1 bg-secondary border-border" /></div>
-            <div><Label>CPF</Label><Input placeholder="000.000.000-00" value={form.cpf} onChange={(e) => setForm((p) => ({ ...p, cpf: e.target.value }))} className="mt-1 bg-secondary border-border" /></div>
-            <Button className="w-full bg-gradient-primary text-primary-foreground" onClick={handleAdd}>Cadastrar Cliente</Button>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-display text-xl">Novo Cliente</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-6 py-4">
+            {/* Dados Pessoais */}
+            <div>
+              <h3 className="text-lg font-semibold border-b pb-2 mb-4">Dados Pessoais</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label>Nome *</Label>
+                  <Input placeholder="Nome" value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} className="mt-1" />
+                </div>
+                <div>
+                  <Label>Sobrenome</Label>
+                  <Input placeholder="Sobrenome" value={form.sobrenome} onChange={(e) => setForm((p) => ({ ...p, sobrenome: e.target.value }))} className="mt-1" />
+                </div>
+                <div>
+                  <Label>CPF</Label>
+                  <Input placeholder="000.000.000-00" value={form.cpf} onChange={(e) => setForm((p) => ({ ...p, cpf: e.target.value }))} className="mt-1" />
+                </div>
+                <div className="flex gap-2">
+                  <div className="flex-1">
+                    <Label>Aniversário (Dia/Mês)</Label>
+                    <Input placeholder="DD/MM" value={form.aniversarioDiaMes} onChange={(e) => setForm((p) => ({ ...p, aniversarioDiaMes: e.target.value }))} className="mt-1" />
+                  </div>
+                  <div className="w-1/3">
+                    <Label>Ano (Opcional)</Label>
+                    <Input placeholder="AAAA" value={form.aniversarioAno} onChange={(e) => setForm((p) => ({ ...p, aniversarioAno: e.target.value }))} className="mt-1" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Contato & Origem */}
+            <div>
+              <h3 className="text-lg font-semibold border-b pb-2 mb-4">Contato & Origem</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label>E-mail *</Label>
+                  <Input type="email" placeholder="email@exemplo.com" value={form.email} onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))} className="mt-1" />
+                </div>
+                <div>
+                  <Label>Celular (Brasil +55)</Label>
+                  <Input placeholder="+55 (11) 99999-9999" value={form.phone} onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))} className="mt-1" />
+                </div>
+                <div className="md:col-span-2">
+                  <Label>Origem</Label>
+                  <Input placeholder="Ex: Feira, Loja, Evento X..." value={form.origem} onChange={(e) => setForm((p) => ({ ...p, origem: e.target.value }))} className="mt-1" />
+                </div>
+              </div>
+            </div>
+
+            {/* Endereço */}
+            <div>
+              <h3 className="text-lg font-semibold border-b pb-2 mb-4">Endereço</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <Label>País</Label>
+                  <Input placeholder="Brasil" value={form.pais} onChange={(e) => setForm((p) => ({ ...p, pais: e.target.value }))} className="mt-1" />
+                </div>
+                <div>
+                  <Label>CEP</Label>
+                  <Input placeholder="00000-000" value={form.cep} onChange={(e) => setForm((p) => ({ ...p, cep: e.target.value }))} className="mt-1" />
+                </div>
+                <div>
+                  <Label>UF</Label>
+                  <Input placeholder="SP" value={form.uf} onChange={(e) => setForm((p) => ({ ...p, uf: e.target.value }))} className="mt-1" />
+                </div>
+                <div className="md:col-span-2">
+                  <Label>Logradouro</Label>
+                  <Input placeholder="Rua, Avenida..." value={form.logradouro} onChange={(e) => setForm((p) => ({ ...p, logradouro: e.target.value }))} className="mt-1" />
+                </div>
+                <div>
+                  <Label>Número</Label>
+                  <Input placeholder="123" value={form.numero} onChange={(e) => setForm((p) => ({ ...p, numero: e.target.value }))} className="mt-1" />
+                </div>
+                <div>
+                  <Label>Complemento</Label>
+                  <Input placeholder="Apto, Sala..." value={form.complemento} onChange={(e) => setForm((p) => ({ ...p, complemento: e.target.value }))} className="mt-1" />
+                </div>
+                <div>
+                  <Label>Bairro</Label>
+                  <Input placeholder="Bairro" value={form.bairro} onChange={(e) => setForm((p) => ({ ...p, bairro: e.target.value }))} className="mt-1" />
+                </div>
+                <div>
+                  <Label>Cidade</Label>
+                  <Input placeholder="Cidade" value={form.cidade} onChange={(e) => setForm((p) => ({ ...p, cidade: e.target.value }))} className="mt-1" />
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-4 flex justify-end gap-3">
+              <Button variant="outline" onClick={() => setShowAddDialog(false)}>Cancelar</Button>
+              <Button className="bg-gradient-primary text-primary-foreground" onClick={handleAdd}>Cadastrar Cliente</Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
