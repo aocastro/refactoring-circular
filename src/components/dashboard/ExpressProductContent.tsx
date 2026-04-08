@@ -1,16 +1,8 @@
 import { useState } from "react";
-import { Copy, PlusCircle, Check, Info } from "lucide-react";
+import { Copy, PlusCircle, Check, Info, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
@@ -22,13 +14,12 @@ import {
 import { toast } from "sonner";
 import api from "@/api/axios";
 
-interface ExpressProductModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+interface ExpressProductContentProps {
+  onBack: () => void;
   onSuccess?: () => void;
 }
 
-export function ExpressProductModal({ open, onOpenChange, onSuccess }: ExpressProductModalProps) {
+export default function ExpressProductContent({ onBack, onSuccess }: ExpressProductContentProps) {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
   const [stockType, setStockType] = useState<"identical" | "unique">("identical");
@@ -145,28 +136,33 @@ export function ExpressProductModal({ open, onOpenChange, onSuccess }: ExpressPr
   };
 
   return (
-    <Dialog open={open} onOpenChange={(val) => {
-      onOpenChange(val);
-      if (!val) resetForm();
-    }}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Cadastro de Produto Express</DialogTitle>
-          <DialogDescription>
+    <div className="space-y-6 max-w-4xl mx-auto">
+      <div className="flex items-center gap-4">
+        <Button variant="ghost" size="icon" onClick={onBack}>
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        <div>
+          <h2 className="text-2xl font-bold font-display text-foreground">Cadastro de Produto Express</h2>
+          <p className="text-muted-foreground text-sm mt-1">
             Ideal para quando você chegou com muitas peças e quer registrar tudo rápido.
             Você informa o básico agora e pode completar os detalhes depois, com calma.
-            <br/><br/>
-            💡 Isso evita esquecer peças, perder controle de estoque ou adiar o cadastro.
-          </DialogDescription>
-        </DialogHeader>
+          </p>
+        </div>
+      </div>
 
+      <div className="bg-primary/5 p-4 rounded-lg border border-primary/20 text-sm flex items-start gap-3">
+        <span className="text-lg">💡</span>
+        <p>Isso evita esquecer peças, perder controle de estoque ou adiar o cadastro.</p>
+      </div>
+
+      <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
         {step === 1 && (
-          <form onSubmit={handleNextStep} className="space-y-6 pt-4">
+          <form onSubmit={handleNextStep} className="space-y-6">
             <h3 className="text-lg font-semibold border-b pb-2">Informações mínimas do produto</h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label htmlFor="loja">Loja: *</Label>
+                <Label htmlFor="loja">Loja: <span className="text-destructive">*</span></Label>
                 <Select value={formData.loja} onValueChange={(val) => setFormData({ ...formData, loja: val })}>
                   <SelectTrigger id="loja">
                     <SelectValue placeholder="Selecione uma loja" />
@@ -179,7 +175,7 @@ export function ExpressProductModal({ open, onOpenChange, onSuccess }: ExpressPr
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="nome">Nome do Produto: *</Label>
+                <Label htmlFor="nome">Nome do Produto: <span className="text-destructive">*</span></Label>
                 <Input
                   id="nome"
                   placeholder="Ex: Vestido Floral"
@@ -189,26 +185,21 @@ export function ExpressProductModal({ open, onOpenChange, onSuccess }: ExpressPr
               </div>
 
               <div className="space-y-2">
-                <Label>O produto é consignado? *</Label>
-                <RadioGroup
-                  value={formData.consignado}
-                  onValueChange={(val) => setFormData({ ...formData, consignado: val })}
-                  className="flex space-x-4 mt-2"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="sim" id="consig-sim" />
-                    <Label htmlFor="consig-sim">Sim</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="não" id="consig-nao" />
-                    <Label htmlFor="consig-nao">Não</Label>
-                  </div>
-                </RadioGroup>
+                <Label>O produto é consignado? <span className="text-destructive">*</span></Label>
+                <Select value={formData.consignado} onValueChange={(val) => setFormData({ ...formData, consignado: val })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="sim">Sim</SelectItem>
+                    <SelectItem value="não">Não</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="tipo" className="flex items-center">
-                  Tipo do produto: * <Info className="ml-1 h-4 w-4 text-muted-foreground" />
+                  Tipo do produto: <span className="text-destructive mx-1">*</span> <Info className="h-4 w-4 text-muted-foreground" />
                 </Label>
                 <Select value={formData.tipo} onValueChange={(val) => setFormData({ ...formData, tipo: val })}>
                   <SelectTrigger id="tipo">
@@ -245,7 +236,7 @@ export function ExpressProductModal({ open, onOpenChange, onSuccess }: ExpressPr
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="categoria">Categoria: *</Label>
+                <Label htmlFor="categoria">Categoria: <span className="text-destructive">*</span></Label>
                 <Select value={formData.categoria} onValueChange={(val) => setFormData({ ...formData, categoria: val })}>
                   <SelectTrigger id="categoria">
                     <SelectValue placeholder="Selecione uma categoria" />
@@ -260,7 +251,7 @@ export function ExpressProductModal({ open, onOpenChange, onSuccess }: ExpressPr
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="subcategoria">Subcategoria: *</Label>
+                <Label htmlFor="subcategoria">Subcategoria: <span className="text-destructive">*</span></Label>
                 <Select value={formData.subcategoria} onValueChange={(val) => setFormData({ ...formData, subcategoria: val })}>
                   <SelectTrigger id="subcategoria">
                     <SelectValue placeholder="Selecione uma subcategoria" />
@@ -276,7 +267,7 @@ export function ExpressProductModal({ open, onOpenChange, onSuccess }: ExpressPr
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="preco">Preço de venda (R$): *</Label>
+                <Label htmlFor="preco">Preço de venda (R$): <span className="text-destructive">*</span></Label>
                 <Input
                   id="preco"
                   placeholder="Ex: 150,00"
@@ -287,7 +278,7 @@ export function ExpressProductModal({ open, onOpenChange, onSuccess }: ExpressPr
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="quantidade">Quantidade total de peças: *</Label>
+                <Label htmlFor="quantidade">Quantidade total de peças: <span className="text-destructive">*</span></Label>
                 <Input
                   id="quantidade"
                   type="number"
@@ -299,82 +290,113 @@ export function ExpressProductModal({ open, onOpenChange, onSuccess }: ExpressPr
               </div>
             </div>
 
-            <Button
-              type="submit"
-              className="w-full bg-gradient-primary text-primary-foreground"
-            >
-              Continuar
-            </Button>
+            <div className="flex justify-between pt-4 border-t border-border mt-6">
+              <Button type="button" variant="outline" onClick={onBack}>
+                Voltar
+              </Button>
+              <Button type="submit" className="bg-[#8b5cf6] hover:bg-[#7c3aed] text-white">
+                Cadastrar
+              </Button>
+            </div>
           </form>
         )}
 
         {step === 2 && (
-          <form onSubmit={handleSubmit} className="space-y-6 pt-4">
-            <h3 className="text-lg font-semibold border-b pb-2">Como você quer organizar esse estoque?</h3>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <h3 className="text-lg font-semibold border-b pb-2">Como você quer organizar essas peças no sistema?</h3>
             <p className="text-sm text-muted-foreground">
-              Você informou que tem {formData.quantidade} peças de "{formData.nome}".
+              Essa escolha define como o estoque vai funcionar depois. Leia com calma — o sistema te ajuda a decidir.
             </p>
 
-            <RadioGroup value={stockType} onValueChange={(val: "identical" | "unique") => setStockType(val)}>
-              <div className="flex flex-col space-y-4">
-                <div className={`border p-4 rounded-lg cursor-pointer ${stockType === 'identical' ? 'border-primary bg-primary/5' : ''}`} onClick={() => setStockType('identical')}>
-                  <div className="flex items-start space-x-3">
-                    <RadioGroupItem value="identical" id="stock-identical" className="mt-1" />
-                    <div>
-                      <Label htmlFor="stock-identical" className="font-semibold text-base cursor-pointer">Tudo o mesmo produto</Label>
-                      <p className="text-sm text-muted-foreground mt-1">Cria 1 único produto no catálogo com estoque de {formData.quantidade}. Use isso para peças exatamente iguais (mesmo tamanho, cor, etc).</p>
-                    </div>
-                  </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div
+                className={`border rounded-lg p-6 cursor-pointer transition-all ${stockType === 'identical' ? 'border-[#8b5cf6] ring-1 ring-[#8b5cf6] bg-secondary/30' : 'hover:border-[#8b5cf6]/50'}`}
+                onClick={() => setStockType('identical')}
+              >
+                <div className="flex items-start mb-4">
+                  <div className="text-xl mr-2">📦</div>
+                  <h4 className="font-semibold text-base leading-tight">Tratar todas as peças como iguais<br/>(código de barras único)</h4>
                 </div>
-
-                <div className={`border p-4 rounded-lg cursor-pointer ${stockType === 'unique' ? 'border-primary bg-primary/5' : ''}`} onClick={() => setStockType('unique')}>
-                  <div className="flex items-start space-x-3">
-                    <RadioGroupItem value="unique" id="stock-unique" className="mt-1" />
-                    <div>
-                      <Label htmlFor="stock-unique" className="font-semibold text-base cursor-pointer">Peças únicas / Diferentes</Label>
-                      <p className="text-sm text-muted-foreground mt-1">Cria {formData.quantidade} produtos separados no catálogo. Use isso se cada peça for única e precisar de fotos/detalhes diferentes depois.</p>
-                    </div>
-                  </div>
-                </div>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Todas as peças ficam em um único cadastro, com as mesmas informações e o mesmo código de barras.
+                </p>
+                <ul className="text-sm space-y-1 list-disc pl-5 mb-4 text-foreground">
+                  <li>Peças realmente iguais</li>
+                  <li>Não precisam de diferenciação</li>
+                  <li>Mesmo preço e etiqueta</li>
+                </ul>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Exemplo: "Camiseta básica preta" — estoque com {formData.quantidade} unidades
+                </p>
+                <p className="text-sm text-destructive flex items-center">
+                  <span className="mr-1">⚠️</span> Depois de salvar, não será possível diferenciar essas peças.
+                </p>
               </div>
-            </RadioGroup>
 
-            <div className="flex gap-2">
-              <Button type="button" variant="outline" className="flex-1" onClick={() => setStep(1)}>
+              <div
+                className={`border rounded-lg p-6 cursor-pointer transition-all ${stockType === 'unique' ? 'border-[#8b5cf6] ring-1 ring-[#8b5cf6] bg-secondary/30' : 'hover:border-[#8b5cf6]/50'}`}
+                onClick={() => setStockType('unique')}
+              >
+                <div className="flex items-start mb-4">
+                  <div className="text-xl mr-2">🧩</div>
+                  <h4 className="font-semibold text-base leading-tight">Tratar cada peça como única (códigos de barra individuais)</h4>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Cada peça vira um cadastro separado, com informações próprias e código de barras diferente.
+                </p>
+                <ul className="text-sm space-y-1 list-disc pl-5 mb-4 text-foreground">
+                  <li>Brechó, desapego ou moda autoral</li>
+                  <li>Peças parecidas, mas não iguais</li>
+                  <li>Editar depois com calma</li>
+                </ul>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Exemplo: {formData.quantidade} cadastros, cada um com 1 peça
+                </p>
+                <p className="text-sm text-emerald-600 flex items-center">
+                  Você pode completar os detalhes depois, uma peça por vez.
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-primary/5 p-4 rounded-lg border border-primary/20 text-sm mt-6">
+              <p className="font-medium flex items-center mb-1"><span className="mr-2">💡</span> Em dúvida?</p>
+              <p>Se você trabalha com brechó, desapego ou peça única, na maioria dos casos a melhor escolha é criar um cadastro para cada peça. Isso evita erro estrutural no futuro.</p>
+            </div>
+
+            <div className="flex justify-between pt-4 border-t border-border mt-6">
+              <Button type="button" variant="outline" onClick={() => setStep(1)}>
                 Voltar
               </Button>
-              <Button type="submit" className="flex-1 bg-gradient-primary text-primary-foreground" disabled={loading}>
-                {loading ? "Salvando..." : "Salvar Produto"}
+              <Button type="submit" className="bg-[#8b5cf6] hover:bg-[#7c3aed] text-white" disabled={loading}>
+                {loading ? "Salvando..." : "Avançar"}
               </Button>
             </div>
           </form>
         )}
 
         {step === 3 && (
-          <div className="space-y-4 pt-4">
-            <div className="p-4 bg-muted/50 rounded-lg text-center space-y-2">
-              <div className="flex justify-center mb-2">
-                <div className="h-12 w-12 bg-green-500/20 rounded-full flex items-center justify-center">
-                  <Check className="h-6 w-6 text-green-500" />
-                </div>
+          <div className="space-y-6 pt-4 text-center max-w-md mx-auto">
+            <div className="flex justify-center mb-4">
+              <div className="h-16 w-16 bg-green-500/20 rounded-full flex items-center justify-center">
+                <Check className="h-8 w-8 text-green-500" />
               </div>
-              <h3 className="font-medium">Pronto! Produto cadastrado.</h3>
-              <p className="text-sm text-muted-foreground">
-                O produto já está no seu catálogo. Você pode enriquecer o cadastro dele depois.
-              </p>
             </div>
+            <h3 className="text-2xl font-semibold">Pronto! Produto cadastrado.</h3>
+            <p className="text-muted-foreground">
+              O produto já está no seu catálogo. Você pode enriquecer o cadastro dele depois.
+            </p>
 
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 mt-6 text-left">
               <Label>Link de venda gerado:</Label>
               <div className="flex gap-2">
-                <Input value={generatedLink} readOnly />
-                <Button size="icon" variant="outline" onClick={copyToClipboard}>
-                  {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                <Input value={generatedLink} readOnly className="bg-secondary/50" />
+                <Button size="icon" variant="outline" onClick={copyToClipboard} className="shrink-0">
+                  {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
                 </Button>
               </div>
             </div>
 
-            <div className="flex flex-col gap-2 mt-4">
+            <div className="flex flex-col gap-3 mt-8">
               <Button
                 type="button"
                 variant="outline"
@@ -386,15 +408,15 @@ export function ExpressProductModal({ open, onOpenChange, onSuccess }: ExpressPr
               </Button>
               <Button
                 type="button"
-                className="w-full"
-                onClick={() => onOpenChange(false)}
+                className="w-full bg-[#8b5cf6] hover:bg-[#7c3aed] text-white"
+                onClick={onBack}
               >
                 Ir para Catálogo
               </Button>
             </div>
           </div>
         )}
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 }

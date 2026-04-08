@@ -19,7 +19,6 @@ import { getStatusColor } from "@/lib/status-colors";
 import type { KpiItem } from "@/types";
 import { ImportFileModal } from "./modals/ImportFileModal";
 import { PhotoUploadModal } from "./modals/PhotoUploadModal";
-import { ExpressProductModal } from "./modals/ExpressProductModal";
 
 interface VendaContentProps {
   onSectionChange?: (section: string) => void;
@@ -35,7 +34,6 @@ const VendaContent = ({ onSectionChange, onEditProduct }: VendaContentProps) => 
   const [mockPDVSales, setMockPDVSales] = useState<any>([]);
 
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
-  const [isExpressModalOpen, setIsExpressModalOpen] = useState(false);
   const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
 
   const fetchData = async () => {
@@ -152,7 +150,7 @@ const VendaContent = ({ onSectionChange, onEditProduct }: VendaContentProps) => 
                     <FileSpreadsheet className="mr-2 h-4 w-4" />
                     <span>Importar Arquivo (CSV/Excel)</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer" onClick={() => setIsExpressModalOpen(true)}>
+                  <DropdownMenuItem className="cursor-pointer" onClick={() => onSectionChange?.("venda-produtos-express")}>
                     <PackagePlus className="mr-2 h-4 w-4" />
                     <span>Cadastro Express</span>
                   </DropdownMenuItem>
@@ -300,11 +298,6 @@ const VendaContent = ({ onSectionChange, onEditProduct }: VendaContentProps) => 
           </div>
         </TabsContent>
       </Tabs>
-      <ExpressProductModal
-        open={isExpressModalOpen}
-        onOpenChange={setIsExpressModalOpen}
-        onSuccess={fetchData}
-      />
       <ImportFileModal
         open={isImportModalOpen}
         onOpenChange={setIsImportModalOpen}
