@@ -24,7 +24,6 @@ import { getStatusColor } from "@/lib/status-colors";
 import type { Product } from "@/types";
 import { PhotoUploadModal } from "./modals/PhotoUploadModal";
 import { ImportFileModal } from "./modals/ImportFileModal";
-import { ExpressProductModal } from "./modals/ExpressProductModal";
 
 interface CatalogoContentProps {
   onSectionChange?: (section: string) => void;
@@ -185,7 +184,6 @@ const CatalogoContent = ({ onSectionChange, onEditProduct }: CatalogoContentProp
 
   const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
-  const [isExpressModalOpen, setIsExpressModalOpen] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -279,7 +277,7 @@ const CatalogoContent = ({ onSectionChange, onEditProduct }: CatalogoContentProp
               <FileSpreadsheet className="mr-2 h-4 w-4" />
               <span>Importar Arquivo (CSV/Excel)</span>
             </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer" onClick={() => setIsExpressModalOpen(true)}>
+            <DropdownMenuItem className="cursor-pointer" onClick={() => onSectionChange?.("venda-produtos-express")}>
               <PackagePlus className="mr-2 h-4 w-4" />
               <span>Cadastro Express</span>
             </DropdownMenuItem>
@@ -377,11 +375,6 @@ const CatalogoContent = ({ onSectionChange, onEditProduct }: CatalogoContentProp
       )}
 
       {/* Modals */}
-      <ExpressProductModal
-        open={isExpressModalOpen}
-        onOpenChange={setIsExpressModalOpen}
-        onSuccess={fetchData}
-      />
       <ImportFileModal
         open={isImportModalOpen}
         onOpenChange={setIsImportModalOpen}
