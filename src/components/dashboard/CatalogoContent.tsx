@@ -1,7 +1,7 @@
 import api from "@/api/axios";
 import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Search, SlidersHorizontal, X, ShoppingBag, Plus, Eye, Edit, Trash2, Tag, Ruler, Star, ShoppingCart, MessageCircle, ArrowLeft, PackagePlus, FileSpreadsheet, Camera } from "lucide-react";
+import { Search, SlidersHorizontal, X, ShoppingBag, Plus, Eye, Edit, Trash2, Tag, Ruler, Star, ShoppingCart, MessageCircle, ArrowLeft, PackagePlus, FileSpreadsheet, Camera, Settings2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,7 +11,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
+import DataTable from "@/components/shared/DataTable";
+import PaginationControls from "@/components/shared/PaginationControls";
+import { usePagination } from "@/hooks/use-pagination";
 import {
   Select,
   SelectContent,
@@ -32,49 +36,6 @@ interface CatalogoContentProps {
 }
 
 const conditions = ["Todos", "Novo", "Excelente", "Bom", "Regular"];
-
-const ProductCard = ({ product, index, onSelect, onEdit }: { product: Product; index: number; onSelect: (p: Product) => void; onEdit?: (id: string | number) => void }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 16 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.3, delay: index * 0.04 }}
-  >
-    <button
-      onClick={() => onSelect(product)}
-      className="group block w-full text-left rounded-xl border border-border bg-card overflow-hidden hover:shadow-elevated transition-all duration-300"
-    >
-      <div className="aspect-square bg-secondary/50 flex items-center justify-center text-5xl group-hover:scale-105 transition-transform duration-300">
-        {product.image}
-      </div>
-      <div className="p-4 space-y-2">
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="text-sm font-semibold text-foreground leading-tight group-hover:text-primary transition-colors line-clamp-2">
-            {product.name}
-          </h3>
-          <span className={`shrink-0 text-[10px] px-2 py-0.5 rounded-full ${getStatusColor(product.status)}`}>
-            {product.status}
-          </span>
-        </div>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <span>{product.category}</span>
-          <span>•</span>
-          <span>{product.condition}</span>
-          <span>•</span>
-          <span>Tam. {product.size}</span>
-        </div>
-        <p className="text-lg font-bold font-display text-foreground">
-          R$ {product.price.toFixed(2).replace(".", ",")}
-        </p>
-      </div>
-      {/* Remove previous logic or add specific edit button below if we want */}
-    </button>
-    <div className="mt-2 flex gap-2">
-      <Button size="sm" variant="outline" className="flex-1 text-xs" onClick={() => onEdit?.(product.id)}>
-        <Edit className="h-3 w-3 mr-1" /> Editar
-      </Button>
-    </div>
-  </motion.div>
-);
 
 const ProductDetail = ({ product, onBack, mockProducts, onEdit }: { product: Product; onBack: () => void; mockProducts: Product[]; onEdit?: (id: string | number) => void }) => {
   const related = mockProducts
@@ -212,6 +173,25 @@ const CatalogoContent = ({ onSectionChange, onEditProduct }: CatalogoContentProp
   const [showFilters, setShowFilters] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
+  const ALL_COLUMNS = [
+    { id: "image", label: "Imagem" },
+    { id: "name", label: "Nome" },
+    { id: "sku", label: "SKU" },
+    { id: "category", label: "Categoria" },
+    { id: "condition", label: "Condição" },
+    { id: "size", label: "Tamanho" },
+    { id: "price", label: "Preço" },
+    { id: "status", label: "Status" },
+    { id: "actions", label: "Ações" },
+  ];
+
+  const [visibleColumns, setVisibleColumns] = useState<string[]>(
+    ALL_COLUMNS.map((col) => col.id)
+  );
+
+  const [page, setPage] = useState(1);
+  const perPage = 10;
+
   const sizes: string[] = useMemo(() => {
     return ["Todos", ...Array.from(new Set(mockProducts.map((p: Product) => String(p.size))))];
   }, [mockProducts]);
@@ -241,6 +221,8 @@ const CatalogoContent = ({ onSectionChange, onEditProduct }: CatalogoContentProp
     setPriceRange("Todos");
     setSearch("");
   };
+
+  const { paginatedItems, totalPages, safePage, totalItems } = usePagination(filtered, perPage, page);
 
   if (selectedProduct) {
     return <ProductDetail product={selectedProduct} onBack={() => setSelectedProduct(null)} mockProducts={mockProducts} onEdit={onEditProduct} />;
@@ -315,6 +297,32 @@ const CatalogoContent = ({ onSectionChange, onEditProduct }: CatalogoContentProp
             </span>
           )}
         </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="border-border shrink-0">
+              <Settings2 className="h-4 w-4 mr-2" />
+              Colunas
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuLabel>Alternar Colunas</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {ALL_COLUMNS.map((col) => (
+              <DropdownMenuCheckboxItem
+                key={col.id}
+                className="capitalize"
+                checked={visibleColumns.includes(col.id)}
+                onCheckedChange={(checked) => {
+                  setVisibleColumns((prev) =>
+                    checked ? [...prev, col.id] : prev.filter((id) => id !== col.id)
+                  );
+                }}
+              >
+                {col.label}
+              </DropdownMenuCheckboxItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {showFilters && (
@@ -356,25 +364,68 @@ const CatalogoContent = ({ onSectionChange, onEditProduct }: CatalogoContentProp
         </motion.div>
       )}
 
-      <p className="text-sm text-muted-foreground">
-        {filtered.length} {filtered.length === 1 ? "produto" : "produtos"}
-      </p>
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-muted-foreground">
+          {filtered.length} {filtered.length === 1 ? "produto" : "produtos"}
+        </p>
+      </div>
 
-      {filtered.length === 0 ? (
-        <div className="text-center py-16">
-          <ShoppingBag className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-          <p className="text-muted-foreground text-sm">Nenhum produto encontrado.</p>
-          <Button variant="outline" size="sm" className="mt-3" onClick={clearFilters}>
-            Limpar filtros
-          </Button>
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          {filtered.map((product, i) => (
-            <ProductCard key={product.id} product={product} index={i} onSelect={setSelectedProduct} onEdit={onEditProduct} />
-          ))}
-        </div>
-      )}
+      <DataTable
+        columns={ALL_COLUMNS.filter((col) => visibleColumns.includes(col.id)).map(col => ({ key: col.id, label: col.label, align: col.id === "price" || col.id === "actions" ? "right" : "left" }))}
+        data={paginatedItems}
+        emptyMessage="Nenhum produto encontrado."
+        renderRow={(product: Product) => (
+          <tr key={product.id} className="border-b border-border/50 hover:bg-secondary/20 transition-colors group cursor-pointer" onClick={() => setSelectedProduct(product)}>
+            {visibleColumns.includes("image") && (
+              <td className="px-4 py-3">
+                <div className="w-10 h-10 rounded-md bg-secondary flex items-center justify-center text-xl">
+                  {product.image}
+                </div>
+              </td>
+            )}
+            {visibleColumns.includes("name") && (
+              <td className="px-4 py-3 text-sm font-medium text-foreground">{product.name}</td>
+            )}
+            {visibleColumns.includes("sku") && (
+              <td className="px-4 py-3 text-sm text-muted-foreground">{product.sku}</td>
+            )}
+            {visibleColumns.includes("category") && (
+              <td className="px-4 py-3 text-sm text-muted-foreground">{product.category}</td>
+            )}
+            {visibleColumns.includes("condition") && (
+              <td className="px-4 py-3 text-sm text-muted-foreground">{product.condition}</td>
+            )}
+            {visibleColumns.includes("size") && (
+              <td className="px-4 py-3 text-sm text-muted-foreground">{product.size}</td>
+            )}
+            {visibleColumns.includes("price") && (
+              <td className="px-4 py-3 text-sm font-bold text-right">R$ {product.price.toFixed(2).replace(".", ",")}</td>
+            )}
+            {visibleColumns.includes("status") && (
+              <td className="px-4 py-3">
+                <span className={`inline-block text-[10px] px-2 py-0.5 rounded-full ${getStatusColor(product.status)}`}>
+                  {product.status}
+                </span>
+              </td>
+            )}
+            {visibleColumns.includes("actions") && (
+              <td className="px-4 py-3 text-right">
+                <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); onEditProduct?.(product.id); }}>
+                  <Edit className="h-4 w-4" />
+                </Button>
+              </td>
+            )}
+          </tr>
+        )}
+      />
+
+      <PaginationControls
+        currentPage={safePage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        itemsPerPage={perPage}
+        onPageChange={setPage}
+      />
 
       {/* Modals */}
       <ExpressProductModal
