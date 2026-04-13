@@ -6,6 +6,8 @@ import { Plus, Edit, Trash2 } from "lucide-react";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, PieChart, Pie, Cell } from "recharts";
 import DataTable from "@/components/shared/DataTable";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -143,6 +145,18 @@ const FinanceiroContent = ({ defaultTab = "visao-geral", onSectionChange }: Fina
   }, [contasPagar, searchQuery, statusFilter, monthFilter, sortKey, sortDirection]);
 
   const { paginatedItems, totalPages, safePage } = usePagination(filteredContas, itemsPerPage, currentPage);
+  const [selectedMonth, setSelectedMonth] = useState("Maio 2026");
+  const [saldoInicialInput, setSaldoInicialInput] = useState("10000.00");
+  const saldoInicial = parseFloat(saldoInicialInput) || 0;
+
+  // Mocked calculations based on current month selection
+  const aPagarPrevisao = 4500.00;
+  const aReceberPrevisao = 8200.00;
+  const jaPagoRealizado = 3200.00;
+  const jaRecebidoRealizado = 5400.00;
+
+  const saldoPrevisto = saldoInicial + aReceberPrevisao + jaRecebidoRealizado - aPagarPrevisao - jaPagoRealizado;
+  const saldoReal = saldoInicial + jaRecebidoRealizado - jaPagoRealizado;
 
   return (
     <div className="space-y-6">
@@ -150,6 +164,33 @@ const FinanceiroContent = ({ defaultTab = "visao-geral", onSectionChange }: Fina
         <h2 className="font-display text-2xl font-bold text-foreground sr-only">Financeiro</h2>
         <p className="text-sm text-muted-foreground">Gerencie suas contas a pagar, a receber e categorias.</p>
       </header>
+
+      <div className="flex flex-col sm:flex-row gap-4 items-end bg-card p-4 rounded-xl border border-border shadow-sm mb-6">
+        <div className="w-full sm:w-64 space-y-1.5">
+          <label className="text-sm font-medium text-muted-foreground">Mês de Referência</label>
+          <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+            <SelectTrigger>
+              <SelectValue placeholder="Selecione o mês" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Março 2026">Março 2026</SelectItem>
+              <SelectItem value="Abril 2026">Abril 2026</SelectItem>
+              <SelectItem value="Maio 2026">Maio 2026</SelectItem>
+              <SelectItem value="Junho 2026">Junho 2026</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="w-full sm:w-64 space-y-1.5">
+          <label className="text-sm font-medium text-muted-foreground">Saldo Inicial (R$)</label>
+          <Input
+            type="number"
+            value={saldoInicialInput}
+            onChange={(e) => setSaldoInicialInput(e.target.value)}
+            placeholder="0.00"
+            className="font-mono"
+          />
+        </div>
+      </div>
 
       <Tabs value={defaultTab} onValueChange={(value) => {
         if (onSectionChange) {
@@ -180,11 +221,11 @@ const FinanceiroContent = ({ defaultTab = "visao-geral", onSectionChange }: Fina
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="rounded-xl border border-border bg-card p-6 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Saldo Atual</p>
-                  <p className="text-2xl font-display font-bold text-foreground mt-1">R$ 15.450,00</p>
+                  <p className="text-sm font-medium text-muted-foreground">A PAGAR (PREVISÃO)</p>
+                  <p className="text-2xl font-display font-bold text-destructive mt-1">R$ {aPagarPrevisao.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</p>
                 </div>
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <Wallet className="h-6 w-6" />
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+                  <TrendingDown className="h-6 w-6" />
                 </div>
               </div>
             </motion.div>
@@ -192,8 +233,8 @@ const FinanceiroContent = ({ defaultTab = "visao-geral", onSectionChange }: Fina
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="rounded-xl border border-border bg-card p-6 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Receitas do Mês</p>
-                  <p className="text-2xl font-display font-bold text-success mt-1">R$ 28.300,00</p>
+                  <p className="text-sm font-medium text-muted-foreground">A RECEBER (PREVISÃO)</p>
+                  <p className="text-2xl font-display font-bold text-success mt-1">R$ {aReceberPrevisao.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</p>
                 </div>
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-success/10 text-success">
                   <TrendingUp className="h-6 w-6" />
@@ -204,11 +245,47 @@ const FinanceiroContent = ({ defaultTab = "visao-geral", onSectionChange }: Fina
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="rounded-xl border border-border bg-card p-6 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Despesas do Mês</p>
-                  <p className="text-2xl font-display font-bold text-destructive mt-1">R$ 12.850,00</p>
+                  <p className="text-sm font-medium text-muted-foreground">JÁ PAGO (REALIZADO)</p>
+                  <p className="text-2xl font-display font-bold text-destructive mt-1">R$ {jaPagoRealizado.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</p>
                 </div>
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 text-destructive">
-                  <TrendingDown className="h-6 w-6" />
+                  <ArrowDownCircle className="h-6 w-6" />
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="rounded-xl border border-border bg-card p-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">JÁ RECEBIDO (REALIZADO)</p>
+                  <p className="text-2xl font-display font-bold text-success mt-1">R$ {jaRecebidoRealizado.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</p>
+                </div>
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-success/10 text-success">
+                  <ArrowUpCircle className="h-6 w-6" />
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="rounded-xl border border-border bg-card p-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">SALDO PREVISTO</p>
+                  <p className="text-2xl font-display font-bold text-foreground mt-1">R$ {saldoPrevisto.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</p>
+                </div>
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <DollarSign className="h-6 w-6" />
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="rounded-xl border border-border bg-primary text-primary-foreground p-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-primary-foreground/80">SALDO REAL</p>
+                  <p className="text-2xl font-display font-bold mt-1">R$ {saldoReal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</p>
+                </div>
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-foreground/20">
+                  <Wallet className="h-6 w-6" />
                 </div>
               </div>
             </motion.div>
@@ -216,24 +293,20 @@ const FinanceiroContent = ({ defaultTab = "visao-geral", onSectionChange }: Fina
 
           <div className="grid gap-4 lg:grid-cols-2">
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="rounded-xl border border-border bg-card p-6 shadow-sm">
-              <h3 className="text-base font-semibold text-foreground mb-4">Fluxo de Caixa (Últimos 6 meses)</h3>
+              <h3 className="text-base font-semibold text-foreground mb-4">Previsão vs Realizado (Mês Atual)</h3>
               <div className="h-[300px] w-full min-w-0 overflow-x-auto">
                 <div className="min-w-[400px] h-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={[
-                      { mes: "Jan", receitas: 22000, despesas: 15000 },
-                      { mes: "Fev", receitas: 25000, despesas: 14000 },
-                      { mes: "Mar", receitas: 28000, despesas: 16000 },
-                      { mes: "Abr", receitas: 24000, despesas: 13000 },
-                      { mes: "Mai", receitas: 29000, despesas: 17000 },
-                      { mes: "Jun", receitas: 32000, despesas: 15000 },
+                      { tipo: "Receitas", previsao: aReceberPrevisao, realizado: jaRecebidoRealizado },
+                      { tipo: "Despesas", previsao: aPagarPrevisao, realizado: jaPagoRealizado }
                     ]} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                      <XAxis dataKey="mes" axisLine={false} tickLine={false} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} />
+                      <XAxis dataKey="tipo" axisLine={false} tickLine={false} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} />
                       <YAxis axisLine={false} tickLine={false} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} tickFormatter={(value) => `R$${value/1000}k`} />
-                      <Tooltip cursor={{ fill: "hsl(var(--muted))" }} contentStyle={{ backgroundColor: "hsl(var(--card))", borderColor: "hsl(var(--border))", borderRadius: "8px" }} />
-                      <Bar dataKey="receitas" fill="hsl(var(--success))" radius={[4, 4, 0, 0]} name="Receitas" />
-                      <Bar dataKey="despesas" fill="hsl(var(--destructive))" radius={[4, 4, 0, 0]} name="Despesas" />
+                      <Tooltip cursor={{ fill: "hsl(var(--muted))" }} formatter={(value) => `R$ ${Number(value).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`} contentStyle={{ backgroundColor: "hsl(var(--card))", borderColor: "hsl(var(--border))", borderRadius: "8px" }} />
+                      <Bar dataKey="previsao" fill="hsl(var(--chart-1))" radius={[4, 4, 0, 0]} name="Previsão" />
+                      <Bar dataKey="realizado" fill="hsl(var(--chart-2))" radius={[4, 4, 0, 0]} name="Realizado" />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
