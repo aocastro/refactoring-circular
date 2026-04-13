@@ -29,8 +29,6 @@ const PaginationControls = ({ currentPage, totalPages, totalItems, itemsPerPage,
             key={p}
             variant={p === currentPage ? "default" : "outline"}
             size="icon"
-            aria-label={"Página " + p}
-            aria-current={p === currentPage ? "page" : undefined}
             className={`h-8 w-8 ${p !== currentPage ? "border-border" : ""}`}
             onClick={() => onPageChange(p)}
             aria-label={`Ir para a página ${p}`}
