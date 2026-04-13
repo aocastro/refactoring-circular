@@ -17,6 +17,7 @@ import {
   BookOpen,
   Link2,
   Building2,
+  DollarSign,
   LogOut,
   ChevronDown,
 } from "lucide-react";
@@ -56,6 +57,12 @@ const menuItems: MenuItem[] = [
   { id: "minha-loja", title: "Minha Loja", icon: Store },
   { id: "minha-conta", title: "Minha Conta", icon: User },
   { id: "configuracoes", title: "Configurações", icon: Settings },
+  { id: "financeiro", title: "Financeiro", icon: DollarSign, children: [
+    { id: "financeiro-visao-geral", title: "Visão Geral" },
+    { id: "financeiro-pagar", title: "Contas a Pagar" },
+    { id: "financeiro-receber", title: "Contas a Receber" },
+    { id: "financeiro-categorias", title: "Categorias" },
+  ] },
   { id: "venda", title: "Venda", icon: ShoppingCart, children: [
     { id: "venda-produtos", title: "Produtos" },
     { id: "venda-smartlook", title: "SmartLook" },

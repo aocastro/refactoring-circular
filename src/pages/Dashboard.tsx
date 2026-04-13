@@ -42,6 +42,7 @@ const LinktreeContent = lazy(() => import("@/components/dashboard/LinktreeConten
 const LojasContent = lazy(() => import("@/components/dashboard/LojasContent"));
 const MinhaLojaContent = lazy(() => import("@/components/dashboard/MinhaLojaContent"));
 const SuporteContent = lazy(() => import("@/components/dashboard/SuporteContent"));
+const FinanceiroContent = lazy(() => import("@/components/dashboard/FinanceiroContent"));
 
 const SectionFallback = () => (
   <div className="rounded-xl border border-border bg-card p-6">
@@ -141,6 +142,11 @@ const Dashboard = () => {
       lojas: { label: "Lojas", content: <LojasContent /> },
       "minha-loja": { label: "Minha Loja", content: <MinhaLojaContent /> },
       suporte: { label: "Suporte", content: <SuporteContent /> },
+      financeiro: { label: "Financeiro", content: <FinanceiroContent onSectionChange={setActiveSection} /> },
+      "financeiro-visao-geral": { label: "Visão Geral Financeira", content: <FinanceiroContent defaultTab="visao-geral" onSectionChange={setActiveSection} /> },
+      "financeiro-pagar": { label: "Contas a Pagar", content: <FinanceiroContent defaultTab="contas-pagar" onSectionChange={setActiveSection} /> },
+      "financeiro-receber": { label: "Contas a Receber", content: <FinanceiroContent defaultTab="contas-receber" onSectionChange={setActiveSection} /> },
+      "financeiro-categorias": { label: "Categorias Financeiras", content: <FinanceiroContent defaultTab="categorias" onSectionChange={setActiveSection} /> },
     }),
     [user, editingProductId],
   );
