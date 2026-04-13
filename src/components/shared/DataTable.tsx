@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import type { ReactNode } from "react";
+import { ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 
 interface DataTableColumn {
@@ -17,6 +18,12 @@ interface DataTableProps<T> {
   emptyMessage?: string;
   header?: ReactNode;
   animated?: boolean;
+  onSort?: (key: string) => void;
+  sortKey?: string;
+  sortDirection?: "asc" | "desc" | null;
+}
+
+function DataTable<T>({ columns, data, renderRow, emptyMessage = "Nenhum item encontrado.", header, animated = false, onSort, sortKey, sortDirection }: DataTableProps<T>) {
   sortKey?: string;
   sortDirection?: "asc" | "desc";
   onSort?: (key: string) => void;
@@ -41,6 +48,8 @@ function DataTable<T>({ columns, data, renderRow, emptyMessage = "Nenhum item en
                   onClick={() => col.sortable && onSort && onSort(col.key)}
                   className={`py-3 px-4 text-muted-foreground font-medium ${
                     col.align === "right" ? "text-right" : col.align === "center" ? "text-center" : "text-left"
+                  } ${hideClass(col)} ${col.sortable ? "cursor-pointer select-none hover:bg-secondary/50" : ""}`}
+                  onClick={() => col.sortable && onSort && onSort(col.key)}
                   } ${hideClass(col)} ${col.sortable ? "cursor-pointer hover:bg-secondary/50 transition-colors" : ""}`}
                 >
                   <div className={`flex items-center gap-1 ${col.align === "right" ? "justify-end" : col.align === "center" ? "justify-center" : "justify-start"}`}>
