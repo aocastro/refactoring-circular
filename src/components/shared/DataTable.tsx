@@ -1,11 +1,13 @@
 import { motion } from "framer-motion";
 import type { ReactNode } from "react";
+import { ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
 
 interface DataTableColumn {
   key: string;
   label: string;
   hideOn?: "sm" | "md" | "lg";
   align?: "left" | "right" | "center";
+  sortable?: boolean;
 }
 
 interface DataTableProps<T> {
@@ -15,9 +17,12 @@ interface DataTableProps<T> {
   emptyMessage?: string;
   header?: ReactNode;
   animated?: boolean;
+  onSort?: (key: string) => void;
+  sortKey?: string;
+  sortDirection?: "asc" | "desc" | null;
 }
 
-function DataTable<T>({ columns, data, renderRow, emptyMessage = "Nenhum item encontrado.", header, animated = false }: DataTableProps<T>) {
+function DataTable<T>({ columns, data, renderRow, emptyMessage = "Nenhum item encontrado.", header, animated = false, onSort, sortKey, sortDirection }: DataTableProps<T>) {
   const hideClass = (col: DataTableColumn) => {
     if (!col.hideOn) return "";
     return col.hideOn === "sm" ? "hidden sm:table-cell" : col.hideOn === "md" ? "hidden md:table-cell" : "hidden lg:table-cell";
@@ -35,9 +40,21 @@ function DataTable<T>({ columns, data, renderRow, emptyMessage = "Nenhum item en
                   key={col.key}
                   className={`py-3 px-4 text-muted-foreground font-medium ${
                     col.align === "right" ? "text-right" : col.align === "center" ? "text-center" : "text-left"
-                  } ${hideClass(col)}`}
+                  } ${hideClass(col)} ${col.sortable ? "cursor-pointer select-none hover:bg-secondary/50" : ""}`}
+                  onClick={() => col.sortable && onSort && onSort(col.key)}
                 >
-                  {col.label}
+                  <div className={`flex items-center gap-1 ${col.align === "right" ? "justify-end" : col.align === "center" ? "justify-center" : "justify-start"}`}>
+                    {col.label}
+                    {col.sortable && (
+                      <span className="inline-flex">
+                        {sortKey === col.key ? (
+                          sortDirection === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                        ) : (
+                          <ArrowUpDown className="h-3 w-3 opacity-30" />
+                        )}
+                      </span>
+                    )}
+                  </div>
                 </th>
               ))}
             </tr>

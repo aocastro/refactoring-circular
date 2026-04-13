@@ -7,15 +7,8 @@ import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGri
 import DataTable from "@/components/shared/DataTable";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-
-interface Conta {
-  id: number;
-  descricao: string;
-  categoria: string;
-  vencimento: string;
-  valor: number;
-  status: "Pendente" | "Pago" | "Atrasado" | "Recebido";
-}
+import { FinanceiroContasReceber } from "./FinanceiroContasReceber";
+import { FinanceiroContasPagar } from "./FinanceiroContasPagar";
 
 interface FinCategoria {
   id: number;
@@ -181,93 +174,11 @@ const FinanceiroContent = ({ defaultTab = "visao-geral", onSectionChange }: Fina
         </TabsContent>
 
         <TabsContent value="contas-pagar" className="mt-6 space-y-4">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-4">
-            <div>
-              <h3 className="text-sm font-semibold text-foreground">Contas a Pagar</h3>
-              <p className="text-sm text-muted-foreground">Gerencie suas obrigações financeiras.</p>
-            </div>
-            <Button size="sm"><Plus className="mr-2 h-4 w-4" />Nova Conta</Button>
-          </div>
-          <DataTable<Conta>
-            columns={[
-              { key: "descricao", label: "Descrição" },
-              { key: "categoria", label: "Categoria", hideOn: "sm" },
-              { key: "vencimento", label: "Vencimento" },
-              { key: "valor", label: "Valor" },
-              { key: "status", label: "Status" },
-              { key: "acoes", label: "Ações", align: "right" },
-            ]}
-            data={[
-              { id: 1, descricao: "Aluguel da Loja", categoria: "Infraestrutura", vencimento: "10/04/2026", valor: 3500, status: "Pendente" },
-              { id: 2, descricao: "Fornecedor - Camisetas", categoria: "Fornecedores", vencimento: "15/04/2026", valor: 4200, status: "Pendente" },
-              { id: 3, descricao: "Conta de Luz", categoria: "Infraestrutura", vencimento: "05/04/2026", valor: 450, status: "Pago" },
-              { id: 4, descricao: "Marketing Social", categoria: "Marketing", vencimento: "01/04/2026", valor: 1500, status: "Atrasado" },
-            ]}
-            renderRow={(conta) => (
-              <tr key={conta.id} className="border-b border-border/50 transition-colors last:border-0 hover:bg-secondary/20">
-                <td className="px-4 py-3 font-medium text-foreground">{conta.descricao}</td>
-                <td className="hidden px-4 py-3 text-muted-foreground sm:table-cell">{conta.categoria}</td>
-                <td className="px-4 py-3 text-muted-foreground">{conta.vencimento}</td>
-                <td className="px-4 py-3 font-medium">R$ {conta.valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</td>
-                <td className="px-4 py-3">
-                  <Badge variant="outline" className={conta.status === "Pago" ? "bg-success/10 text-success" : conta.status === "Atrasado" ? "bg-destructive/10 text-destructive" : "bg-warning/10 text-warning"}>
-                    {conta.status}
-                  </Badge>
-                </td>
-                <td className="px-4 py-3 text-right">
-                  <div className="flex justify-end gap-1">
-                    <Button variant="ghost" size="icon" className="h-7 w-7"><Edit className="h-3.5 w-3.5" /></Button>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive"><Trash2 className="h-3.5 w-3.5" /></Button>
-                  </div>
-                </td>
-              </tr>
-            )}
-          />
+          <FinanceiroContasPagar />
         </TabsContent>
 
         <TabsContent value="contas-receber" className="mt-6 space-y-4">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-4">
-            <div>
-              <h3 className="text-sm font-semibold text-foreground">Contas a Receber</h3>
-              <p className="text-sm text-muted-foreground">Acompanhe suas receitas pendentes e recebidas.</p>
-            </div>
-            <Button size="sm"><Plus className="mr-2 h-4 w-4" />Nova Receita</Button>
-          </div>
-          <DataTable<Conta>
-            columns={[
-              { key: "descricao", label: "Descrição" },
-              { key: "categoria", label: "Categoria", hideOn: "sm" },
-              { key: "vencimento", label: "Recebimento" },
-              { key: "valor", label: "Valor" },
-              { key: "status", label: "Status" },
-              { key: "acoes", label: "Ações", align: "right" },
-            ]}
-            data={[
-              { id: 1, descricao: "Vendas Online (Cartão)", categoria: "Vendas", vencimento: "12/04/2026", valor: 8500, status: "Pendente" },
-              { id: 2, descricao: "Vendas PDV (Pix)", categoria: "Vendas", vencimento: "10/04/2026", valor: 3200, status: "Recebido" },
-              { id: 3, descricao: "Marketplace X", categoria: "Plataformas", vencimento: "15/04/2026", valor: 4100, status: "Pendente" },
-              { id: 4, descricao: "Parceria Influenciador", categoria: "Parcerias", vencimento: "05/04/2026", valor: 1200, status: "Recebido" },
-            ]}
-            renderRow={(conta) => (
-              <tr key={conta.id} className="border-b border-border/50 transition-colors last:border-0 hover:bg-secondary/20">
-                <td className="px-4 py-3 font-medium text-foreground">{conta.descricao}</td>
-                <td className="hidden px-4 py-3 text-muted-foreground sm:table-cell">{conta.categoria}</td>
-                <td className="px-4 py-3 text-muted-foreground">{conta.vencimento}</td>
-                <td className="px-4 py-3 font-medium text-success">R$ {conta.valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</td>
-                <td className="px-4 py-3">
-                  <Badge variant="outline" className={conta.status === "Recebido" ? "bg-success/10 text-success" : "bg-warning/10 text-warning"}>
-                    {conta.status}
-                  </Badge>
-                </td>
-                <td className="px-4 py-3 text-right">
-                  <div className="flex justify-end gap-1">
-                    <Button variant="ghost" size="icon" className="h-7 w-7"><Edit className="h-3.5 w-3.5" /></Button>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive"><Trash2 className="h-3.5 w-3.5" /></Button>
-                  </div>
-                </td>
-              </tr>
-            )}
-          />
+          <FinanceiroContasReceber />
         </TabsContent>
 
         <TabsContent value="categorias" className="mt-6 space-y-4">
