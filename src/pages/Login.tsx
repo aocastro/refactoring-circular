@@ -40,7 +40,16 @@ const Login = () => {
       );
 
       if (matchedUser) {
-        localStorage.setItem("user", JSON.stringify({ name: matchedUser.name, email: matchedUser.email }));
+        localStorage.setItem("user", JSON.stringify({ name: matchedUser.name, email: matchedUser.email, role: "admin" }));
+        navigate("/dashboard");
+      } else if (email === "carlos@loja.com" && password === "Senha@123") {
+        // Demo employee login (Carlos)
+        localStorage.setItem("user", JSON.stringify({
+          name: "Carlos Ribeiro",
+          email: "carlos@loja.com",
+          role: "lojista_funcionario",
+          permissoes: ["dashboard", "venda", "pdv", "clientes"]
+        }));
         navigate("/dashboard");
       } else {
         toast({
@@ -164,7 +173,20 @@ const Login = () => {
         aria-describedby="demo-credentials"
       >
         <p id="demo-credentials" className="text-center text-xs text-muted-foreground">
-          <strong className="text-foreground">Demo:</strong> maria_demo@uorak.com / Senha@123
+          <strong className="text-foreground">Demo Admin:</strong> maria_demo@uorak.com / Senha@123
+        </p>
+      </button>
+
+      <button
+        type="button"
+        onClick={() => {
+          setEmail("carlos@loja.com");
+          setPassword("Senha@123");
+        }}
+        className="mt-2 w-full cursor-pointer rounded-lg border border-border bg-secondary/50 p-3 transition-colors hover:bg-secondary"
+      >
+        <p className="text-center text-xs text-muted-foreground">
+          <strong className="text-foreground">Demo Funcionário:</strong> carlos@loja.com / Senha@123
         </p>
       </button>
     </AuthLayout>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { UserCog, Plus, Phone, Mail, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,8 +7,10 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import FilterToolbar from "@/components/shared/FilterToolbar";
 import { toast } from "sonner";
+import { getPlanPermissions } from "@/lib/permissions";
 
 interface Funcionario {
   id: number;
@@ -18,15 +20,16 @@ interface Funcionario {
   telefone: string;
   status: string;
   avatar: string;
+  permissoes: string[];
 }
 
 const initialData: Funcionario[] = [
-  { id: 1, nome: "Juliana Mendes", cargo: "Gerente", email: "juliana@loja.com", telefone: "(11) 99888-7766", status: "ativo", avatar: "JM" },
-  { id: 2, nome: "Carlos Ribeiro", cargo: "Vendedor", email: "carlos@loja.com", telefone: "(11) 99777-6655", status: "ativo", avatar: "CR" },
-  { id: 3, nome: "Fernanda Alves", cargo: "Costureira", email: "fernanda@loja.com", telefone: "(11) 99666-5544", status: "ativo", avatar: "FA" },
-  { id: 4, nome: "Ricardo Lima", cargo: "Estoquista", email: "ricardo@loja.com", telefone: "(11) 99555-4433", status: "férias", avatar: "RL" },
-  { id: 5, nome: "Beatriz Souza", cargo: "Vendedora", email: "beatriz@loja.com", telefone: "(11) 99444-3322", status: "ativo", avatar: "BS" },
-  { id: 6, nome: "Lucas Martins", cargo: "Social Media", email: "lucas@loja.com", telefone: "(11) 99333-2211", status: "inativo", avatar: "LM" },
+  { id: 1, nome: "Juliana Mendes", cargo: "Gerente", email: "juliana@loja.com", telefone: "(11) 99888-7766", status: "ativo", avatar: "JM", permissoes: ["dashboard", "venda", "clientes", "pdv", "relatorios", "cupons", "inventario"] },
+  { id: 2, nome: "Carlos Ribeiro", cargo: "Vendedor", email: "carlos@loja.com", telefone: "(11) 99777-6655", status: "ativo", avatar: "CR", permissoes: ["dashboard", "venda", "pdv", "clientes"] },
+  { id: 3, nome: "Fernanda Alves", cargo: "Costureira", email: "fernanda@loja.com", telefone: "(11) 99666-5544", status: "ativo", avatar: "FA", permissoes: ["dashboard", "servicos"] },
+  { id: 4, nome: "Ricardo Lima", cargo: "Estoquista", email: "ricardo@loja.com", telefone: "(11) 99555-4433", status: "férias", avatar: "RL", permissoes: ["dashboard", "inventario", "venda"] },
+  { id: 5, nome: "Beatriz Souza", cargo: "Vendedora", email: "beatriz@loja.com", telefone: "(11) 99444-3322", status: "ativo", avatar: "BS", permissoes: ["dashboard", "venda", "pdv", "clientes"] },
+  { id: 6, nome: "Lucas Martins", cargo: "Social Media", email: "lucas@loja.com", telefone: "(11) 99333-2211", status: "inativo", avatar: "LM", permissoes: ["dashboard", "blog", "meu-linktree", "newsletter"] },
 ];
 
 const statusColors: Record<string, string> = {
@@ -44,7 +47,26 @@ const FuncionariosContent = () => {
   const [filterCargo, setFilterCargo] = useState("Todos");
   const [filterStatus, setFilterStatus] = useState("Todos");
   const [showAddDialog, setShowAddDialog] = useState(false);
-  const [form, setForm] = useState({ nome: "", cargo: "", email: "", telefone: "" });
+  const [form, setForm] = useState<{nome: string, cargo: string, email: string, telefone: string, permissoes: string[]}>({ nome: "", cargo: "", email: "", telefone: "", permissoes: [] });
+  const [availablePerms, setAvailablePerms] = useState<string[]>([]);
+
+  useEffect(() => {
+    try {
+      const conf = JSON.parse(localStorage.getItem("storeConfig") || "{}");
+      setAvailablePerms(getPlanPermissions(conf.planName));
+    } catch {
+      // fallback
+    }
+  }, []);
+
+  const handleTogglePerm = (perm: string) => {
+    setForm(prev => {
+      if (prev.permissoes.includes(perm)) {
+        return { ...prev, permissoes: prev.permissoes.filter(p => p !== perm) };
+      }
+      return { ...prev, permissoes: [...prev.permissoes, perm] };
+    });
+  };
 
   const filtered = funcionarios.filter((f) => {
     const matchSearch = f.nome.toLowerCase().includes(search.toLowerCase()) || f.cargo.toLowerCase().includes(search.toLowerCase());
@@ -67,9 +89,10 @@ const FuncionariosContent = () => {
       telefone: form.telefone || "(00) 00000-0000",
       status: "ativo",
       avatar: initials,
+      permissoes: form.permissoes,
     };
     setFuncionarios((prev) => [newFunc, ...prev]);
-    setForm({ nome: "", cargo: "", email: "", telefone: "" });
+    setForm({ nome: "", cargo: "", email: "", telefone: "", permissoes: [] });
     setShowAddDialog(false);
     toast.success(`Funcionário ${form.nome} cadastrado com sucesso!`);
   };
@@ -146,6 +169,25 @@ const FuncionariosContent = () => {
             </div>
             <div><Label>E-mail</Label><Input type="email" placeholder="email@loja.com" value={form.email} onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))} className="mt-1 bg-secondary border-border" /></div>
             <div><Label>Telefone</Label><Input placeholder="(11) 99999-9999" value={form.telefone} onChange={(e) => setForm((p) => ({ ...p, telefone: e.target.value }))} className="mt-1 bg-secondary border-border" /></div>
+
+            <div className="space-y-2">
+              <Label>Permissões</Label>
+              <div className="grid grid-cols-2 gap-2 mt-2 max-h-40 overflow-y-auto p-2 border border-border rounded-md bg-secondary/50">
+                {availablePerms.map(perm => (
+                  <div key={perm} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`perm-${perm}`}
+                      checked={form.permissoes.includes(perm)}
+                      onCheckedChange={() => handleTogglePerm(perm)}
+                    />
+                    <label htmlFor={`perm-${perm}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                      {perm}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             <Button className="w-full bg-gradient-primary text-primary-foreground" onClick={handleAdd}>Cadastrar Funcionário</Button>
           </div>
         </DialogContent>
