@@ -21,9 +21,10 @@ import {
   LogOut,
   ChevronDown,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "@/assets/logo.png";
+import { getPlanPermissions } from "@/lib/permissions";
 import {
   Sidebar,
   SidebarContent,
@@ -97,6 +98,27 @@ export function DashboardSidebar({ activeSection, onSectionChange }: DashboardSi
   const navigate = useNavigate();
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
 
+  const [userRole, setUserRole] = useState<string>("admin");
+  const [userPerms, setUserPerms] = useState<string[]>([]);
+  const [planMaxPerms, setPlanMaxPerms] = useState<string[]>([]);
+
+  useEffect(() => {
+    try {
+      const u = JSON.parse(localStorage.getItem("user") || "{}");
+      if (u.role === "lojista_funcionario") {
+        setUserRole("lojista_funcionario");
+        setUserPerms(u.permissoes || []);
+      } else {
+        setUserRole("admin");
+      }
+
+      const conf = JSON.parse(localStorage.getItem("storeConfig") || "{}");
+      setPlanMaxPerms(getPlanPermissions(conf.planName));
+    } catch {
+      // fallback
+    }
+  }, []);
+
   const isChildActive = (item: MenuItem) => item.children?.some((c) => c.id === activeSection) ?? false;
 
   const isGroupOpen = (item: MenuItem) => openGroups[item.id] ?? isChildActive(item);
@@ -128,7 +150,20 @@ export function DashboardSidebar({ activeSection, onSectionChange }: DashboardSi
           <SidebarGroup>
             <SidebarGroupContent>
               <SidebarMenu>
-                {menuItems.map((item) =>
+                {menuItems
+                  .filter((item) => {
+                    // Check plan max permissions first
+                    if (!planMaxPerms.includes(item.id)) return false;
+
+                    // If it's an employee, check their specific permissions
+                    if (userRole === "lojista_funcionario") {
+                      return userPerms.includes(item.id);
+                    }
+
+                    // Otherwise (store admin), show everything the plan allows
+                    return true;
+                  })
+                  .map((item) =>
                   item.children ? (
                     <Collapsible key={item.id} open={isGroupOpen(item)}>
                       <SidebarMenuItem>
