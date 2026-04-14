@@ -9,6 +9,10 @@ import type { DataTableColumn } from "@/components/shared/DataTable";
 import { usePagination } from "@/hooks/use-pagination";
 import PaginationControls from "@/components/shared/PaginationControls";
 import { parse, format } from "date-fns";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 
 export interface Conta {
   id: number;
@@ -35,6 +39,8 @@ export function FinanceiroContasReceber() {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc" | null>(null);
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isRepetir, setIsRepetir] = useState(false);
 
   const handleSort = (key: string) => {
     const k = key as keyof Conta;
@@ -139,7 +145,94 @@ export function FinanceiroContasReceber() {
           <h3 className="text-sm font-semibold text-foreground">Contas a Receber</h3>
           <p className="text-sm text-muted-foreground">Acompanhe suas receitas pendentes e recebidas.</p>
         </div>
-        <Button size="sm"><Plus className="mr-2 h-4 w-4" />Nova Receita</Button>
+        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+          <DialogTrigger asChild>
+            <Button size="sm"><Plus className="mr-2 h-4 w-4" />Nova Receita</Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Nova Receita</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="descricao">Descrição</Label>
+                <Input id="descricao" placeholder="Ex: Venda de Produtos" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="valor">Valor R$</Label>
+                <Input id="valor" type="number" placeholder="Ex: 150.00" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="categoria">Categoria</Label>
+                <Select>
+                  <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="vendas">Vendas</SelectItem>
+                    <SelectItem value="servicos">Serviços</SelectItem>
+                    <SelectItem value="parcerias">Parcerias</SelectItem>
+                    <SelectItem value="outros">Outros</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="vencimento">Vencimento</Label>
+                <Input id="vencimento" type="date" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="associarCliente">Associar Cliente (Opcional)</Label>
+                <Select>
+                  <SelectTrigger><SelectValue placeholder="Selecione o Cliente" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="cliente1">João Silva</SelectItem>
+                    <SelectItem value="cliente2">Maria Souza</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="nomeManual">Nome Manual (Opcional)</Label>
+                <Input id="nomeManual" placeholder="Digite o nome..." />
+              </div>
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="observacoes">Observações</Label>
+                <Textarea id="observacoes" placeholder="Adicione observações relevantes..." className="resize-none" />
+              </div>
+              <div className="space-y-2 md:col-span-2 flex items-center justify-between border p-3 rounded-md">
+                <div className="space-y-0.5">
+                  <Label className="text-base">Repetir essa conta?</Label>
+                  <p className="text-sm text-muted-foreground">Configurar recorrência para esta receita.</p>
+                </div>
+                <Switch checked={isRepetir} onCheckedChange={setIsRepetir} />
+              </div>
+              {isRepetir && (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="frequencia">Frequência</Label>
+                    <Select>
+                      <SelectTrigger><SelectValue placeholder="Selecione a frequência" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="diario">Diário</SelectItem>
+                        <SelectItem value="semanal">Semanal</SelectItem>
+                        <SelectItem value="quinzenal">Quinzenal</SelectItem>
+                        <SelectItem value="mensal">Mensal</SelectItem>
+                        <SelectItem value="trimestral">Trimestral</SelectItem>
+                        <SelectItem value="semestral">Semestral</SelectItem>
+                        <SelectItem value="anual">Anual</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="parcelas">Número de parcelas</Label>
+                    <Input id="parcelas" type="number" min="1" placeholder="Ex: 12" />
+                  </div>
+                </>
+              )}
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsModalOpen(false)}>Cancelar</Button>
+              <Button onClick={() => setIsModalOpen(false)}>Salvar Receita</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-4 bg-card p-4 rounded-xl border border-border">
