@@ -1,4 +1,11 @@
-import { adminPlans } from "@/data/admin";
+const fs = require('fs');
+let content = fs.readFileSync('src/lib/permissions.ts', 'utf8');
+
+// We need to fetch the mock `adminPlans` to get real permissions configured by admin
+// The mock api doesn't actually persist across reloads (in-memory mock array) but we'll fetch from `adminPlans` directly
+// because `getPlanPermissions` is synchronous and can't do an API call.
+// Alternatively we can read the adminPlans mock data list.
+const newContent = `import { adminPlans } from "@/data/admin";
 
 export const getPlanPermissions = (planName: string): string[] => {
   const planNameLower = (planName || "Growth").toLowerCase();
@@ -50,3 +57,6 @@ export const getPlanPermissions = (planName: string): string[] => {
     "lojas",
   ];
 };
+`;
+
+fs.writeFileSync('src/lib/permissions.ts', newContent);
