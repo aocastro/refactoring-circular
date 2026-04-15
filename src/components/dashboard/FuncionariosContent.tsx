@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { UserCog, Plus, Phone, Mail, Trash2 } from "lucide-react";
+import { UserCog, Plus, Phone, Mail, Trash2, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -47,7 +47,8 @@ const FuncionariosContent = () => {
   const [filterCargo, setFilterCargo] = useState("Todos");
   const [filterStatus, setFilterStatus] = useState("Todos");
   const [showAddDialog, setShowAddDialog] = useState(false);
-  const [form, setForm] = useState<{nome: string, cargo: string, email: string, telefone: string, permissoes: string[]}>({ nome: "", cargo: "", email: "", telefone: "", permissoes: [] });
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [form, setForm] = useState<{nome: string, cargo: string, email: string, telefone: string, status: string, permissoes: string[]}>({ nome: "", cargo: "", email: "", telefone: "", status: "ativo", permissoes: [] });
   const [availablePerms, setAvailablePerms] = useState<string[]>([]);
 
   useEffect(() => {
@@ -75,26 +76,52 @@ const FuncionariosContent = () => {
     return matchSearch && matchCargo && matchStatus;
   });
 
+  const handleEdit = (f: Funcionario) => {
+    setForm({
+      nome: f.nome,
+      cargo: f.cargo,
+      email: f.email,
+      telefone: f.telefone,
+      status: f.status,
+      permissoes: f.permissoes,
+    });
+    setEditingId(f.id);
+    setShowAddDialog(true);
+  };
+
   const handleAdd = () => {
     if (!form.nome.trim() || !form.cargo.trim()) {
       toast.error("Nome e cargo são obrigatórios.");
       return;
     }
-    const initials = form.nome.split(" ").map((n) => n.charAt(0).toUpperCase()).slice(0, 2).join("");
-    const newFunc: Funcionario = {
-      id: Date.now(),
-      nome: form.nome,
-      cargo: form.cargo,
-      email: form.email || `${form.nome.toLowerCase().split(" ")[0]}@loja.com`,
-      telefone: form.telefone || "(00) 00000-0000",
-      status: "ativo",
-      avatar: initials,
-      permissoes: form.permissoes,
-    };
-    setFuncionarios((prev) => [newFunc, ...prev]);
-    setForm({ nome: "", cargo: "", email: "", telefone: "", permissoes: [] });
-    setShowAddDialog(false);
-    toast.success(`Funcionário ${form.nome} cadastrado com sucesso!`);
+
+    if (editingId !== null) {
+      setFuncionarios((prev) => prev.map((f) =>
+        f.id === editingId
+          ? { ...f, ...form }
+          : f
+      ));
+      setForm({ nome: "", cargo: "", email: "", telefone: "", status: "ativo", permissoes: [] });
+      setEditingId(null);
+      setShowAddDialog(false);
+      toast.success("Funcionário atualizado com sucesso!");
+    } else {
+      const initials = form.nome.split(" ").map((n) => n.charAt(0).toUpperCase()).slice(0, 2).join("");
+      const newFunc: Funcionario = {
+        id: Date.now(),
+        nome: form.nome,
+        cargo: form.cargo,
+        email: form.email || `${form.nome.toLowerCase().split(" ")[0]}@loja.com`,
+        telefone: form.telefone || "(00) 00000-0000",
+        status: form.status || "ativo",
+        avatar: initials,
+        permissoes: form.permissoes,
+      };
+      setFuncionarios((prev) => [newFunc, ...prev]);
+      setForm({ nome: "", cargo: "", email: "", telefone: "", status: "ativo", permissoes: [] });
+      setShowAddDialog(false);
+      toast.success(`Funcionário ${form.nome} cadastrado com sucesso!`);
+    }
   };
 
   const handleDelete = (id: number) => {
@@ -140,7 +167,10 @@ const FuncionariosContent = () => {
               <p className="flex items-center gap-1.5"><Mail className="h-3 w-3" />{f.email}</p>
               <p className="flex items-center gap-1.5"><Phone className="h-3 w-3" />{f.telefone}</p>
             </div>
-            <div className="flex justify-end">
+            <div className="flex justify-end gap-1">
+              <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground" onClick={() => handleEdit(f)}>
+                <Edit className="h-3.5 w-3.5" />
+              </Button>
               <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => handleDelete(f.id)}>
                 <Trash2 className="h-3.5 w-3.5" />
               </Button>
@@ -153,9 +183,15 @@ const FuncionariosContent = () => {
       </div>
 
       {/* Add Dialog */}
-      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+      <Dialog open={showAddDialog} onOpenChange={(open) => {
+        setShowAddDialog(open);
+        if (!open) {
+          setEditingId(null);
+          setForm({ nome: "", cargo: "", email: "", telefone: "", status: "ativo", permissoes: [] });
+        }
+      }}>
         <DialogContent className="max-w-md">
-          <DialogHeader><DialogTitle className="font-display">Novo Funcionário</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle className="font-display">{editingId ? "Editar Funcionário" : "Novo Funcionário"}</DialogTitle></DialogHeader>
           <div className="space-y-4">
             <div><Label>Nome *</Label><Input placeholder="Nome completo" value={form.nome} onChange={(e) => setForm((p) => ({ ...p, nome: e.target.value }))} className="mt-1 bg-secondary border-border" /></div>
             <div>
@@ -164,6 +200,15 @@ const FuncionariosContent = () => {
                 <SelectTrigger className="mt-1 bg-secondary border-border"><SelectValue placeholder="Selecione o cargo" /></SelectTrigger>
                 <SelectContent>
                   {cargos.filter((c) => c !== "Todos").map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Status</Label>
+              <Select value={form.status} onValueChange={(v) => setForm((p) => ({ ...p, status: v }))}>
+                <SelectTrigger className="mt-1 bg-secondary border-border"><SelectValue placeholder="Selecione o status" /></SelectTrigger>
+                <SelectContent>
+                  {["ativo", "inativo", "férias"].map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
@@ -188,7 +233,9 @@ const FuncionariosContent = () => {
               </div>
             </div>
 
-            <Button className="w-full bg-gradient-primary text-primary-foreground" onClick={handleAdd}>Cadastrar Funcionário</Button>
+            <Button className="w-full bg-gradient-primary text-primary-foreground" onClick={handleAdd}>
+              {editingId ? "Salvar Alterações" : "Cadastrar Funcionário"}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
