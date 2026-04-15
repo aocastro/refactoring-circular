@@ -132,6 +132,7 @@ mock.onPost('/api/admin/plans').reply((config) => {
     ...newPlan,
     id: Date.now(),
     status: newPlan.status || 'ativo',
+    permissions: newPlan.permissions || [],
     subscribers: 0,
   };
   mutableAdminPlans.push(planToAdd);

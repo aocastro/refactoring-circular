@@ -8,8 +8,33 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 import { type AdminPlan } from "@/data/admin";
 import { toast } from "sonner";
+
+
+const ALL_PERMISSIONS = [
+  { id: "dashboard", label: "Dashboard" },
+  { id: "minha-loja", label: "Minha Loja" },
+  { id: "minha-conta", label: "Minha Conta" },
+  { id: "configuracoes", label: "Configurações" },
+  { id: "venda", label: "Venda" },
+  { id: "clientes", label: "Clientes" },
+  { id: "suporte", label: "Suporte" },
+  { id: "funcionarios", label: "Funcionários" },
+  { id: "pdv", label: "PDV" },
+  { id: "relatorios", label: "Relatórios" },
+  { id: "cupons", label: "Cupons" },
+  { id: "blog", label: "Blog" },
+  { id: "inventario", label: "Inventário" },
+  { id: "financeiro", label: "Financeiro" },
+  { id: "servicos", label: "Serviços" },
+  { id: "consignantes", label: "Consignantes" },
+  { id: "fornecedores", label: "Fornecedores" },
+  { id: "newsletter", label: "Newsletter" },
+  { id: "meu-linktree", label: "Meu Linktree" },
+  { id: "lojas", label: "Múltiplas Lojas" },
+];
 
 const AdminPlanosContent = () => {
   const [loadingData, setLoadingData] = useState(true);
@@ -45,7 +70,8 @@ const AdminPlanosContent = () => {
     name: "",
     priceMonthly: 0,
     priceYearly: 0,
-    features: [""]
+    features: [""],
+    permissions: [] as string[]
   });
 
   const handleOpenDialog = (plan?: AdminPlan) => {
@@ -55,7 +81,8 @@ const AdminPlanosContent = () => {
         name: plan.name,
         priceMonthly: plan.priceMonthly,
         priceYearly: plan.priceYearly,
-        features: [...plan.features]
+        features: [...plan.features],
+        permissions: plan.permissions ? [...plan.permissions] : []
       });
     } else {
       setEditingPlan(null);
@@ -63,7 +90,8 @@ const AdminPlanosContent = () => {
         name: "",
         priceMonthly: 0,
         priceYearly: 0,
-        features: [""]
+        features: [""],
+        permissions: []
       });
     }
     setIsDialogOpen(true);
@@ -82,6 +110,18 @@ const AdminPlanosContent = () => {
   const removeFeature = (index: number) => {
     const newFeatures = formData.features.filter((_, i) => i !== index);
     setFormData({ ...formData, features: newFeatures });
+  };
+
+
+  const handlePermissionToggle = (permissionId: string) => {
+    setFormData((prev) => {
+      const current = prev.permissions;
+      if (current.includes(permissionId)) {
+        return { ...prev, permissions: current.filter(p => p !== permissionId) };
+      } else {
+        return { ...prev, permissions: [...current, permissionId] };
+      }
+    });
   };
 
   const fetchPlans = async () => {
@@ -144,12 +184,12 @@ const AdminPlanosContent = () => {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {plans.map((plan, i) => (
           <motion.div key={plan.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-            <Card className={plan.status === "inativo" ? "opacity-60" : ""}>
+            <Card className={`h-full flex flex-col ${plan.status === "inativo" ? "opacity-60" : ""}`}>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-lg">{plan.name}</CardTitle>
                 <Badge variant={plan.status === "ativo" ? "default" : "secondary"}>{plan.status}</Badge>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="flex-1 flex flex-col space-y-4">
                 <div className="flex items-baseline gap-1">
                   <span className="text-3xl font-bold text-foreground">R$ {plan.priceMonthly}</span>
                   <span className="text-sm text-muted-foreground">/mês</span>
@@ -167,7 +207,7 @@ const AdminPlanosContent = () => {
                   ))}
                 </ul>
 
-                <div className="flex gap-2 pt-2">
+                <div className="flex gap-2 pt-2 mt-auto">
                   <Button variant="outline" size="sm" className="flex-1" onClick={() => handleOpenDialog(plan)}>Editar</Button>
                   <Button variant="ghost" size="sm" onClick={() => toggleStatus(plan.id)} aria-label={`Alternar status do plano ${plan.name}`}>
                     {plan.status === "ativo" ? <ToggleRight className="h-5 w-5 text-green-600" /> : <ToggleLeft className="h-5 w-5 text-muted-foreground" />}
@@ -180,7 +220,7 @@ const AdminPlanosContent = () => {
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingPlan ? "Editar Plano" : "Novo Plano"}</DialogTitle>
           </DialogHeader>
@@ -239,6 +279,28 @@ const AdminPlanosContent = () => {
               </Button>
             </div>
           </div>
+
+            <div className="space-y-2">
+              <Label>Permissões de Acesso</Label>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 border rounded-md p-3 max-h-[200px] overflow-y-auto bg-muted/20">
+                {ALL_PERMISSIONS.map((perm) => (
+                  <div key={perm.id} className="flex flex-row items-start space-x-2">
+                    <Checkbox
+                      id={`perm-${perm.id}`}
+                      checked={formData.permissions.includes(perm.id)}
+                      onCheckedChange={() => handlePermissionToggle(perm.id)}
+                    />
+                    <label
+                      htmlFor={`perm-${perm.id}`}
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer select-none"
+                    >
+                      {perm.label}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancelar</Button>
             <Button onClick={handleSave}>Salvar</Button>
