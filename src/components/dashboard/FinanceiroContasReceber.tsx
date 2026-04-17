@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Plus, Edit, Trash2, Search, Filter } from "lucide-react";
+import { Plus, Edit, Trash2, Search, Filter, Calendar as CalendarIcon, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,7 @@ import DataTable from "@/components/shared/DataTable";
 import type { DataTableColumn } from "@/components/shared/DataTable";
 import { usePagination } from "@/hooks/use-pagination";
 import PaginationControls from "@/components/shared/PaginationControls";
-import { parse, format } from "date-fns";
+import { parse, format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, startOfWeek, endOfWeek } from "date-fns";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -39,6 +39,8 @@ export function FinanceiroContasReceber() {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc" | null>(null);
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
+  const [viewMode, setViewMode] = useState<"table" | "calendar">("table");
+  const [currentDate, setCurrentDate] = useState(new Date());
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isRepetir, setIsRepetir] = useState(false);
 
@@ -129,6 +131,12 @@ export function FinanceiroContasReceber() {
 
   const { paginatedItems, totalPages, totalItems } = usePagination(filteredAndSortedData, itemsPerPage, page);
 
+  const calendarDays = useMemo(() => {
+    const start = startOfWeek(startOfMonth(currentDate));
+    const end = endOfWeek(endOfMonth(currentDate));
+    return eachDayOfInterval({ start, end });
+  }, [currentDate]);
+
   const columns: DataTableColumn[] = [
     { key: "descricao", label: "Descrição", sortable: true },
     { key: "categoria", label: "Categoria", hideOn: "sm", sortable: true },
@@ -145,10 +153,29 @@ export function FinanceiroContasReceber() {
           <h3 className="text-sm font-semibold text-foreground">Contas a Receber</h3>
           <p className="text-sm text-muted-foreground">Acompanhe suas receitas pendentes e recebidas.</p>
         </div>
-        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-          <DialogTrigger asChild>
-            <Button size="sm"><Plus className="mr-2 h-4 w-4" />Nova Receita</Button>
-          </DialogTrigger>
+        <div className="flex items-center gap-2">
+           <div className="flex bg-secondary rounded-md p-1">
+             <Button
+               variant={viewMode === "table" ? "secondary" : "ghost"}
+               size="sm"
+               className="h-8 px-2"
+               onClick={() => setViewMode("table")}
+             >
+               <List className="h-4 w-4 mr-1" /> Lista
+             </Button>
+             <Button
+               variant={viewMode === "calendar" ? "secondary" : "ghost"}
+               size="sm"
+               className="h-8 px-2"
+               onClick={() => setViewMode("calendar")}
+             >
+               <CalendarIcon className="h-4 w-4 mr-1" /> Calendário
+             </Button>
+           </div>
+          <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+            <DialogTrigger asChild>
+              <Button size="sm"><Plus className="mr-2 h-4 w-4" />Nova Receita</Button>
+            </DialogTrigger>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Nova Receita</DialogTitle>
@@ -233,6 +260,7 @@ export function FinanceiroContasReceber() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-4 bg-card p-4 rounded-xl border border-border">
@@ -276,42 +304,86 @@ export function FinanceiroContasReceber() {
       </div>
 
 
-      <DataTable<Conta>
-        columns={columns}
-        data={paginatedItems}
-        onSort={handleSort}
-        sortKey={sortKey || undefined}
-        sortDirection={sortDirection}
-        renderRow={(conta) => (
-          <tr key={conta.id} className="border-b border-border/50 transition-colors last:border-0 hover:bg-secondary/20">
-            <td className="px-4 py-3 font-medium text-foreground">{conta.descricao}</td>
-            <td className="hidden px-4 py-3 text-muted-foreground sm:table-cell">{conta.categoria}</td>
-            <td className="px-4 py-3 text-muted-foreground">{conta.vencimento}</td>
-            <td className="px-4 py-3 font-medium text-success">R$ {conta.valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</td>
-            <td className="px-4 py-3">
-              <Badge variant="outline" className={conta.status === "Recebido" ? "bg-success/10 text-success" : "bg-warning/10 text-warning"}>
-                {conta.status}
-              </Badge>
-            </td>
-            <td className="px-4 py-3 text-right">
-              <div className="flex justify-end gap-1">
-                {conta.status === "Pendente" && (
-                  <Button variant="outline" size="sm" onClick={() => handleBaixa(conta.id)} className="mr-2">Dar Baixa</Button>
-                )}
-                <Button variant="ghost" size="icon" className="h-7 w-7"><Edit className="h-3.5 w-3.5" /></Button>
-                <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive"><Trash2 className="h-3.5 w-3.5" /></Button>
+      {viewMode === "table" ? (
+        <>
+          <DataTable<Conta>
+            columns={columns}
+            data={paginatedItems}
+            onSort={handleSort}
+            sortKey={sortKey || undefined}
+            sortDirection={sortDirection}
+            renderRow={(conta) => (
+              <tr key={conta.id} className="border-b border-border/50 transition-colors last:border-0 hover:bg-secondary/20">
+                <td className="px-4 py-3 font-medium text-foreground">{conta.descricao}</td>
+                <td className="hidden px-4 py-3 text-muted-foreground sm:table-cell">{conta.categoria}</td>
+                <td className="px-4 py-3 text-muted-foreground">{conta.vencimento}</td>
+                <td className="px-4 py-3 font-medium text-success">R$ {conta.valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</td>
+                <td className="px-4 py-3">
+                  <Badge variant="outline" className={conta.status === "Recebido" ? "bg-success/10 text-success" : "bg-warning/10 text-warning"}>
+                    {conta.status}
+                  </Badge>
+                </td>
+                <td className="px-4 py-3 text-right">
+                  <div className="flex justify-end gap-1">
+                    {conta.status === "Pendente" && (
+                      <Button variant="outline" size="sm" onClick={() => handleBaixa(conta.id)} className="mr-2">Dar Baixa</Button>
+                    )}
+                    <Button variant="ghost" size="icon" className="h-7 w-7"><Edit className="h-3.5 w-3.5" /></Button>
+                    <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive"><Trash2 className="h-3.5 w-3.5" /></Button>
+                  </div>
+                </td>
+              </tr>
+            )}
+          />
+          <PaginationControls
+            currentPage={page}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+            onPageChange={setPage}
+          />
+        </>
+      ) : (
+        <div className="bg-card rounded-xl border border-border p-4">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold text-foreground">
+              {format(currentDate, "MMMM yyyy")}
+            </h3>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() - 1)))}>Mês Anterior</Button>
+              <Button variant="outline" size="sm" onClick={() => setCurrentDate(new Date())}>Hoje</Button>
+              <Button variant="outline" size="sm" onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() + 1)))}>Próximo Mês</Button>
+            </div>
+          </div>
+          <div className="grid grid-cols-7 gap-1">
+            {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map((day) => (
+              <div key={day} className="text-center font-medium text-sm text-muted-foreground py-2">
+                {day}
               </div>
-            </td>
-          </tr>
-        )}
-      />
-      <PaginationControls
-        currentPage={page}
-        totalPages={totalPages}
-        totalItems={totalItems}
-        itemsPerPage={itemsPerPage}
-        onPageChange={setPage}
-      />
+            ))}
+            {calendarDays.map((day, idx) => {
+              const dayStr = format(day, "dd/MM/yyyy");
+              const dayExpenses = filteredAndSortedData.filter(d => d.vencimento === dayStr);
+
+              return (
+                <div
+                  key={idx}
+                  className={`min-h-[100px] p-2 border border-border rounded-md ${!isSameMonth(day, currentDate) ? "bg-muted/50 opacity-50" : "bg-card"} ${isToday(day) ? "ring-2 ring-primary" : ""}`}
+                >
+                  <div className="text-right text-xs font-medium mb-1">{format(day, "d")}</div>
+                  <div className="space-y-1">
+                    {dayExpenses.map(expense => (
+                      <div key={expense.id} className={`text-xs p-1 rounded-sm truncate ${expense.status === "Recebido" ? "bg-success/20 text-success-foreground" : expense.status === "Atrasado" ? "bg-destructive/20 text-destructive-foreground" : "bg-warning/20 text-warning-foreground"}`} title={`${expense.descricao} - R$ ${expense.valor}`}>
+                        R$ {expense.valor}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
